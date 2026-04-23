@@ -1,0 +1,29 @@
+services:
+  web:
+    build: ./web_natrent
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./web_natrent:/usr/src/app/
+    ports:
+      - 1337:8000
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-kdbc_ud&-shv0zehg93f1lbv0kb*ovwhr(xu$e#)=43_#0qig6
+      - POSTGRES_DB=natrent_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=ruKDgx7JZL3Bn9Q2gDctsI070bR2BA
+      - POSTGRES_HOST=db
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: natrent_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: ruKDgx7JZL3Bn9Q2gDctsI070bR2BA
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

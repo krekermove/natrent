@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EliteHouses - Аренда частных домов для отдыха</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <style>
+        .hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 70vh;
+        }
+
+        .booking-form {
+            transform: translateY(50%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                height: 60vh;
+            }
+            .booking-form {
+                transform: translateY(20%);
+            }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Навигационная панель -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-home text-2xl text-blue-600"></i>
+                    <span class="text-xl font-bold text-gray-800">NatRent</span>
+                </div>
+
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-blue-600 font-medium">Главная</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">Дома</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">О нас</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">Отзывы</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">Контакты</a>
+                </div>
+
+                <div class="md:hidden">
+                    <button class="text-gray-600 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+    {% endblock content %}
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">EliteHouses</h3>
+                    <p class="text-gray-400">Мы предлагаем лучшие частные дома для аренды по всей стране.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Навигация</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Главная</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Дома</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">О нас</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Отзывы</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Контакты</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-phone"></i>
+                            <span>+7 (123) 456-78-90</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-envelope"></i>
+                            <span>info@elitehouses.ru</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Москва, ул. Примерная, 123</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-4">Подписаться</h4>
+                    <p class="text-gray-400 mb-4">Будьте в курсе наших новых предложений.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook-f text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-telegram text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-vk text-xl"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2023 EliteHouses. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Обработка формы бронирования
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const dates = document.getElementById('dates').value;
+            const guests = document.getElementById('guests').value;
+
+            if(!dates) {
+                alert('Пожалуйста, выберите даты проживания');
+                return;
+            }
+
+            // Здесь будет логика поиска домов
+            alert(`Ищем дома для ${guests} гостей на период ${dates}. В реальном приложении здесь был бы переход к результатам поиска.`);
+
+            // В реальном приложении здесь был бы редирект или AJAX запрос
+            // window.location.href = `/search?dates=${dates}&guests=${guests}`;
+        });
+
+        // Инициализация выбора дат (в реальном приложении можно подключить datepicker)
+        document.getElementById('dates').addEventListener('focus', function() {
+            this.type = 'date';
+        });
+    </script>
+</body>
+</html>

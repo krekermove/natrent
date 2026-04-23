@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Премиальная аренда недвижимости | Luxury Rentals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+        .hero-gradient {
+            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
+        }
+        .property-card:hover .property-overlay {
+            opacity: 1;
+        }
+        .booking-form {
+            transform: translateY(50%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            -webkit-appearance: none; /* Для кастомизации select */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-6.5%200-12.3%203.2-16.2%208.4-4%205.1-4.7%2011.6-1.7%2017.3l138.5%20227.7c3.5%205.7%209.5%209.2%2016.2%209.2c6.6%200%2012.7-3.5%2016.2-9.2L287%2086.1c3-5.7%202.3-12.2-1.7-17.3z%22%2F%3E%3C%2Fsvg%3E'); /* Стрелка для селекта */
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+            cursor: pointer;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #007bff; /* Пример синего фокуса */
+        }
+
+        /* Стили для календаря (скрыт по умолчанию) */
+        /*.date-picker-calendar-popup {*/
+        /*    position: absolute;*/
+        /*    bottom: calc(100% + 15px); !* Отступ над формой *!*/
+        /*    left: 0; !* Или по центру, в зависимости от желаемого расположения *!*/
+        /*    background-color: #fff;*/
+        /*    border-radius: 8px;*/
+        /*    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);*/
+        /*    padding: 20px;*/
+        /*    display: flex; !* Для двухмесячного календаря *!*/
+        /*    gap: 20px;*/
+        /*    z-index: 20; !* Выше формы *!*/
+        /*    opacity: 0;*/
+        /*    visibility: hidden;*/
+        /*    transform: translateY(10px);*/
+        /*    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;*/
+        /*}*/
+        .date-picker-calendar-popup {
+            position: absolute;
+            bottom: calc(100% + 15px); /* Отступ над формой */
+            left: 0; /* Или по центру, в зависимости от желаемого расположения */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            display: flex; /* Для размещения модулей календарей и действий рядом */
+            gap: 30px; /* Отступ между календарными модулями */
+            z-index: 20; /* Выше формы */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            align-items: flex-start; /* Выравнивает элементы по верху, чтобы кнопка "Очистить" не центрировалась */
+        }
+
+        .date-picker-calendar-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .guests-popup {
+            position: absolute;
+            bottom: calc(100% + 15px); /* Отступ над формой */
+            right: 25%; /* Или по центру, в зависимости от желаемого расположения */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            display: flex; /* Для размещения модулей календарей и действий рядом */
+            gap: 30px; /* Отступ между календарными модулями */
+            z-index: 20; /* Выше формы */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            align-items: center;
+            height: 90px;
+            width: 28%;
+        }
+        .guests-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .guests-picker {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10%;
+            height: 60px;
+        }
+
+        .guests_counter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+            height: 70%;
+        }
+
+        .guests_counter button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px 12px;
+        }
+
+        .guests_value {
+            font-size: 18px;
+        }
+
+        .guests_counter button[disabled] {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background-color: #f0f0f0;
+        }
+
+        .calendar-module {
+            display: flex;
+            flex-direction: column; /* Элементы внутри модуля располагаются вертикально */
+            /* Можете добавить ширину, если календари должны быть фиксированного размера */
+            width: 280px;
+            height: 340px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between; /* Размещает стрелки по краям, а месяц/год по центру */
+            align-items: center;
+            margin-bottom: 15px; /* Отступ между заголовком и днями недели */
+            font-size: 1.1em; /* Размер шрифта для месяца и года */
+            font-weight: bold;
+            color: #333;
+        }
+
+        .calendar-header .month-year-display1 {
+            flex-grow: 1; /* Позволяет названию месяца/года занимать доступное пространство */
+            text-align: center; /* Центрирует текст */
+            margin: 0 10px; /* Отступы от кнопок навигации */
+        }
+
+        .calendar-header .month-year-display2 {
+            flex-grow: 1; /* Позволяет названию месяца/года занимать доступное пространство */
+            text-align: center; /* Центрирует текст */
+            margin: 0 10px; /* Отступы от кнопок навигации */
+        }
+
+        .calendar-header .nav-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px 10px;
+        }
+
+        .calendar-grid-1 {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .calendar-grid-1 .weekday {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .calendar-grid-1 .day {
+            display: flex;
+            padding: 8px 0;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .calendar-grid-1 .day.today {
+            font-size: 13px;
+            border: 1px solid green; /* Выделяем текущий день */
+            font-weight: bold;
+        }
+
+        .calendar-grid-1 .day.other-month {
+            color: #bbb;
+            cursor: default;
+            visibility: hidden;
+        }
+
+        .calendar-grid-1 .day:not(.other-month):hover {
+            background-color: #f0f0f0;
+        }
+
+        .calendar-grid-1 .day.clicked {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: 600;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .calendar-grid-1 .day.middle {
+            background-color: #e0f2ff; /* Светло-голубой для диапазона */
+            color: #333;
+            border-radius: 0; /* Убираем закругления для середины диапазона */
+        }
+
+        .calendar-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .calendar-grid-2 .weekday {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .calendar-grid-2 .day {
+            padding: 8px 0;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .calendar-grid-2 .day.other-month {
+            color: #bbb;
+            cursor: default;
+            visibility: hidden;
+        }
+
+        .calendar-grid-2 .day:not(.other-month):hover {
+            background-color: #f0f0f0;
+        }
+
+        .calendar-grid-2 .day.clicked {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: 600;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .calendar-grid-2 .day.middle {
+            background-color: #e0f2ff; /* Светло-голубой для диапазона */
+            color: #333;
+            border-radius: 0; /* Убираем закругления для середины диапазона */
+        }
+
+        .date-picker-actions {
+            position: absolute;
+            bottom: 5px;
+        }
+
+        .clear-button {
+            text-decoration-line: underline;
+            text-underline-offset: 2px;
+        }
+
+        .calendar-footer {
+            padding-top: 15px;
+            text-align: right;
+        }
+
+        .calendar-footer .clear-button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-footer .clear-button:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dates {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dates:hover {
+            background-color: lightgrey;
+        }
+
+        .active {
+            background-color: lightgrey;
+        }
+
+        /* Адаптация для мобильных устройств, если нужна */
+        @media (max-width: 768px) {
+            .date-picker-calendar-popup {
+                width: 90%; /* Шире для мобильных */
+                left: 5%;
+                right: 5%;
+                transform: translateX(0); /* Убираем transform для центрирования */
+                flex-direction: column; /* Месяцы друг под другом */
+                gap: 10px;
+                bottom: calc(100% + 10px);
+            }
+            .guests-popup {
+                width: 90%; /* Шире для мобильных */
+                left: 5%;
+                right: 5%;
+                transform: translateX(0); /* Убираем transform для центрирования */
+                flex-direction: column; /* Месяцы друг под другом */
+                gap: 10px;
+                bottom: calc(100% + 10px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm fixed w-full z-10 rounded-b-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center">
+                        <i data-feather="home" class="h-6 w-6 text-indigo-600"></i>
+                        <span class="ml-2 text-xl font-playfair font-semibold text-gray-800">NatRent</span>
+                    </a>
+                </div>
+                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                    <a href="#properties" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Объекты</a>
+                    <a href="#about" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">О нас</a>
+                    <a href="#contact" class="text-gray-900 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Контакты</a>
+                    <a href="#booking" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition duration-300">Забронировать</a>
+                </div>
+                <div class="-mr-2 flex items-center md:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <i data-feather="menu"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1">
+                <a href="#properties" class="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Объекты</a>
+                <a href="#about" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">О нас</a>
+                <a href="#contact" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Контакты</a>
+                <a href="#booking" class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">Забронировать</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative bg-gray-900">
+        <div class="fun">
+            <img class="absolute w-full h-full object-cover" src="../../../media/houses/house1.jpg" alt="Luxury property">
+            <div class="absolute inset-0 hero-gradient"></div>
+        </div>
+        <div class="relative max-w-7xl mx-auto py-10 px-4 sm:pt-32 lg:px-2">
+            <h1 class="text-4xl font-playfair font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">Комфортный отдых в Санкт-Петербурге и Ленинградской области</h1>
+            <p class="mt-12 max-w-4xl text-4xl text-gray-300">Предлагаем Вам уютные дома в Лен.обл с баней, бассейном и сибирский чан. Баня премиум-класса, изготовлена мастерами на Урале. А также, если Вам нужно остановиться в СПб, то для Вас есть квартира недалеко от центра и клиники Скандинавия на Ленинском проеспекте.</p>
+<!--            <div class="mt-10">-->
+<!--                <a href="#properties" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition duration-300">-->
+<!--                    Посмотреть объекты-->
+<!--                    <i data-feather="arrow-right" class="ml-2 w-4 h-4"></i>-->
+<!--                </a>-->
+<!--            </div>-->
+        </div>
+
+
+        <div id="booking" class="bg-gray-100 pb-16">
+            <div class="container mx-auto px-4">
+                <div class="booking-form bg-white rounded-xl p-8 max-w-4xl mx-auto">
+<!--                    <h2 class="text-2xl font-bold mb-6 text-center">Найти идеальный дом для отдыха</h2>-->
+
+                    <div id="calendar" class="date-picker-calendar-popup">
+                        <!-- Первый календарь -->
+                        <div class="calendar-module">
+                            <div class="calendar-header">
+                                <button class="nav-button prev-month" style="visibility: hidden;">&lt;</button>
+                                <span class="month-year-display1"></span>
+                            </div>
+                            <div class="calendar-grid-1">
+
+                            </div>
+                            <div class="date-picker-actions">
+                                <button class="clear-button">Очистить даты</button>
+                            </div>
+                        </div>
+
+                        <!-- Второй календарь -->
+                        <div class="calendar-module">
+                            <div class="calendar-header">
+                                <span class="month-year-display2"></span>
+                                <button class="nav-button next-month">&gt;</button>
+                            </div>
+                            <div class="calendar-grid-2">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="guestsPopup" class="guests-popup">
+                        <div class="guests-picker">
+                            <span>Количество</span>
+                            <div class="guests_counter">
+                                <button class="dec_guests_number" disabled>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.7 11.7v-1.4H4.3v1.4h11.4Z" fill="currentColor"></path>
+                                    </svg>
+                                </button>
+                                <span class="guests_value">1</span>
+                                <button class="inc_guests_number">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.3 11.7v5h1.4v-5h5v-1.4h-5v-5H9.3v5h-5v1.4h5Z" fill="currentColor"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="bookingForm" action="{% url 'main:main_page' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4" method="post">
+                        {% csrf_token %}
+                        <div class="md:col-span-2">
+                            <input type="hidden" name="firstInputDate" value="">
+                            <input type="hidden" name="secondInputDate" value="">
+                            <label for="dates" class="block text-gray-700 font-medium mb-2">Даты проживания</label>
+                            <div class="relative">
+                                <div type="text" id="dates" class="dates w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <span>Выберите даты</span>
+                                </div>
+                                <i class="fas fa-calendar-alt absolute right-3 top-4 text-gray-400"></i>
+                            </div>
+                            {% if date_input_error %}
+                                <div class="date_input_error" style="position:absolute; color: red">
+                                    <span>{{ date_input_error }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="guests" class="block text-gray-700 font-medium mb-2">Количество гостей</label>
+                            <div class="relative">
+                                <input type="hidden" name="guestInputValue" value="1">
+                                <div type="text" id="guests" class="dates w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <span>1 гость</span>
+                                </div>
+                            </div>
+                        </div>
+
+<!--                        <div>-->
+<!--                            <label for="guests" class="block text-gray-700 font-medium mb-2">Гости</label>-->
+<!--                            <select id="guests" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">-->
+<!--                                <option value="1">1 гость</option>-->
+<!--                                <option value="2">2 гостя</option>-->
+<!--                                <option value="3">3 гостя</option>-->
+<!--                                <option value="4">4 гостя</option>-->
+<!--                                <option value="5">5+ гостей</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                                Найти дома
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- Properties Section -->
+    <section id="properties" class="py-12 sm:py-16 lg:py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-playfair font-bold text-gray-900 sm:text-4xl">Наши объекты</h2>
+                <p class="mt-4 max-w-2xl text-xl text-gray-600 mx-auto">Выберите идеальное место для вашего проживания</p>
+            </div>
+
+            <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                <!-- Property 1 -->
+                <div class="property-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl" data-aos="fade-up">
+                    <div class="relative h-64">
+                        <img class="w-full h-full object-cover" src="#" alt="Modern apartment">
+                        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center property-overlay opacity-0 transition-opacity duration-300">
+                            <a href="#booking" class="bg-white text-indigo-600 px-6 py-2 rounded-md font-medium hover:bg-indigo-600 hover:text-white transition duration-300">Забронировать</a>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">$250/ночь</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-playfair font-bold text-gray-900">Современная квартира в центре</h3>
+                        <div class="mt-2 flex items-center text-gray-600">
+                            <i data-feather="map-pin" class="w-4 h-4 mr-1"></i>
+                            <span>Москва, Центральный округ</span>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="users" class="w-4 h-4 mr-1"></i>
+                                    <span>4 гостя</span>
+                                </div>
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="home" class="w-4 h-4 mr-1"></i>
+                                    <span>2 спальни</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-indigo-600">
+                                <i data-feather="star" class="w-4 h-4 mr-1 fill-current"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property 2 -->
+                <div class="property-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl" data-aos="fade-up" data-aos-delay="100">
+                    <div class="relative h-64">
+                        <img class="w-full h-full object-cover" src="#" alt="Luxury villa">
+                        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center property-overlay opacity-0 transition-opacity duration-300">
+                            <a href="#booking" class="bg-white text-indigo-600 px-6 py-2 rounded-md font-medium hover:bg-indigo-600 hover:text-white transition duration-300">Забронировать</a>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">$450/ночь</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-playfair font-bold text-gray-900">Загородная вилла с бассейном</h3>
+                        <div class="mt-2 flex items-center text-gray-600">
+                            <i data-feather="map-pin" class="w-4 h-4 mr-1"></i>
+                            <span>Подмосковье, Рублево-Успенское ш.</span>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="users" class="w-4 h-4 mr-1"></i>
+                                    <span>8 гостей</span>
+                                </div>
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="home" class="w-4 h-4 mr-1"></i>
+                                    <span>4 спальни</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-indigo-600">
+                                <i data-feather="star" class="w-4 h-4 mr-1 fill-current"></i>
+                                <span>4.8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property 3 -->
+                <div class="property-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl" data-aos="fade-up" data-aos-delay="200">
+                    <div class="relative h-64">
+                        <img class="w-full h-full object-cover" src="#" alt="Downtown loft">
+                        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center property-overlay opacity-0 transition-opacity duration-300">
+                            <a href="#booking" class="bg-white text-indigo-600 px-6 py-2 rounded-md font-medium hover:bg-indigo-600 hover:text-white transition duration-300">Забронировать</a>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">$350/ночь</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-playfair font-bold text-gray-900">Лофт в деловом центре</h3>
+                        <div class="mt-2 flex items-center text-gray-600">
+                            <i data-feather="map-pin" class="w-4 h-4 mr-1"></i>
+                            <span>Москва, Сити</span>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="users" class="w-4 h-4 mr-1"></i>
+                                    <span>6 гостей</span>
+                                </div>
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="home" class="w-4 h-4 mr-1"></i>
+                                    <span>3 спальни</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-indigo-600">
+                                <i data-feather="star" class="w-4 h-4 mr-1 fill-current"></i>
+                                <span>4.7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property 4 -->
+                <div class="property-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl" data-aos="fade-up" data-aos-delay="300">
+                    <div class="relative h-64">
+                        <img class="w-full h-full object-cover" src="#" alt="Lake house">
+                        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center property-overlay opacity-0 transition-opacity duration-300">
+                            <a href="#booking" class="bg-white text-indigo-600 px-6 py-2 rounded-md font-medium hover:bg-indigo-600 hover:text-white transition duration-300">Забронировать</a>
+                        </div>
+                        <div class="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-medium">$550/ночь</div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-playfair font-bold text-gray-900">Дом на озере</h3>
+                        <div class="mt-2 flex items-center text-gray-600">
+                            <i data-feather="map-pin" class="w-4 h-4 mr-1"></i>
+                            <span>Ленинградская область</span>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="flex space-x-4">
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="users" class="w-4 h-4 mr-1"></i>
+                                    <span>10 гостей</span>
+                                </div>
+                                <div class="flex items-center text-gray-600">
+                                    <i data-feather="home" class="w-4 h-4 mr-1"></i>
+                                    <span>5 спален</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center text-indigo-600">
+                                <i data-feather="star" class="w-4 h-4 mr-1 fill-current"></i>
+                                <span>4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-12 sm:py-16 lg:py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+                <div class="lg:col-span-5" data-aos="fade-right">
+                    <div class="relative">
+                        <img class="w-full rounded-lg shadow-xl" src="#" alt="About us">
+                        <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-lg shadow-lg">
+                            <div class="text-3xl font-playfair font-bold text-indigo-600">4+</div>
+                            <div class="text-gray-600">года на рынке</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 lg:mt-0 lg:col-span-7" data-aos="fade-left">
+                    <h2 class="text-3xl font-playfair font-bold text-gray-900 sm:text-4xl">О нашей компании</h2>
+                    <p class="mt-6 text-lg text-gray-600">Мы специализируемся на предоставлении элитных объектов недвижимости для краткосрочной и долгосрочной аренды. Наша цель — обеспечить клиентам максимальный комфорт и премиальный сервис.</p>
+                    <div class="mt-8">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
+                                    <i data-feather="shield"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-playfair font-medium text-gray-900">Безопасность и надежность</h3>
+                                <p class="mt-2 text-gray-600">Все наши объекты проходят тщательную проверку и соответствуют самым высоким стандартам безопасности.</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
+                                    <i data-feather="award"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-playfair font-medium text-gray-900">Премиальное качество</h3>
+                                <p class="mt-2 text-gray-600">Мы тщательно отбираем объекты и обеспечиваем их безупречное состояние для наших клиентов.</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
+                                    <i data-feather="headphones"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-playfair font-medium text-gray-900">Круглосуточная поддержка</h3>
+                                <p class="mt-2 text-gray-600">Наша служба поддержки доступна 24/7 для решения любых вопросов и помощи нашим гостям.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+<!--    <section id="booking1" class="py-12 sm:py-16 lg:py-20 bg-indigo-700">-->
+<!--        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">-->
+<!--            <div class="lg:grid lg:grid-cols-12 lg:gap-8">-->
+<!--                <div class="lg:col-span-5 mb-10 lg:mb-0" data-aos="fade-right">-->
+<!--                    <h2 class="text-3xl font-playfair font-bold text-white sm:text-4xl">Забронируйте ваш идеальный отдых</h2>-->
+<!--                    <p class="mt-6 text-lg text-indigo-200">Выберите один из наших объектов и укажите желаемые даты для бронирования. Мы свяжемся с вами для подтверждения брони в течение 24 часов.</p>-->
+<!--                    <div class="mt-8">-->
+<!--                        <div class="flex">-->
+<!--                            <div class="flex-shrink-0">-->
+<!--                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-white text-indigo-600">-->
+<!--                                    <i data-feather="calendar"></i>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="ml-4">-->
+<!--                                <h3 class="text-lg font-playfair font-medium text-white">Гибкие даты</h3>-->
+<!--                                <p class="mt-2 text-indigo-200">Минимальный срок аренды — 2 ночи. Возможность долгосрочной аренды.</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="mt-8 flex">-->
+<!--                            <div class="flex-shrink-0">-->
+<!--                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-white text-indigo-600">-->
+<!--                                    <i data-feather="credit-card"></i>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="ml-4">-->
+<!--                                <h3 class="text-lg font-playfair font-medium text-white">Безопасная оплата</h3>-->
+<!--                                <p class="mt-2 text-indigo-200">Принимаем все основные кредитные карты. Без скрытых комиссий.</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="mt-8 flex">-->
+<!--                            <div class="flex-shrink-0">-->
+<!--                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-white text-indigo-600">-->
+<!--                                    <i data-feather="refresh-cw"></i>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="ml-4">-->
+<!--                                <h3 class="text-lg font-playfair font-medium text-white">Бесплатная отмена</h3>-->
+<!--                                <p class="mt-2 text-indigo-200">Бесплатная отмена бронирования за 7 дней до заезда.</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="lg:col-span-7" data-aos="fade-left">-->
+<!--                    <div class="bg-white rounded-lg booking-form p-6">-->
+<!--                        <h3 class="text-2xl font-playfair font-bold text-gray-900">Форма бронирования</h3>-->
+<!--                        <form class="mt-6 space-y-6">-->
+<!--                            <div>-->
+<!--                                <label for="property" class="block text-sm font-medium text-gray-700">Выберите объект</label>-->
+<!--                                <select id="property" name="property" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">-->
+<!--                                    <option>Современная квартира в центре</option>-->
+<!--                                    <option>Загородная вилла с бассейном</option>-->
+<!--                                    <option>Лофт в деловом центре</option>-->
+<!--                                    <option>Дом на озере</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">-->
+<!--                                <div>-->
+<!--                                    <label for="check-in" class="block text-sm font-medium text-gray-700">Дата заезда</label>-->
+<!--                                    <div class="mt-1 relative rounded-md shadow-sm">-->
+<!--                                        <input type="date" id="check-in" name="check-in" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-10 py-2 sm:text-sm border-gray-300 rounded-md">-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div>-->
+<!--                                    <label for="check-out" class="block text-sm font-medium text-gray-700">Дата выезда</label>-->
+<!--                                    <div class="mt-1 relative rounded-md shadow-sm">-->
+<!--                                        <input type="date" id="check-out" name="check-out" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-10 py-2 sm:text-sm border-gray-300 rounded-md">-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">-->
+<!--                                <div>-->
+<!--                                    <label for="guests1" class="block text-sm font-medium text-gray-700">Количество гостей</label>-->
+<!--                                    <select id="guests1" name="guests" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">-->
+<!--                                        <option>1</option>-->
+<!--                                        <option>2</option>-->
+<!--                                        <option>3</option>-->
+<!--                                        <option>4</option>-->
+<!--                                        <option>5+</option>-->
+<!--                                    </select>-->
+<!--                                </div>-->
+<!--                                <div>-->
+<!--                                    <label for="nights" class="block text-sm font-medium text-gray-700">Количество ночей</label>-->
+<!--                                    <input type="text" id="nights" name="nights" readonly class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 bg-gray-50 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div>-->
+<!--                                <label for="name" class="block text-sm font-medium text-gray-700">Ваше имя</label>-->
+<!--                                <input type="text" id="name" name="name" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">-->
+<!--                            </div>-->
+<!--                            <div>-->
+<!--                                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>-->
+<!--                                <input type="email" id="email" name="email" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">-->
+<!--                            </div>-->
+<!--                            <div>-->
+<!--                                <label for="phone" class="block text-sm font-medium text-gray-700">Телефон</label>-->
+<!--                                <input type="tel" id="phone" name="phone" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">-->
+<!--                            </div>-->
+<!--                            <div>-->
+<!--                                <label for="message" class="block text-sm font-medium text-gray-700">Дополнительные пожелания</label>-->
+<!--                                <textarea id="message" name="message" rows="3" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"></textarea>-->
+<!--                            </div>-->
+<!--                            <div class="flex items-center">-->
+<!--                                <input id="terms" name="terms" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">-->
+<!--                                <label for="terms" class="ml-2 block text-sm text-gray-700">Я согласен с условиями бронирования и политикой конфиденциальности</label>-->
+<!--                            </div>-->
+<!--                            <div>-->
+<!--                                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300">-->
+<!--                                    Отправить запрос-->
+<!--                                </button>-->
+<!--                            </div>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </section>-->
+
+    <!-- Testimonials Section -->
+    <section class="py-12 sm:py-16 lg:py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-playfair font-bold text-gray-900 sm:text-4xl">Отзывы наших клиентов</h2>
+                <p class="mt-4 max-w-2xl text-xl text-gray-600 mx-auto">Что говорят гости о наших объектах</p>
+            </div>
+            <div class="mt-12 grid gap-8 md:grid-cols-3">
+                <div class="bg-gray-50 p-6 rounded-lg" data-aos="fade-up">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="#" alt="Anna K.">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-lg font-medium text-gray-900">Анна К.</div>
+                            <div class="flex items-center text-indigo-600">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">"Квартира в центре превзошла все ожидания! Идеальное расположение, стильный интерьер и все необходимое для комфортного проживания. Обязательно вернемся!"</p>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500">Остались в июне 2023</div>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="#" alt="Dmitry S.">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-lg font-medium text-gray-900">Дмитрий С.</div>
+                            <div class="flex items-center text-indigo-600">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">"Вилла просто потрясающая! Бассейн, сауна, прекрасный вид — все на высшем уровне. Сервис безупречный, все вопросы решались мгновенно. Рекомендую!"</p>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500">Остались в августе 2023</div>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="#" alt="Elena M.">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-lg font-medium text-gray-900">Елена М.</div>
+                            <div class="flex items-center text-indigo-600">
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                                <i data-feather="star" class="w-4 h-4 fill-current"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-gray-600">"Дом на озере — это мечта! Тишина, природа, уют. Провели незабываемый отпуск с семьей. Особенно понравилась баня и причал с лодкой. Спасибо за прекрасный отдых!"</p>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500">Остались в июле 2023</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-12 sm:py-16 lg:py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+                <div class="lg:col-span-5" data-aos="fade-right">
+                    <h2 class="text-3xl font-playfair font-bold text-gray-900 sm:text-4xl">Контакты</h2>
+                    <p class="mt-6 text-lg text-gray-600">Если у вас есть вопросы или вам нужна помощь с бронированием, свяжитесь с нами любым удобным способом.</p>
+                    <div class="mt-8">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
+                                    <i data-feather="phone"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-playfair font-medium text-gray-900">Телефон</h3>
+                                <p class="mt-2 text-gray-600">+7 (495) 123-45-67</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
+                                    <i data-feather="mail"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-playfair font-medium text-gray-900">Email</h3>
+                                <p class="mt-2 text-gray-600">info@luxuryrentals.ru</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
+                                    <i data-feather="map-pin"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-playfair font-medium text-gray-900">Адрес</h3>
+                                <p class="mt-2 text-gray-600">Москва, ул. Тверская, 15</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-600 text-white">
+                                    <i data-feather="clock"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-playfair font-medium text-gray-900">Часы работы</h3>
+                                <p class="mt-2 text-gray-600">Пн-Пт: 9:00 - 20:00<br>Сб-Вс: 10:00 - 18:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-10 lg:mt-0 lg:col-span-7" data-aos="fade-left">
+                    <div class="bg-white rounded-lg shadow-xl p-6">
+                        <h3 class="text-2xl font-playfair font-bold text-gray-900">Напишите нам</h3>
+                        <form class="mt-6 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="contact-name" class="block text-sm font-medium text-gray-700">Ваше имя</label>
+                                    <input type="text" id="contact-name" name="contact-name" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                </div>
+                                <div>
+                                    <label for="contact-email" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" id="contact-email" name="contact-email" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="contact-subject" class="block text-sm font-medium text-gray-700">Тема</label>
+                                <input type="text" id="contact-subject" name="contact-subject" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                            </div>
+                            <div>
+                                <label for="contact-message" class="block text-sm font-medium text-gray-700">Сообщение</label>
+                                <textarea id="contact-message" name="contact-message" rows="4" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"></textarea>
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300">
+                                    Отправить сообщение
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-12 sm:py-16 lg:py-20 bg-indigo-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-playfair font-bold text-white sm:text-4xl">Подпишитесь на рассылку</h2>
+                <p class="mt-4 max-w-2xl text-xl text-indigo-200 mx-auto">Получайте первыми информацию о специальных предложениях и новых объектах.</p>
+                <form class="mt-8 sm:flex sm:max-w-md mx-auto">
+                    <label for="email-address" class="sr-only">Email</label>
+                    <input type="email" id="email-address" name="email-address" required class="w-full px-5 py-3 placeholder-gray-500 focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs rounded-md" placeholder="Ваш email">
+                    <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
+                        <button type="submit" class="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300">
+                            Подписаться
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Компания</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">О нас</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Блог</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Карьера</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Контакты</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Поддержка</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Центр помощи</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Безопасность</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Условия аренды</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Объекты</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Москва</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Подмосковье</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Санкт-Петербург</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Сочи</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Социальные сети</h3>
+                    <div class="mt-4 flex space-x-6">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i data-feather="facebook" class="h-6 w-6"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i data-feather="instagram" class="h-6 w-6"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i data-feather="twitter" class="h-6 w-6"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i data-feather="youtube" class="h-6 w-6"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between">
+                <p class="text-base text-gray-400">&copy; 2023 Luxury Rentals. Все права защищены.</p>
+                <div class="mt-4 md:mt-0 flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white">Политика конфиденциальности</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Условия использования</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Карта сайта</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Mobile menu toggle
+        document.querySelector('[aria-controls="mobile-menu"]').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Calculate nights between check-in and check-out
+        const checkIn = document.getElementById('check-in');
+        const checkOut = document.getElementById('check-out');
+        const nights = document.getElementById('nights');
+
+        function calculateNights() {
+            if (checkIn.value && checkOut.value) {
+                const start = new Date(checkIn.value);
+                const end = new Date(checkOut.value);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                nights.value = diffDays;
+            }
+        }
+
+
+        const calendarGrid1 = document.querySelector(".calendar-grid-1");
+        const calendarGrid2 = document.querySelector(".calendar-grid-2");
+        const calendar = document.getElementsByClassName('date-picker-calendar-popup')[0]
+        const monthYearElement1 = document.getElementsByClassName('month-year-display1')[0]
+        const monthYearElement2 = document.getElementsByClassName('month-year-display2')[0]
+        calendarGrid1.innerHTML = '';
+        calendarGrid2.innerHTML = '';
+        const input_dates = document.getElementById('dates');
+        var firstInputDate = document.getElementsByName('firstInputDate')[0];
+        var secondInputDate = document.getElementsByName('secondInputDate')[0];
+
+        const currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        const prevMonthButton = document.getElementsByClassName("prev-month")[0];
+        const nextMonthButton = document.getElementsByClassName("next-month")[0];
+
+        var calendarFlag = false;
+        const calendarClearBtn = document.getElementsByClassName("clear-button")[0];
+
+        const input_guests = document.getElementById('guests');
+        const guests_popup = document.getElementsByClassName('guests-popup')[0];
+        var guestInputValue = document.getElementsByName('guestInputValue')[0];
+
+        var guestsPopupFlag = false;
+        const decrementBtn = document.querySelector('.dec_guests_number');
+        const incrementBtn = document.querySelector('.inc_guests_number');
+        const guestsValue = document.querySelector('.guests_value');
+
+        const guestsLimit = 10;
+        let currentValue = 1
+
+
+        // Устанавливаем начальное значение
+        guestsValue.textContent = currentValue;
+
+        // Обработчик для кнопки уменьшения
+        decrementBtn.addEventListener('click', () => {
+            currentValue -= 1;
+            incrementBtn.removeAttribute('disabled');
+            if (currentValue < 2) {
+                currentValue = 1;
+                guestsValue.textContent = currentValue;
+                guestInputValue.value = currentValue;
+                input_guests.textContent = String(currentValue) + " гость";
+                decrementBtn.setAttribute('disabled', '');
+                return;
+            }
+            guestsValue.textContent = currentValue;
+            guestInputValue.value = currentValue;
+            if (currentValue === 1) {
+                input_guests.textContent = String(currentValue) + " гость";
+            }
+            else if (currentValue > 4) {
+                input_guests.textContent = String(currentValue) + " гостей";
+            }
+            else {
+                input_guests.textContent = String(currentValue) + " гостя";
+            }
+        });
+
+        // Обработчик для кнопки увеличения
+        incrementBtn.addEventListener('click', () => {
+            currentValue += 1;
+            decrementBtn.removeAttribute('disabled');
+            if (currentValue < guestsLimit){
+                incrementBtn.removeAttribute('disabled');
+                guestsValue.textContent = currentValue;
+                guestInputValue.value = currentValue;
+                if (currentValue === 1) {
+                    input_guests.textContent = String(currentValue) + " гость";
+                }
+                else if (currentValue > 4) {
+                    input_guests.textContent = String(currentValue) + " гостей";
+                }
+                else {
+                    input_guests.textContent = String(currentValue) + " гостя";
+                }
+            }
+            else if (currentValue === guestsLimit){
+                guestsValue.textContent = currentValue;
+                guestInputValue.value = currentValue;
+                input_guests.textContent = String(currentValue) + " гостей";
+                incrementBtn.setAttribute('disabled', '');
+            }
+        });
+
+        input_dates.addEventListener("click", function (event){
+            event.stopPropagation();
+            closeGuestsPopup();
+            if (calendar.classList.contains("show")) {
+                calendar.classList.remove("show");
+                input_dates.classList.remove("active");
+            }
+            else if (calendarFlag) {
+                calendar.classList.add('show');
+                input_dates.classList.add("active");
+            }
+            else {
+                input_dates.classList.add("active");
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                prevMonthButton.style.visibility = "hidden";
+                calendar.classList.add('show');
+                generateCalendar(calendarGrid1, monthYearElement1, currentMonth, currentYear);
+                currentMonth += 1;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear += 1;
+                }
+                generateCalendar(calendarGrid2, monthYearElement2, currentMonth, currentYear);
+                calendarFlag = true;
+            }
+        })
+
+        calendar.addEventListener("click", function (event) {
+            event.stopPropagation();
+        })
+
+        function closeCalendar(){
+            document.getElementById("calendar").classList.remove("show");
+            input_dates.classList.remove("active");
+        }
+
+        calendarClearBtn.addEventListener("click", function (event) {
+            let calendarDays = document.getElementsByClassName("day");
+            for (let i=0; i < calendarDays.length; i++) {
+                calendarDays[i].classList.remove("clicked");
+                calendarDays[i].classList.remove("middle");
+                clickedBtnCounter = 0;
+                input_dates.children.item(0).textContent = "Выберите даты";
+            }
+        });
+
+        window.addEventListener("click", function(event) {
+            const modalCalendar = document.getElementById("calendar");
+            const modalGuestsPopup = document.getElementById("guestsPopup");
+
+            const isInsideCalendar = modalCalendar.contains(event.target);
+            const isInsideGuestsPopup = modalGuestsPopup.contains(event.target);
+
+            if (modalCalendar.classList.contains("show") && !isInsideCalendar) {
+                closeCalendar();
+                input_dates.classList.remove("active");
+            }
+            if (modalGuestsPopup.classList.contains("show") && !isInsideGuestsPopup) {
+                closeGuestsPopup();
+                input_guests.classList.remove("active");
+            }
+        });
+
+        input_guests.addEventListener("click", function (event){
+            event.stopPropagation();
+            closeCalendar();
+            if (guests_popup.classList.contains("show")) {
+                guests_popup.classList.remove("show");
+                input_guests.classList.remove("active");
+            }
+            else if (guestsPopupFlag) {
+                guests_popup.classList.add('show');
+                input_guests.classList.add("active");
+            }
+            else {
+                input_guests.classList.add("active");
+                guests_popup.classList.add('show');
+                guestsPopupFlag = true;
+            }
+        });
+
+        function closeGuestsPopup(){
+            document.getElementById("guestsPopup").classList.remove("show");
+            input_guests.classList.remove("active");
+        }
+
+
+
+        function generateCalendar(calendarGrid, monthYearElement, month, year) {
+            // Очищаем текущий календарь
+            calendarGrid.innerHTML = `
+                <div class="weekday">Пн</div>
+                <div class="weekday">Вт</div>
+                <div class="weekday">Ср</div>
+                <div class="weekday">Чт</div>
+                <div class="weekday">Пт</div>
+                <div class="weekday">Сб</div>
+                <div class="weekday">Вс</div>
+            `;
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const daysInMonth = lastDayOfMonth.getDate();
+            const startingDay = firstDayOfMonth.getDay();
+
+            let startingOffset = (startingDay === 0) ? 6 : startingDay - 1;
+
+            // Заполняем пустые ячейки перед первым днем месяца
+            let lastDayInPrevMonth = new Date(year, month, 0);
+            let daysInPrevMonth = lastDayInPrevMonth.getDate();
+            for (let i = 0; i < startingOffset; i++) {
+                const emptyDay = document.createElement("div");
+                emptyDay.classList.add("day");
+                emptyDay.classList.add("other-month");
+                emptyDay.textContent = daysInPrevMonth - startingOffset + 1 + i;
+                emptyDay.dataset.day = daysInPrevMonth - startingOffset + 1 + i;
+                emptyDay.onclick = function () {
+                    selectInterval(this);
+                }
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            // Заполняем дни месяца
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("day");
+                dayElement.textContent = i;
+                dayElement.dataset.day = i;
+                const dayOfWeek = (startingOffset + i -1) % 7;
+                if (dayOfWeek === 5 || dayOfWeek === 6) {
+                    dayElement.classList.add("weekend");
+                }
+
+                if (i === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                    dayElement.classList.add("today");
+                }
+
+                if (i < currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                    dayElement.classList.add("other-month");
+                    dayElement.style.visibility = "visible";
+                }
+
+                dayElement.onclick = function () {
+                    selectInterval(this);
+                }
+                calendarGrid.appendChild(dayElement);
+            }
+
+            // Заполняем ячейки после последнего дня месяца
+            let daysRemainder = 7 - lastDayOfMonth.getDay();
+            if (daysRemainder !== 7) {
+                for (let i = 0; i < daysRemainder; i++) {
+                    const emptyDay = document.createElement("div");
+                    emptyDay.classList.add("day");
+                    emptyDay.classList.add("other-month");
+                    emptyDay.textContent = i + 1;
+                    emptyDay.dataset.day = i + 1;
+                    emptyDay.onclick = function () {
+                        selectInterval(this);
+                    }
+                    calendarGrid.appendChild(emptyDay);
+                }
+            }
+
+            // Обновляем заголовок месяца и года
+            const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+            monthYearElement.textContent = `${monthNames[month]} ${year}`;
+        }
+
+        // generateCalendar(currentMonth, currentYear);
+        //
+        //
+        // const prevMonthButton = document.getElementById("prev-month");
+        // const nextMonthButton = document.getElementById("next-month");
+        //
+        // prevMonthButton.addEventListener("click", () => {
+        //     currentMonth--;
+        //     if (currentMonth < 0) {
+        //     currentMonth = 11;
+        //     currentYear--;
+        //     }
+        //     generateCalendar(currentMonth, currentYear);
+        // });
+        //
+        // nextMonthButton.addEventListener("click", () => {
+        //     currentMonth++;
+        //     if (currentMonth > 11) {
+        //     currentMonth = 0;
+        //     currentYear++;
+        //     }
+        //     generateCalendar(currentMonth, currentYear);
+        // });
+
+        prevMonthButton.addEventListener("click", () => {
+            let tmpDate = new Date();
+            let tmpMonth = tmpDate.getMonth();
+            let tmpYear = tmpDate.getFullYear();
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(calendarGrid2, monthYearElement2, currentMonth, currentYear);
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            if (currentMonth === tmpMonth && currentYear === tmpYear) prevMonthButton.style.visibility = "hidden";
+            generateCalendar(calendarGrid1, monthYearElement1, currentMonth, currentYear);
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+        });
+
+        nextMonthButton.addEventListener("click", () => {
+            console.log(currentMonth);
+            generateCalendar(calendarGrid1, monthYearElement1, currentMonth, currentYear);
+            currentMonth++;
+            prevMonthButton.style.visibility = "visible";
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(calendarGrid2, monthYearElement2, currentMonth, currentYear);
+        });
+
+        var clickedBtnCounter = 0;
+        var firstClickedBtn = 0;
+        var secondClickedBtn = 0;
+        var firstInput = "";
+        var secondInput = "";
+
+        function selectInterval(clickedBtn){
+            let datesInput = "";
+            let tmpMonth = "";
+            let gridMonth = currentMonth + 1;
+            let gridYear = currentYear;
+            if (!clickedBtn.classList.contains("clicked") && clickedBtnCounter === 0) {
+                if (clickedBtn.parentElement.className === "calendar-grid-1") {
+                    if (currentMonth === 0) {
+                        gridMonth = 12;
+                        gridYear -= 1;
+                    }
+                    else {
+                        gridMonth = currentMonth;
+                    }
+                }
+                clickedBtn.classList.add("clicked");
+                if (gridMonth < 10) {
+                    tmpMonth = "0" + gridMonth.toString();
+                }
+                else {
+                    tmpMonth = gridMonth.toString();
+                }
+                if (Number(clickedBtn.textContent) < 10) {
+                    firstInput = "0" + clickedBtn.textContent + "." + tmpMonth;
+                }
+                else {
+                    firstInput =  clickedBtn.textContent + "." + tmpMonth;
+                }
+                input_dates.children.item(0).textContent = firstInput + " - ";
+                firstInput = firstInput + "." + gridYear.toString();
+                firstInputDate.value = firstInput;
+                firstClickedBtn = Array.prototype.indexOf.call(calendarGrid1.children, clickedBtn);
+                if (firstClickedBtn === -1) firstClickedBtn = Array.prototype.indexOf.call(calendarGrid2.children, clickedBtn) + 100;
+                clickedBtnCounter++;
+            }
+            else if (!clickedBtn.classList.contains("clicked") && clickedBtnCounter === 1) {
+                secondClickedBtn = Array.prototype.indexOf.call(calendarGrid1.children, clickedBtn);
+                if (secondClickedBtn === -1) secondClickedBtn = Array.prototype.indexOf.call(calendarGrid2.children, clickedBtn) + 100;
+                if (clickedBtn.parentElement.className === "calendar-grid-1") {
+                    if (currentMonth === 0) {
+                        gridMonth = 12;
+                        gridYear -= 1;
+                    }
+                    else {
+                        gridMonth = currentMonth;
+                    }
+                }
+                if (gridMonth < 10) {
+                    tmpMonth = "0" + gridMonth.toString();
+                }
+                else {
+                    tmpMonth = gridMonth.toString();
+                }
+                if (Number(clickedBtn.textContent) < 10) {
+                    secondInput = "0" + clickedBtn.textContent + "." + tmpMonth;
+                }
+                else {
+                    secondInput =  clickedBtn.textContent + "." + tmpMonth;
+                }
+                input_dates.children.item(0).textContent += secondInput;
+                if (firstInput.slice(6) !== gridYear.toString()) {
+                    input_dates.children.item(0).textContent = firstInput + " - " + secondInput + "." + gridYear.toString();
+                }
+                secondInput = secondInput + "." + gridYear.toString();
+                secondInputDate.value = secondInput;
+                let calendarDays = document.getElementsByClassName("day");
+                let flag = false;
+                if (secondClickedBtn < firstClickedBtn) {
+                    let tmp = firstClickedBtn;
+                    firstClickedBtn = secondClickedBtn;
+                    secondClickedBtn = tmp;
+                    input_dates.children.item(0).textContent = secondInput.slice(0, 5) + " - " + firstInput.slice(0, 5);
+                    if (firstInput.slice(6) !== secondInput.slice(6)) {
+                        input_dates.children.item(0).textContent = secondInput + " - " + firstInput;
+                    }
+                    let tmpValue = firstInput;
+                    firstInput = secondInput;
+                    secondInput = tmpValue;
+                    firstInputDate.value = firstInput;
+                    secondInputDate.value = secondInput;
+                }
+                clickedBtn.classList.add("clicked");
+                for (let i=0; i < calendarDays.length; i++) {
+                    if (flag && !calendarDays[i].classList.contains("clicked")) {
+                        calendarDays[i].classList.add("middle");
+                    }
+                    if (calendarDays[i].classList.contains("clicked") && !flag){
+                        flag = true;
+                    }
+                    else if (calendarDays[i].classList.contains("clicked") && flag) {
+                        break;
+                    }
+                }
+
+                clickedBtnCounter++;
+            }
+            else if (clickedBtn.classList.contains("clicked") && clickedBtnCounter === 2) {
+                clickedBtn.classList.remove("clicked");
+                let tmpInputDates = input_dates.children.item(0).textContent.split(' - ');
+                let calendarDays = document.getElementsByClassName("day");
+                for (let i = 0; i < calendarDays.length; i++) {
+                    calendarDays[i].classList.remove("middle");
+                }
+                if (tmpInputDates[0].slice(0,2) === clickedBtn.textContent) {
+                    input_dates.children.item(0).textContent = tmpInputDates[1] + " - ";
+                }
+                else if (tmpInputDates[1].slice(0,2) === clickedBtn.textContent) {
+                    input_dates.children.item(0).textContent = tmpInputDates[0] + " - ";
+                }
+                clickedBtnCounter--;
+            }
+            else if (clickedBtn.classList.contains("clicked") ) {
+                clickedBtn.classList.remove("clicked");
+                clickedBtnCounter = 0;
+                input_dates.children.item(0).textContent = "Выберите даты";
+            }
+            else {
+                let calendarDays = document.getElementsByClassName("day");
+                for (let i=0; i < calendarDays.length; i++) {
+                    calendarDays[i].classList.remove("clicked");
+                    calendarDays[i].classList.remove("middle");
+                    clickedBtnCounter = 0;
+                    input_dates.children.item(0).textContent = "Выберите даты";
+                }
+            }
+        }
+
+        feather.replace();
+    </script>
+    <script src="https://kit.fontawesome.com/ad0ddaade4.js" crossorigin="anonymous"></script>
+</body>
+</html>

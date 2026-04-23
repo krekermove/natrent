@@ -1,0 +1,799 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+<style>
+    /* Базовая стилизация, можно настроить по своему вкусу */
+    body {
+        font-family: sans-serif;
+        background-color: #1b1b1b;
+        color: white;
+    }
+    .calendar {
+        width: 800px;
+        margin: 50px auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .calendar-header {
+        padding: 20px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+    }
+
+    .calendar-body {
+      padding: 10px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-day {
+        text-align: center;
+        margin: 10px 5px;
+        padding: 5px;
+        border: 1px solid #eee;
+        border-radius: 3px;
+        font-size: 20px;
+    }
+
+    .calendar-day.weekend {
+      color: red; /* Выделяем выходные */
+    }
+
+    .calendar-day.today {
+      border: 3px solid green; /* Выделяем текущий день */
+      font-weight: bold;
+    }
+    .calendar-day.prev {
+      opacity: .5;
+    }
+    .calendar-day.next {
+      opacity: .5;
+    }
+    .calendar-day.booked {
+      background-color: darkgoldenrod;
+    }
+    .calendar-day.clicked {
+      background-color: darkblue;
+    }
+    .calendar-day.middle {
+      background-color: dodgerblue;
+    }
+    .add_interval_btn {
+        cursor: pointer;
+        color: #1b1b1b;
+        width: 160px;
+        margin: auto;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 10px 4px;
+        outline: 1px solid #e3e3e3;
+        border-radius: 15px;
+        background-color: rgb(255,255,255);
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        color: white;
+        background-color: #141211;
+        margin: 7% 10% 15% 35%;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 45%;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .reg_field{
+        margin-top: 10px;
+        width: 600px;
+    }
+  </style>
+<div id="content-main">
+    <div class="house_selector">
+        <label>Выберите необходимый дом:</label>
+        <select name="type" id="id_type">
+            {% for house in objects %}
+                <option value="{{ house.id }}">{{ house.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="calendar">
+        <div class="calendar-header">
+            <button id="prev-month">&lt;</button>
+            <span id="month-year">Январь 2024</span>
+            <button id="next-month">&gt;</button>
+        </div>
+        <div class="calendar-body">
+            <div class="calendar-grid">
+                <div class="calendar-day">Пн</div>
+                <div class="calendar-day">Вт</div>
+                <div class="calendar-day">Ср</div>
+                <div class="calendar-day">Чт</div>
+                <div class="calendar-day">Пт</div>
+                <div class="calendar-day weekend">Сб</div>
+                <div class="calendar-day weekend">Вс</div>
+            </div>
+        </div>
+    </div>
+    <div id="costModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModalBtnDate">&times;</span>
+            <form class="booking_form" action="{% url 'admin:timetable_calendar' %}" method="post">
+                {% csrf_token %}
+                <div class="reg_field">
+                    <input type="hidden" name="date" value="0">
+                    <input type="hidden" name="house1" value="-1">
+                    <input type="hidden" name="month" value="0">
+                    <input type="hidden" name="year" value="0">
+                    <span>Стоимость:</span>
+                    {{ formCost.cost }}
+                </div>
+                <div class="reg_button">
+                    <button style="background: #1a1818;" class="btn btn-success" type="submit">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <button id="openModalBtn" class="add_interval_btn">Добавить промежуток</button>
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <span class="close" id="closeModalBtn">&times;</span>
+        <form class="booking_form" action="{% url 'admin:timetable_calendar' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="month" value="0">
+            <input type="hidden" name="year" value="0">
+            <div class="reg_field">
+                <span>Имя клиента:</span>
+                {{ form.name }}
+            </div>
+            <div class="reg_field">
+                <span>Номер телефона:</span>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <ul class="errorlist" style="color: red">
+                        {% for error in form.phone.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="reg_field">
+                <span>Название объекта:</span>
+                {{ form.house }}
+                {% if form.house.errors %}
+                    <ul class="errorlist" style="color: red">
+                        {% for error in form.house.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="reg_field">
+                <span>Дата заезда:</span>
+                {{ form.startdate }}
+            </div>
+            <div class="reg_field">
+                <span>Дата выезда:</span>
+                {{ form.enddate }}
+            </div>
+            <div class="reg_field">
+                <span>Количество гостей:</span>
+                {{ form.guests_amount }}
+                {% if form.guests_amount.errors %}
+                    <ul class="errorlist" style="color: red">
+                        {% for error in form.guests_amount.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="reg_field">
+                <span>Комментарий:</span>
+                {{ form.comment }}
+            </div>
+            <div class="reg_field">
+                <span>Стоимость:</span>
+                {{ form.order_cost }}
+                {% if form.order_cost.errors %}
+                    <ul class="errorlist" style="color: red">
+                        {% for error in form.order_cost.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="reg_button">
+                <button style="background: #1a1818;" class="btn btn-success" type="submit">Подтвердить</button>
+            </div>
+        </form>
+      </div>
+    </div>
+    <script>
+    // JavaScript для генерации дней календаря
+    const monthYearElement = document.getElementById("month-year");
+    const calendarGrid = document.querySelector(".calendar-grid");
+    calendarGrid.innerHTML = '';
+    const calendarBtn = document.querySelector(".add_interval_btn");
+    const bookedDays = {{ booked_days|safe }};
+    const datesObjectCost = {{ dates_object_cost|safe }};
+
+    const selectElement = document.getElementById("id_type");
+    var selectedValue = selectElement.value;
+
+    const currentDate = new Date();
+    let currentMonth = currentDate.getMonth();
+    let currentYear = currentDate.getFullYear();
+
+    let recently_month = {{ month|safe }};
+    var month1_input = document.getElementsByName("month")[0];
+    var month2_input = document.getElementsByName("month")[1];
+    if (recently_month !== -1) currentMonth = recently_month;
+
+    let recently_year = {{ year|safe }};
+    var year1_input = document.getElementsByName("year")[0];
+    var year2_input = document.getElementsByName("year")[1];
+    if (recently_year !== -1) currentYear = recently_year;
+
+    month1_input.setAttribute("value", currentMonth.toString());
+    month2_input.setAttribute("value", currentMonth.toString());
+    year1_input.setAttribute("value", currentYear.toString());
+    year2_input.setAttribute("value", currentYear.toString());
+
+    var clickedBtnCounter = 0;
+    var firstClickedBtn = 0;
+    var secondClickedBtn = 0;
+
+    phone_btn = document.getElementsByName("phone")[0]
+    if (phone_btn) {
+        phone_btn.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let formattedValue = '';
+
+            if (value.length > 0) {
+                formattedValue = '+7';
+            }
+
+            if (value.length > 1) {
+                formattedValue += ' (' + value.substring(1, 4);
+            }
+
+            if (value.length > 4) {
+                formattedValue += ') ' + value.substring(4, 7);
+            }
+
+            if (value.length > 7) {
+                formattedValue += '-' + value.substring(7, 9);
+            }
+
+            if (value.length > 9) {
+                formattedValue += '-' + value.substring(9, 11);
+            }
+
+            e.target.value = formattedValue;
+            });
+
+        phone_btn.addEventListener('focus', function() {
+            if (!this.value) {
+                this.value = '+7';
+            }
+        });
+
+        phone_btn.addEventListener('blur', function() {
+            if (this.value === '+7') {
+                this.value = '';
+            }
+        });
+    }
+
+    var start_date_input = document.getElementsByName("startdate")[0];
+    var end_date_input = document.getElementsByName("enddate")[0];
+    var house_input = document.getElementsByName("house")[0]
+    var order_cost_input = document.getElementsByName("order_cost")[0]
+
+    function openModal() {
+        document.getElementById("myModal").style.display = "block";
+        let clicked_dates = document.getElementsByClassName('clicked');
+        let middle_dates = document.getElementsByClassName('middle');
+        let datesObjectCostForHouse = datesObjectCost[`${selectedValue}`];
+        let cost = 0;
+        let flag = false;
+        let month = currentMonth + 1;
+        let transition_start_month = month;
+        let transition_end_month = month;
+        let transition_start_year = currentYear;
+        let transition_end_year = currentYear;
+        order_cost_input.setAttribute("value", "");
+        order_cost_input.value = null;
+
+        if (clicked_dates[0].classList.contains('prev')) {
+            if (month === 1) {
+                transition_start_month = 12;
+                transition_start_year -= 1;
+            }
+            else transition_start_month -= 1;
+        }
+        if (clicked_dates[1].classList.contains('prev')) {
+            if (month === 1) {
+                transition_end_month = 12;
+                transition_end_year -= 1;
+            }
+            else transition_end_month -= 1;
+        }
+        if (clicked_dates[0].classList.contains('next')) {
+            if (month === 12) {
+                transition_start_month = 1;
+                transition_start_year += 1;
+            }
+            else transition_start_month += 1;
+        }
+        if (clicked_dates[1].classList.contains('next')) {
+            if (month === 12) {
+                transition_end_month = 1;
+                transition_end_year += 1;
+            }
+            else transition_end_month += 1;
+        }
+
+        if ((Number(clicked_dates[0].dataset.day) < 10) && (transition_start_month < 10)) {
+            start_date_input.setAttribute("value", transition_start_year.toString() + "-" + "0" + transition_start_month.toString() + "-" + "0" + clicked_dates[0].dataset.day);
+            start_date_input.value = transition_start_year.toString() + "-" + "0" + transition_start_month.toString() + "-" + "0" + clicked_dates[0].dataset.day;
+        } else if (transition_start_month < 10) {
+            start_date_input.setAttribute("value", transition_start_year.toString() + "-" + "0" + transition_start_month.toString() + "-" + clicked_dates[0].dataset.day);
+            start_date_input.value = transition_start_year.toString() + "-" + "0" + transition_start_month.toString() + "-" + clicked_dates[0].dataset.day;
+        } else if (Number(clicked_dates[0].dataset.day) < 10) {
+            start_date_input.setAttribute("value", transition_start_year.toString() + "-" + transition_start_month.toString() + "-" + "0" + clicked_dates[0].dataset.day);
+            start_date_input.value = transition_start_year.toString() + "-" + transition_start_month.toString() + "-" + "0" + clicked_dates[0].dataset.day;
+        } else {
+            start_date_input.setAttribute("value", transition_start_year.toString() + "-" + transition_start_month.toString() + "-" + clicked_dates[0].dataset.day);
+            start_date_input.value = transition_start_year.toString() + "-" + transition_start_month.toString() + "-" + clicked_dates[0].dataset.day;
+        }
+        if (datesObjectCostForHouse[start_date_input.value]) cost += datesObjectCostForHouse[start_date_input.value];
+        else flag = true;
+
+        let tmp = "";
+
+        for (let i = 0; i < middle_dates.length; i++) {
+            let transition_middle_month = month;
+            let transition_middle_year = currentYear;
+            if (middle_dates[i].classList.contains('prev')) {
+                if (month === 1) {
+                    transition_middle_month = 12;
+                    transition_middle_year -= 1;
+                }
+                else transition_middle_month -= 1;
+            }
+            else if (middle_dates[i].classList.contains('next')) {
+                if (month === 12) {
+                    transition_middle_month = 1;
+                    transition_middle_year += 1;
+                }
+                else transition_middle_month += 1;
+            }
+            if ((Number(middle_dates[i].dataset.day) < 10) && (transition_middle_month < 10)) {
+                tmp = transition_middle_year.toString() + "-" + "0" + transition_middle_month.toString() + "-" + "0" + middle_dates[i].dataset.day;
+                if (datesObjectCostForHouse[tmp]) cost += datesObjectCostForHouse[tmp];
+                else flag = true;
+            } else if (transition_middle_month < 10) {
+                tmp = transition_middle_year.toString() + "-" + "0" + transition_middle_month.toString() + "-" + middle_dates[i].dataset.day;
+                if (datesObjectCostForHouse[tmp]) cost += datesObjectCostForHouse[tmp];
+                else flag = true;
+            } else if (Number(middle_dates[i].dataset.day) < 10) {
+                tmp = transition_middle_year.toString() + "-" + transition_middle_month.toString() + "-" + "0" + middle_dates[i].dataset.day;
+                if (datesObjectCostForHouse[tmp]) cost += datesObjectCostForHouse[tmp];
+                else flag = true;
+            } else {
+                tmp = transition_middle_year.toString() + "-" + transition_middle_month.toString() + "-" + middle_dates[i].dataset.day;
+                if (datesObjectCostForHouse[tmp]) cost += datesObjectCostForHouse[tmp];
+                else flag = true;
+            }
+        }
+
+        if ((Number(clicked_dates[1].dataset.day) < 10) && (transition_end_month < 10)) {
+            end_date_input.setAttribute("value", transition_end_year.toString() + "-" + "0" + transition_end_month.toString() + "-" + "0" + clicked_dates[1].dataset.day);
+            end_date_input.value = transition_end_year.toString() + "-" + "0" + transition_end_month.toString() + "-" + "0" + clicked_dates[1].dataset.day;
+        } else if (transition_end_month < 10) {
+            end_date_input.setAttribute("value", transition_end_year.toString() + "-" + "0" + transition_end_month.toString() + "-" + clicked_dates[1].dataset.day);
+            end_date_input.value = transition_end_year.toString() + "-" + "0" + transition_end_month.toString() + "-" + clicked_dates[1].dataset.day;
+        } else if (Number(clicked_dates[1].dataset.day) < 10) {
+            end_date_input.setAttribute("value", transition_end_year.toString() + "-" + transition_end_month.toString() + "-" + "0" + clicked_dates[1].dataset.day);
+            end_date_input.value = transition_end_year.toString() + "-" + transition_end_month.toString() + "-" + "0" + clicked_dates[1].dataset.day;
+        } else {
+            end_date_input.setAttribute("value", transition_end_year.toString() + "-" + transition_end_month.toString() + "-" + clicked_dates[1].dataset.day);
+            end_date_input.value = transition_end_year.toString() + "-" + transition_end_month.toString() + "-" + clicked_dates[1].dataset.day;
+        }
+        if (datesObjectCostForHouse[end_date_input.value]) cost += datesObjectCostForHouse[end_date_input.value];
+        else flag = true;
+
+        if (!flag) {
+            order_cost_input.setAttribute("value", cost.toString());
+            order_cost_input.value = cost;
+        }
+
+        house_input.setAttribute("value", selectedValue)
+        house_input.value = selectedValue;
+    }
+
+    function closeModal() {
+        document.getElementById("myModal").style.display = "none";
+    }
+
+    // Обработчики событий
+    document.getElementById("openModalBtn").addEventListener("click", openModal);
+    document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+
+    var input_date = document.getElementsByName("date");
+    var input_house1 = document.getElementsByName("house1");
+
+
+    function openCostModal(event) {
+        const el = event.currentTarget;
+        document.getElementById("costModal").style.display = "block";
+        let month = currentMonth + 1;
+        let year = currentYear;
+        if (el.classList.contains('prev')) {
+            if (month === 1) {
+                month = 12;
+                year -= 1;
+            }
+            else month -= 1;
+        }
+        else if (el.classList.contains('next')) {
+            if (month === 12) {
+                month = 1;
+                year += 1;
+            }
+            else month += 1;
+        }
+        if ((Number(el.dataset.day) < 10) && (month < 10)) {
+            input_date[0].setAttribute("value", year.toString() + "-" + "0" + month.toString() + "-" + "0" + el.dataset.day);
+            input_date.value = year.toString() + "-" + "0" + month.toString() + "-" + "0" + el.dataset.day;
+        }
+        else if (month < 10) {
+            input_date[0].setAttribute("value", year.toString() + "-" + "0" + month.toString() + "-" + el.dataset.day);
+            input_date.value = year.toString() + "-" + "0" + month.toString() + "-" + el.dataset.day;
+        }
+        else if (Number(el.dataset.day) < 10) {
+            input_date[0].setAttribute("value", year.toString() + "-" + month.toString() + "-" + "0" + el.dataset.day);
+            input_date.value = year.toString() + "-" + month.toString() + "-" + "0" + el.dataset.day;
+        }
+        else {
+            input_date[0].setAttribute("value", year.toString() + "-" + month.toString() + "-" + el.dataset.day);
+            input_date.value = year.toString() + "-" + month.toString() + "-" + el.dataset.day;
+        }
+        input_house1[0].setAttribute("value", selectedValue)
+        input_house1.value = selectedValue;
+    }
+
+    function closeCostModal() {
+        document.getElementById("costModal").style.display = "none";
+        input_date[0].setAttribute("value", "0");
+        input_house1[0].setAttribute("value", "-1")
+        input_date.value = 0;
+        input_house1.value = -1;
+    }
+
+    document.getElementById("closeModalBtnDate").addEventListener("click", closeCostModal);
+
+    window.addEventListener("click", function(event) {
+        const modal = document.getElementById("myModal");
+        const costModal = document.getElementById("costModal");
+        if (event.target === modal) {
+            closeModal();
+        }
+        else if (event.target === costModal) {
+            closeCostModal();
+        }
+    });
+
+    function generateCalendar(month, year) {
+        // Очищаем текущий календарь
+        calendarGrid.innerHTML = `
+            <div class="calendar-day">Пн</div>
+            <div class="calendar-day">Вт</div>
+            <div class="calendar-day">Ср</div>
+            <div class="calendar-day">Чт</div>
+            <div class="calendar-day">Пт</div>
+            <div class="calendar-day weekend">Сб</div>
+            <div class="calendar-day weekend">Вс</div>
+        `;
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        const startingDay = firstDayOfMonth.getDay();
+        let bookedDaysForHouse = bookedDays[`${selectedValue}`];
+        let datesObjectCostForHouse = datesObjectCost[`${selectedValue}`];
+
+        let dayCounter = 1;
+        let startingOffset = (startingDay === 0) ? 6 : startingDay - 1;
+
+        // Заполняем пустые ячейки перед первым днем месяца
+        let lastDayInPrevMonth = new Date(year, month, 0);
+        let daysInPrevMonth = lastDayInPrevMonth.getDate();
+        for (let i = 0; i < startingOffset; i++) {
+            const emptyDay = document.createElement("div");
+            emptyDay.classList.add("calendar-day");
+            emptyDay.classList.add("prev");
+            emptyDay.textContent = daysInPrevMonth - startingOffset + 1 + i;
+            emptyDay.dataset.day = daysInPrevMonth - startingOffset + 1 + i;
+            emptyDay.onclick = function () {
+                selectInterval(this);
+            }
+            const dateCost = document.createElement("div");
+            dateCost.textContent = "-";
+            emptyDay.addEventListener('dblclick', openCostModal);
+            Object.keys(datesObjectCostForHouse).forEach(function(key) {
+                if (month === 0) {
+                    if ((Number(key.substring(5, 7)) === 12) && (Number(key.substring(0,4)) === year - 1) && (Number(key.substring(8)) === Number(emptyDay.textContent))) {
+                        dateCost.textContent = datesObjectCostForHouse[key] + "₽";
+                        dateCost.style.fontSize = "16px";
+                    }
+                }
+                else {
+                    if ((Number(key.substring(5, 7)) === month) && (Number(key.substring(0,4)) === year) && (Number(key.substring(8)) === Number(emptyDay.textContent))) {
+                        dateCost.textContent = datesObjectCostForHouse[key] + "₽";
+                        dateCost.style.fontSize = "16px";
+                    }
+                }
+            });
+            emptyDay.appendChild(dateCost);
+            calendarGrid.appendChild(emptyDay);
+        }
+
+        // Заполняем дни месяца
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayElement = document.createElement("div");
+            dayElement.classList.add("calendar-day");
+            dayElement.textContent = i;
+            dayElement.dataset.day = i;
+            const dayOfWeek = (startingOffset + i -1) % 7;
+            if (dayOfWeek === 5 || dayOfWeek === 6) {
+                dayElement.classList.add("weekend");
+            }
+
+            if (i === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
+                dayElement.classList.add("today");
+            }
+
+            dayElement.onclick = function () {
+                selectInterval(this);
+            }
+            const dateCost = document.createElement("div");
+            dateCost.textContent = "-";
+            dayElement.addEventListener('dblclick', openCostModal);
+            Object.keys(datesObjectCostForHouse).forEach(function(key) {
+                console.log(month);
+                if (month === 0) {
+                    if ((Number(key.substring(5, 7)) === 1) && (Number(key.substring(0,4)) === year) && (Number(key.substring(8)) === Number(dayElement.textContent))) {
+                        // let dateCost = dayElement.children;
+                        dateCost.textContent = datesObjectCostForHouse[key] + "₽";
+                        dateCost.style.fontSize = "16px";
+                    }
+                }
+                else {
+                    if ((Number(key.substring(5, 7)) === month + 1) && (Number(key.substring(0,4)) === year) && (Number(key.substring(8)) === Number(dayElement.textContent))) {
+                        dateCost.textContent = datesObjectCostForHouse[key] + "₽";
+                        dateCost.style.fontSize = "16px";
+                    }
+                }
+            });
+            dayElement.appendChild(dateCost);
+            calendarGrid.appendChild(dayElement);
+        }
+
+        // Заполняем ячейки после последнего дня месяца
+        let daysRemainder = 7 - lastDayOfMonth.getDay();
+        if (daysRemainder !== 7) {
+            for (let i = 0; i < daysRemainder; i++) {
+                const emptyDay = document.createElement("div");
+                emptyDay.classList.add("calendar-day");
+                emptyDay.classList.add("next");
+                emptyDay.textContent = i + 1;
+                emptyDay.dataset.day = i + 1;
+                emptyDay.onclick = function () {
+                    selectInterval(this);
+                }
+                const dateCost = document.createElement("div");
+                dateCost.textContent = "-";
+                emptyDay.addEventListener('dblclick', openCostModal);
+                Object.keys(datesObjectCostForHouse).forEach(function(key) {
+                    if (month === 11) {
+                        if ((Number(key.substring(5, 7)) === 1) && (Number(key.substring(0,4)) === year + 1) && (Number(key.substring(8)) === Number(emptyDay.textContent))) {
+                            dateCost.textContent = datesObjectCostForHouse[key] + "₽";
+                            dateCost.style.fontSize = "16px";
+                        }
+                    }
+                    else {
+                        if ((Number(key.substring(5, 7)) === month + 2) && (Number(key.substring(0,4)) === year) && (Number(key.substring(8)) === Number(emptyDay.textContent))) {
+                            dateCost.textContent = datesObjectCostForHouse[key] + "₽";
+                            dateCost.style.fontSize = "16px";
+                        }
+                    }
+                });
+                emptyDay.appendChild(dateCost);
+                calendarGrid.appendChild(emptyDay);
+            }
+        }
+
+        // Закрашиваем забронированные дни
+        for (let i=0; i < bookedDaysForHouse.length; i++) {
+            let bookedMonth = Number(bookedDaysForHouse[i].split('-')[1]);
+            let bookedDay = Number(bookedDaysForHouse[i].split('-')[2]);
+            if (month + 1 === bookedMonth) {
+                let dayDivs = document.getElementsByClassName('calendar-day')
+                for (let j=0; j < dayDivs.length; j++){
+                    if (Number(dayDivs[j].dataset.day) === bookedDay && !dayDivs[j].classList.contains("prev") && !dayDivs[j].classList.contains("next")) {
+                        dayDivs[j].classList.add("booked");
+                    }
+                }
+            }
+            else if (month === bookedMonth) {
+                let dayDivs = document.getElementsByClassName('calendar-day prev')
+                for (let j=0; j < dayDivs.length; j++){
+                    if (Number(dayDivs[j].dataset.day) === bookedDay && dayDivs[j].classList.contains("prev")) {
+                        dayDivs[j].classList.add("booked");
+                    }
+                }
+            }
+            else if ((month === 0) && (bookedMonth === 12)) {
+                let dayDivs = document.getElementsByClassName('calendar-day prev')
+                for (let j=0; j < dayDivs.length; j++){
+                    if (Number(dayDivs[j].dataset.day) === bookedDay && dayDivs[j].classList.contains("prev")) {
+                        dayDivs[j].classList.add("booked");
+                    }
+                }
+            }
+            else if (month + 2 === bookedMonth) {
+                let dayDivs = document.getElementsByClassName('calendar-day next')
+                for (let j=0; j < dayDivs.length; j++){
+                    if (Number(dayDivs[j].dataset.day) === bookedDay && dayDivs[j].classList.contains("next")) {
+                        dayDivs[j].classList.add("booked");
+                    }
+                }
+            }
+            else if ((month + 2 > 12) && (bookedMonth === 1)) {
+                let dayDivs = document.getElementsByClassName('calendar-day next')
+                for (let j=0; j < dayDivs.length; j++){
+                    if (Number(dayDivs[j].dataset.day) === bookedDay && dayDivs[j].classList.contains("next")) {
+                        dayDivs[j].classList.add("booked");
+                    }
+                }
+            }
+        }
+
+        // Обновляем заголовок месяца и года
+        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        monthYearElement.textContent = `${monthNames[month]} ${year}`;
+    }
+
+    selectElement.addEventListener("change", function (){
+        selectedValue = this.value;
+        generateCalendar(currentMonth, currentYear);
+    });
+
+    // Инициализация календаря при загрузке страницы
+    generateCalendar(currentMonth, currentYear);
+
+
+    const prevMonthButton = document.getElementById("prev-month");
+    const nextMonthButton = document.getElementById("next-month");
+
+    prevMonthButton.addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+        }
+        month1_input.setAttribute("value", currentMonth.toString());
+        month2_input.setAttribute("value", currentMonth.toString());
+        year1_input.setAttribute("value", currentYear.toString());
+        year2_input.setAttribute("value", currentYear.toString());
+        generateCalendar(currentMonth, currentYear);
+    });
+
+    nextMonthButton.addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+        }
+        month1_input.setAttribute("value", currentMonth.toString());
+        month2_input.setAttribute("value", currentMonth.toString());
+        year1_input.setAttribute("value", currentYear.toString());
+        year2_input.setAttribute("value", currentYear.toString());
+        generateCalendar(currentMonth, currentYear);
+    });
+
+    function selectInterval(clickedBtn){
+        if (!clickedBtn.classList.contains("clicked") && clickedBtnCounter === 0) {
+            clickedBtn.classList.add("clicked");
+            firstClickedBtn = Array.prototype.indexOf.call(calendarGrid.children, clickedBtn);
+            clickedBtnCounter++;
+        }
+        else if (!clickedBtn.classList.contains("clicked") && clickedBtnCounter === 1) {
+            secondClickedBtn = Array.prototype.indexOf.call(calendarGrid.children, clickedBtn);
+            let calendarDays = document.getElementsByClassName("calendar-day");
+            let flag = false;
+            if (secondClickedBtn < firstClickedBtn) {
+                let tmp = firstClickedBtn;
+                firstClickedBtn = secondClickedBtn;
+                secondClickedBtn = tmp;
+            }
+            for (let i=firstClickedBtn; i <= secondClickedBtn; i++) {
+                if (calendarDays[i].classList.contains("booked")) {
+                    alert("Выбранный временной промежуток пересекается с уже существующим.");
+                    return;
+                }
+            }
+            clickedBtn.classList.add("clicked");
+            for (let i=0; i < calendarDays.length; i++) {
+                if (flag && !calendarDays[i].classList.contains("clicked")) {
+                    calendarDays[i].classList.add("middle");
+                }
+                if (calendarDays[i].classList.contains("clicked") && !flag){
+                    flag = true;
+                }
+                else if (calendarDays[i].classList.contains("clicked") && flag) {
+                    break;
+                }
+            }
+            clickedBtnCounter++;
+            calendarBtn.style.display = "block";
+        }
+        else if (clickedBtn.classList.contains("clicked") && clickedBtnCounter === 2) {
+            clickedBtn.classList.remove("clicked");
+            let calendarDays = document.getElementsByClassName("calendar-day");
+            for (let i=0; i < calendarDays.length; i++) {
+                calendarDays[i].classList.remove("middle");
+            }
+            clickedBtnCounter--;
+            calendarBtn.style.display = "none";
+        }
+        else if (clickedBtn.classList.contains("clicked") ) {
+            clickedBtn.classList.remove("clicked");
+            clickedBtnCounter = 0;
+            calendarBtn.style.display = "none";
+        }
+        else {
+            let calendarDays = document.getElementsByClassName("calendar-day");
+            for (let i=0; i < calendarDays.length; i++) {
+                calendarDays[i].classList.remove("clicked");
+                calendarDays[i].classList.remove("middle");
+                clickedBtnCounter = 0;
+            }
+            calendarBtn.style.display = "none";
+        }
+    }
+
+  </script>
+</div>
+{% endblock %}
