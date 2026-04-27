@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Свободные дома | NatRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <main class="max-w-5xl mx-auto px-4 py-10">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-semibold">Свободные дома</h1>
+            <a href="{% url 'main:main_page' %}" class="text-blue-600 hover:text-blue-800">Назад к поиску</a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border p-4 mb-8">
+            <p class="text-sm text-gray-700">
+                Период: <span class="font-medium">{{ first_date }}</span> - <span class="font-medium">{{ second_date }}</span>,
+                гостей: <span class="font-medium">{{ guest_count }}</span>
+            </p>
+        </div>
+
+        {% if free_houses %}
+            <div class="grid gap-6 sm:grid-cols-2">
+                {% for house in free_houses %}
+                    <article class="bg-white rounded-lg border shadow-sm overflow-hidden">
+                        {% if house.img1 %}
+                            <img src="{{ house.img1.url }}" alt="{{ house.name }}" class="w-full h-48 object-cover">
+                        {% endif %}
+                        <div class="p-5">
+                            <h2 class="text-xl font-semibold mb-2">{{ house.name }}</h2>
+                            <p class="text-gray-600 mb-4">{{ house.description|truncatechars:180 }}</p>
+                            <div class="text-sm text-gray-700 space-y-1">
+                                <p>Максимум гостей: <span class="font-medium">{{ house.max_guests }}</span></p>
+                                <p>Цена за ночь: <span class="font-medium">{{ house.price }} ₽</span></p>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white rounded-lg border shadow-sm p-6">
+                <p class="text-lg">На выбранные даты свободных домов нет.</p>
+                <p class="text-gray-600 mt-2">Попробуйте изменить даты или количество гостей.</p>
+            </div>
+        {% endif %}
+    </main>
+</body>
+</html>
