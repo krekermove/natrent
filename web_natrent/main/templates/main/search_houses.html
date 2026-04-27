@@ -158,8 +158,7 @@
         }
 
         .date-picker-actions {
-            position: absolute;
-            bottom: 10px;
+            margin-top: 14px;
         }
 
         .clear-button {
@@ -299,6 +298,10 @@
         const decrementBtn = document.querySelector(".dec_guests_number");
         const incrementBtn = document.querySelector(".inc_guests_number");
 
+        const queryFirstDateRaw = "{{ first_date|default:''|escapejs }}";
+        const querySecondDateRaw = "{{ second_date|default:''|escapejs }}";
+        const queryGuestCountRaw = "{{ guest_count|default:''|escapejs }}";
+
         let calendarInitialized = false;
         const guestsLimit = 10;
         let currentGuestsValue = 1;
@@ -309,7 +312,7 @@
         let firstInput = "";
         let secondInput = "";
 
-        guestsLabel.textContent = "1 гость";
+        applyInitialSearchParams();
 
         decrementBtn.addEventListener("click", () => {
             currentGuestsValue -= 1;
@@ -342,6 +345,104 @@
             }
         }
 
+        function formatGuestLabel(value) {
+            if (value === 1) return "1 гость";
+            if (value > 4) return String(value) + " гостей";
+            return String(value) + " гостя";
+        }
+
+        function toDisplayDate(isoDate) {
+            if (!isoDate || isoDate.indexOf("-") === -1) return "";
+            const dateParts = isoDate.split("-");
+            if (dateParts.length !== 3) return "";
+            return [dateParts[2], dateParts[1], dateParts[0]].join(".");
+        }
+
+        function toDateFromDisplay(displayDate) {
+            if (!displayDate || displayDate.indexOf(".") === -1) return null;
+            const parts = displayDate.split(".");
+            if (parts.length !== 3) return null;
+            const parsedDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+            if (Number.isNaN(parsedDate.getTime())) return null;
+            return parsedDate;
+        }
+
+        function normalizeDateKey(dateObj) {
+            const year = String(dateObj.getFullYear());
+            const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+            const day = String(dateObj.getDate()).padStart(2, "0");
+            return year + "-" + month + "-" + day;
+        }
+
+        function applyInitialSearchParams() {
+            const displayFirstDate = toDisplayDate(queryFirstDateRaw);
+            const displaySecondDate = toDisplayDate(querySecondDateRaw);
+            if (displayFirstDate && displaySecondDate) {
+                firstInputDate.value = displayFirstDate;
+                secondInputDate.value = displaySecondDate;
+                firstInput = displayFirstDate;
+                secondInput = displaySecondDate;
+                inputDates.children.item(0).textContent = displayFirstDate.slice(0, 5) + " - " + displaySecondDate.slice(0, 5);
+            } else {
+                inputDates.children.item(0).textContent = "Выберите даты";
+            }
+
+            const guestCount = Number(queryGuestCountRaw);
+            if (Number.isInteger(guestCount) && guestCount >= 1 && guestCount <= guestsLimit) {
+                currentGuestsValue = guestCount;
+            } else {
+                currentGuestsValue = 1;
+            }
+            guestInputValue.value = currentGuestsValue;
+            guestsLabel.textContent = formatGuestLabel(currentGuestsValue);
+            decrementBtn.toggleAttribute("disabled", currentGuestsValue <= 1);
+            incrementBtn.toggleAttribute("disabled", currentGuestsValue >= guestsLimit);
+        }
+
+        function highlightSelectedIntervalInCalendar() {
+            const allDays = document.querySelectorAll(".day");
+            allDays.forEach((day) => day.classList.remove("clicked", "middle"));
+
+            const startDate = toDateFromDisplay(firstInputDate.value);
+            const endDate = toDateFromDisplay(secondInputDate.value);
+            if (!startDate || !endDate) {
+                clickedBtnCounter = 0;
+                return;
+            }
+
+            let rangeStart = startDate;
+            let rangeEnd = endDate;
+            if (rangeStart > rangeEnd) {
+                rangeStart = endDate;
+                rangeEnd = startDate;
+            }
+
+            const startKey = normalizeDateKey(rangeStart);
+            const endKey = normalizeDateKey(rangeEnd);
+            let hasStartInVisibleCalendar = false;
+            let hasEndInVisibleCalendar = false;
+
+            allDays.forEach((day) => {
+                const dayKey = day.dataset.fullDate;
+                if (!dayKey) return;
+                if (dayKey >= startKey && dayKey <= endKey) {
+                    day.classList.add("middle");
+                }
+                if (dayKey === startKey) {
+                    day.classList.add("clicked");
+                    day.classList.remove("middle");
+                    hasStartInVisibleCalendar = true;
+                }
+                if (dayKey === endKey) {
+                    day.classList.add("clicked");
+                    day.classList.remove("middle");
+                    hasEndInVisibleCalendar = true;
+                }
+            });
+
+            clickedBtnCounter = hasStartInVisibleCalendar && hasEndInVisibleCalendar ? 2 : 0;
+        }
+
         inputDates.addEventListener("click", (event) => {
             event.stopPropagation();
             if (calendar.classList.contains("show")) {
@@ -360,6 +461,7 @@
                     secondYear += 1;
                 }
                 generateCalendar(calendarGrid2, monthYearElement2, secondMonth, secondYear);
+                highlightSelectedIntervalInCalendar();
                 calendarInitialized = true;
             }
             calendar.classList.add("show");
@@ -423,6 +525,7 @@
                 dayElement.classList.add("day");
                 dayElement.textContent = i;
                 dayElement.dataset.day = i;
+                dayElement.dataset.fullDate = normalizeDateKey(new Date(year, month, i));
 
                 if (i === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear()) {
                     dayElement.classList.add("today");
@@ -475,6 +578,7 @@
                 currentMonth = 0;
                 currentYear += 1;
             }
+            highlightSelectedIntervalInCalendar();
         });
 
         nextMonthButton.addEventListener("click", () => {
@@ -486,6 +590,7 @@
                 currentYear += 1;
             }
             generateCalendar(calendarGrid2, monthYearElement2, currentMonth, currentYear);
+            highlightSelectedIntervalInCalendar();
         });
 
         function selectInterval(clickedBtn) {
