@@ -95,64 +95,40 @@
             transform: translateY(0);
         }
 
-        .guests-popup {
-            position: absolute;
-            bottom: calc(100% + 15px); /* Отступ над формой */
-            right: 25%; /* Или по центру, в зависимости от желаемого расположения */
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            padding: 10px;
-            display: flex; /* Для размещения модулей календарей и действий рядом */
-            gap: 30px; /* Отступ между календарными модулями */
-            z-index: 20; /* Выше формы */
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-            align-items: center;
-            height: 90px;
-            width: 28%;
-        }
-        .guests-popup.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+        .booking-control {
+            height: 50px;
+            box-sizing: border-box;
         }
 
-        .guests-picker {
+        .guests_counter_inline {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10%;
-            height: 60px;
-        }
-
-        .guests_counter {
-            display: flex;
-            justify-content: center;
-            align-items: center;
             gap: 8px;
             border-radius: 8px;
-            background-color: #f0f0f0;
-            height: 70%;
+            border: 1px solid #d1d5db;
+            padding: 0 10px;
+            background: #fff;
         }
 
-        .guests_counter button {
+        .guests_counter_inline button {
             background-color: transparent;
             border: none;
             cursor: pointer;
             padding: 4px 12px;
+            font-size: 20px;
+            line-height: 1;
         }
 
         .guests_value {
-            font-size: 18px;
+            min-width: 84px;
+            text-align: center;
+            user-select: none;
         }
 
-        .guests_counter button[disabled] {
+        .guests_counter_inline button[disabled] {
             opacity: 0.3;
             cursor: not-allowed;
-            background-color: #f0f0f0;
         }
 
         .calendar-module {
@@ -347,15 +323,6 @@
                 gap: 10px;
                 bottom: calc(100% + 10px);
             }
-            .guests-popup {
-                width: 90%; /* Шире для мобильных */
-                left: 5%;
-                right: 5%;
-                transform: translateX(0); /* Убираем transform для центрирования */
-                flex-direction: column; /* Месяцы друг под другом */
-                gap: 10px;
-                bottom: calc(100% + 10px);
-            }
         }
     </style>
 </head>
@@ -445,25 +412,6 @@
                         </div>
                     </div>
 
-                    <div id="guestsPopup" class="guests-popup">
-                        <div class="guests-picker">
-                            <span>Количество</span>
-                            <div class="guests_counter">
-                                <button class="dec_guests_number" disabled>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.7 11.7v-1.4H4.3v1.4h11.4Z" fill="currentColor"></path>
-                                    </svg>
-                                </button>
-                                <span class="guests_value">1</span>
-                                <button class="inc_guests_number">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M9.3 11.7v5h1.4v-5h5v-1.4h-5v-5H9.3v5h-5v1.4h5Z" fill="currentColor"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
                     <form id="bookingForm" action="{% url 'main:main_page' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4" method="post">
                         {% csrf_token %}
                         <div class="md:col-span-2">
@@ -471,7 +419,7 @@
                             <input type="hidden" name="secondInputDate" value="">
                             <label for="dates" class="block text-gray-700 font-medium mb-2">Даты проживания</label>
                             <div class="relative">
-                                <div type="text" id="dates" class="dates w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <div type="text" id="dates" class="dates booking-control w-full px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center">
                                     <span>Выберите даты</span>
                                 </div>
                                 <i class="fas fa-calendar-alt absolute right-3 top-4 text-gray-400"></i>
@@ -487,8 +435,12 @@
                             <label for="guests" class="block text-gray-700 font-medium mb-2">Количество гостей</label>
                             <div class="relative">
                                 <input type="hidden" name="guestInputValue" value="1">
-                                <div type="text" id="guests" class="dates w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <span>1 гость</span>
+                                <div class="guests_counter_inline booking-control w-full">
+                                    <button class="dec_guests_number" type="button" disabled>-</button>
+                                    <div id="guests">
+                                        <span class="guests_value">1 гость</span>
+                                    </div>
+                                    <button class="inc_guests_number" type="button">+</button>
                                 </div>
                             </div>
                         </div>
@@ -505,7 +457,7 @@
 <!--                        </div>-->
 
                         <div class="flex items-end">
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            <button type="submit" class="booking-control w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 rounded-lg transition duration-300 flex items-center justify-center">
                                 Найти дома
                             </button>
                         </div>
@@ -1130,20 +1082,18 @@
         const calendarClearBtn = document.getElementsByClassName("clear-button")[0];
 
         const input_guests = document.getElementById('guests');
-        const guests_popup = document.getElementsByClassName('guests-popup')[0];
+        const guestsLabel = input_guests.querySelector('.guests_value');
         var guestInputValue = document.getElementsByName('guestInputValue')[0];
 
-        var guestsPopupFlag = false;
         const decrementBtn = document.querySelector('.dec_guests_number');
         const incrementBtn = document.querySelector('.inc_guests_number');
-        const guestsValue = document.querySelector('.guests_value');
 
         const guestsLimit = 10;
         let currentValue = 1
 
 
         // Устанавливаем начальное значение
-        guestsValue.textContent = currentValue;
+        guestsLabel.textContent = "1 гость";
 
         // Обработчик для кнопки уменьшения
         decrementBtn.addEventListener('click', () => {
@@ -1151,22 +1101,20 @@
             incrementBtn.removeAttribute('disabled');
             if (currentValue < 2) {
                 currentValue = 1;
-                guestsValue.textContent = currentValue;
                 guestInputValue.value = currentValue;
-                input_guests.textContent = String(currentValue) + " гость";
+                guestsLabel.textContent = "1 гость";
                 decrementBtn.setAttribute('disabled', '');
                 return;
             }
-            guestsValue.textContent = currentValue;
             guestInputValue.value = currentValue;
             if (currentValue === 1) {
-                input_guests.textContent = String(currentValue) + " гость";
+                guestsLabel.textContent = String(currentValue) + " гость";
             }
             else if (currentValue > 4) {
-                input_guests.textContent = String(currentValue) + " гостей";
+                guestsLabel.textContent = String(currentValue) + " гостей";
             }
             else {
-                input_guests.textContent = String(currentValue) + " гостя";
+                guestsLabel.textContent = String(currentValue) + " гостя";
             }
         });
 
@@ -1176,29 +1124,26 @@
             decrementBtn.removeAttribute('disabled');
             if (currentValue < guestsLimit){
                 incrementBtn.removeAttribute('disabled');
-                guestsValue.textContent = currentValue;
                 guestInputValue.value = currentValue;
                 if (currentValue === 1) {
-                    input_guests.textContent = String(currentValue) + " гость";
+                    guestsLabel.textContent = String(currentValue) + " гость";
                 }
                 else if (currentValue > 4) {
-                    input_guests.textContent = String(currentValue) + " гостей";
+                    guestsLabel.textContent = String(currentValue) + " гостей";
                 }
                 else {
-                    input_guests.textContent = String(currentValue) + " гостя";
+                    guestsLabel.textContent = String(currentValue) + " гостя";
                 }
             }
             else if (currentValue === guestsLimit){
-                guestsValue.textContent = currentValue;
                 guestInputValue.value = currentValue;
-                input_guests.textContent = String(currentValue) + " гостей";
+                guestsLabel.textContent = String(currentValue) + " гостей";
                 incrementBtn.setAttribute('disabled', '');
             }
         });
 
         input_dates.addEventListener("click", function (event){
             event.stopPropagation();
-            closeGuestsPopup();
             if (calendar.classList.contains("show")) {
                 calendar.classList.remove("show");
                 input_dates.classList.remove("active");
@@ -1245,43 +1190,14 @@
 
         window.addEventListener("click", function(event) {
             const modalCalendar = document.getElementById("calendar");
-            const modalGuestsPopup = document.getElementById("guestsPopup");
 
             const isInsideCalendar = modalCalendar.contains(event.target);
-            const isInsideGuestsPopup = modalGuestsPopup.contains(event.target);
 
             if (modalCalendar.classList.contains("show") && !isInsideCalendar) {
                 closeCalendar();
                 input_dates.classList.remove("active");
             }
-            if (modalGuestsPopup.classList.contains("show") && !isInsideGuestsPopup) {
-                closeGuestsPopup();
-                input_guests.classList.remove("active");
-            }
         });
-
-        input_guests.addEventListener("click", function (event){
-            event.stopPropagation();
-            closeCalendar();
-            if (guests_popup.classList.contains("show")) {
-                guests_popup.classList.remove("show");
-                input_guests.classList.remove("active");
-            }
-            else if (guestsPopupFlag) {
-                guests_popup.classList.add('show');
-                input_guests.classList.add("active");
-            }
-            else {
-                input_guests.classList.add("active");
-                guests_popup.classList.add('show');
-                guestsPopupFlag = true;
-            }
-        });
-
-        function closeGuestsPopup(){
-            document.getElementById("guestsPopup").classList.remove("show");
-            input_guests.classList.remove("active");
-        }
 
 
 
