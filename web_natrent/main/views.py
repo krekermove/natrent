@@ -1,11 +1,12 @@
 from urllib.parse import urlencode
+from datetime import datetime, timedelta
 
 from django.shortcuts import render, redirect
 from django.views import View
 from django.db.models import Q
 from django.urls import reverse
 
-from .models import RentObject, TimeTable
+from .models import RentObject, TimeTable, DateObjectCost
 
 
 # Create your views here.
@@ -20,6 +21,7 @@ class MainView(View):
         return render(request, 'main/index2.html')
 
     def post(self, request):
+        print(request.POST)
         first_date = self.date_transform(request.POST.get('firstInputDate'))
         second_date = self.date_transform(request.POST.get('secondInputDate'))
         guest_count = request.POST.get('guestInputValue')
@@ -82,6 +84,38 @@ class SearchView(View):
         ).exclude(
             id__in=busy_houses_ids
         )
+
+        start_date = datetime.strptime(first_date, "%Y-%m-%d").date()
+        end_date = datetime.strptime(second_date, "%Y-%m-%d").date()
+        stay_nights = (end_date - start_date).days
+        stay_dates = [start_date + timedelta(days=day) for day in range(stay_nights)]
+
+        free_houses = list(free_houses)
+        house_ids = [house.id for house in free_houses]
+        date_costs = DateObjectCost.objects.filter(
+            house_id__in=house_ids,
+            date__gte=start_date,
+            date__lt=end_date,
+        )
+
+        costs_by_house_and_date = {
+            (date_cost.house_id, date_cost.date): date_cost.cost
+            for date_cost in date_costs
+        }
+
+        for house in free_houses:
+            total_stay_cost = 0
+            has_all_dates_cost = True
+            for stay_date in stay_dates:
+                night_cost = costs_by_house_and_date.get((house.id, stay_date))
+                if night_cost is None:
+                    has_all_dates_cost = False
+                    break
+                total_stay_cost += night_cost
+            house.total_stay_cost = total_stay_cost
+            house.use_total_stay_cost = has_all_dates_cost and stay_nights > 0
+            house.stay_nights = stay_nights
+
         context['free_houses'] = free_houses
         context['first_date'] = first_date
         context['second_date'] = second_date

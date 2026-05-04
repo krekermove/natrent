@@ -262,7 +262,11 @@
                             <p class="text-gray-600 mb-4">{{ house.description|truncatechars:180 }}</p>
                             <div class="text-sm text-gray-700 space-y-1">
                                 <p>Максимум гостей: <span class="font-medium">{{ house.max_guests }}</span></p>
-                                <p>Цена за ночь: <span class="font-medium">{{ house.price }} ₽</span></p>
+                                {% if house.use_total_stay_cost %}
+                                    <p>Стоимость за {{ house.stay_nights }} ноч{{ house.stay_nights|pluralize:"ь,и,ей" }}: <span class="font-medium">{{ house.total_stay_cost }} ₽</span></p>
+                                {% else %}
+                                    <p>Цена за ночь: <span class="font-medium">{{ house.price }} ₽</span></p>
+                                {% endif %}
                             </div>
                         </div>
                     </article>
@@ -372,6 +376,14 @@
             const month = String(dateObj.getMonth() + 1).padStart(2, "0");
             const day = String(dateObj.getDate()).padStart(2, "0");
             return year + "-" + month + "-" + day;
+        }
+
+        function displayDateFromKey(ymd) {
+            if (!ymd || ymd.indexOf("-") === -1) return "";
+            const parts = ymd.split("-");
+            if (parts.length !== 3) return "";
+            const day = parts[2].padStart(2, "0");
+            return day + "." + parts[1] + "." + parts[0];
         }
 
         function applyInitialSearchParams() {
@@ -594,61 +606,42 @@
         });
 
         function selectInterval(clickedBtn) {
-            let tmpMonth = "";
-            let gridMonth = currentMonth + 1;
-            let gridYear = currentYear;
+            const fullDateKey = clickedBtn.dataset.fullDate;
+            if (!fullDateKey) return;
+
+            const pickedDisplay = displayDateFromKey(fullDateKey);
+            if (!pickedDisplay) return;
 
             if (!clickedBtn.classList.contains("clicked") && clickedBtnCounter === 0) {
-                if (clickedBtn.parentElement.className === "calendar-grid-1") {
-                    if (currentMonth === 0) {
-                        gridMonth = 12;
-                        gridYear -= 1;
-                    } else {
-                        gridMonth = currentMonth;
-                    }
-                }
                 clickedBtn.classList.add("clicked");
-                tmpMonth = gridMonth < 10 ? "0" + gridMonth : String(gridMonth);
-                firstInput = Number(clickedBtn.textContent) < 10 ? "0" + clickedBtn.textContent + "." + tmpMonth : clickedBtn.textContent + "." + tmpMonth;
-                inputDates.children.item(0).textContent = firstInput + " - ";
-                firstInput = firstInput + "." + gridYear;
+                firstInput = pickedDisplay;
                 firstInputDate.value = firstInput;
+                inputDates.children.item(0).textContent = pickedDisplay.slice(0, 5) + " - ";
                 firstClickedBtn = Array.prototype.indexOf.call(calendarGrid1.children, clickedBtn);
                 if (firstClickedBtn === -1) firstClickedBtn = Array.prototype.indexOf.call(calendarGrid2.children, clickedBtn) + 100;
                 clickedBtnCounter += 1;
             } else if (!clickedBtn.classList.contains("clicked") && clickedBtnCounter === 1) {
                 secondClickedBtn = Array.prototype.indexOf.call(calendarGrid1.children, clickedBtn);
                 if (secondClickedBtn === -1) secondClickedBtn = Array.prototype.indexOf.call(calendarGrid2.children, clickedBtn) + 100;
-                if (clickedBtn.parentElement.className === "calendar-grid-1") {
-                    if (currentMonth === 0) {
-                        gridMonth = 12;
-                        gridYear -= 1;
-                    } else {
-                        gridMonth = currentMonth;
-                    }
-                }
-                tmpMonth = gridMonth < 10 ? "0" + gridMonth : String(gridMonth);
-                secondInput = Number(clickedBtn.textContent) < 10 ? "0" + clickedBtn.textContent + "." + tmpMonth : clickedBtn.textContent + "." + tmpMonth;
-                inputDates.children.item(0).textContent += secondInput;
-                if (firstInput.slice(6) !== String(gridYear)) {
-                    inputDates.children.item(0).textContent = firstInput + " - " + secondInput + "." + gridYear;
-                }
-                secondInput = secondInput + "." + gridYear;
+                secondInput = pickedDisplay;
                 secondInputDate.value = secondInput;
 
-                if (secondClickedBtn < firstClickedBtn) {
-                    const tmp = firstClickedBtn;
-                    firstClickedBtn = secondClickedBtn;
-                    secondClickedBtn = tmp;
-                    inputDates.children.item(0).textContent = secondInput.slice(0, 5) + " - " + firstInput.slice(0, 5);
-                    if (firstInput.slice(6) !== secondInput.slice(6)) {
-                        inputDates.children.item(0).textContent = secondInput + " - " + firstInput;
-                    }
+                const startDateObj = toDateFromDisplay(firstInput);
+                const endDateObj = toDateFromDisplay(secondInput);
+                if (startDateObj && endDateObj && startDateObj > endDateObj) {
                     const tmpValue = firstInput;
                     firstInput = secondInput;
                     secondInput = tmpValue;
                     firstInputDate.value = firstInput;
                     secondInputDate.value = secondInput;
+                    const tmpIdx = firstClickedBtn;
+                    firstClickedBtn = secondClickedBtn;
+                    secondClickedBtn = tmpIdx;
+                }
+
+                inputDates.children.item(0).textContent = firstInput.slice(0, 5) + " - " + secondInput.slice(0, 5);
+                if (firstInput.slice(6) !== secondInput.slice(6)) {
+                    inputDates.children.item(0).textContent = firstInput + " - " + secondInput;
                 }
 
                 clickedBtn.classList.add("clicked");
