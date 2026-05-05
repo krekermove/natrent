@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
+{% load russian_plural %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Свободные дома | NatRent</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/ad0ddaade4.js" crossorigin="anonymous"></script>
     <style>
         .date-picker-calendar-popup {
             position: absolute;
@@ -38,26 +40,53 @@
         .guests_counter_inline {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 8px;
+            align-items: stretch;
+            gap: 0;
             border-radius: 8px;
             border: 1px solid #d1d5db;
-            padding: 0 10px;
+            padding: 0;
             background: #fff;
+            overflow: hidden;
+        }
+
+        .guests_counter_inline > #guests {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            padding: 0 12px;
         }
 
         .guests_counter_inline button {
+            flex: 1 1 0;
+            min-width: 0;
             background-color: transparent;
             border: none;
             cursor: pointer;
-            padding: 4px 10px;
+            padding: 0;
             font-size: 20px;
             line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dec_guests_number {
+            border-radius: 7px 0 0 7px;
+        }
+
+        .inc_guests_number {
+            border-radius: 0 7px 7px 0;
         }
 
         .guests_counter_inline button[disabled] {
             opacity: 0.3;
             cursor: not-allowed;
+        }
+
+        .dec_guests_number:hover,
+        .inc_guests_number:hover {
+            background-color: lightgrey;
         }
 
         .guests_value {
@@ -184,6 +213,120 @@
                 gap: 14px;
             }
         }
+
+        .house-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .house-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 24px rgba(17, 24, 39, 0.12);
+            border-color: #d1d5db;
+        }
+        .house-card img {
+            height: 350px;
+        }
+
+        .house-slider {
+            position: relative;
+            overflow: hidden;
+            background-color: #f3f4f6;
+        }
+
+        .house-slider-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .house-slider-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .house-slide {
+            width: 100%;
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+        }
+
+        .house-slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 9999px;
+            background: rgba(17, 24, 39, 0.45);
+            color: #fff;
+            font-size: 30px;
+            font-weight: 500;
+            line-height: 1.2;
+            cursor: pointer;
+            display: flex;
+            /* align-items: center; */
+            justify-content: center;
+            text-align: center;
+            z-index: 4;
+            opacity: 0;
+            transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .house-slider-btn:hover {
+            background: rgba(17, 24, 39, 0.75);
+            transform: translateY(-50%) scale(1.03);
+        }
+
+        .house-slider-btn.prev {
+            left: 14px;
+        }
+
+        .house-slider-btn.next {
+            right: 14px;
+        }
+
+        .house-slider-hit {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 15%;
+            border: 0;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0);
+            opacity: 0;
+            z-index: 2;
+            transition: opacity 0.2s ease, background-color 0.2s ease;
+        }
+
+        .house-slider-hit.left {
+            left: 0;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.14) 55%, rgba(0, 0, 0, 0) 100%);
+        }
+
+        .house-slider-hit.right {
+            right: 0;
+            background: linear-gradient(270deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.14) 55%, rgba(0, 0, 0, 0) 100%);
+        }
+
+
+        .house-slider:has(.house-slider-btn.prev:hover) .house-slider-hit.left,
+        .house-slider:has(.house-slider-btn.next:hover) .house-slider-hit.right,
+        .house-slider-hit.left:hover,
+        .house-slider-hit.right:hover {
+            background-color: rgb(0, 0, 0);
+        }
+
+        
+        .house-card:hover .house-slider-btn {
+            opacity: 1;
+        }
+
+        .house-card:hover .house-slider-hit {
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -225,6 +368,7 @@
                         <div id="dates" class="dates booking-control w-full px-3 border border-gray-300 rounded-lg flex items-center">
                             <span>Выберите даты</span>
                         </div>
+                        <i class="fas fa-calendar-alt absolute right-3 top-4 text-gray-400"></i>
                     </div>
                 </div>
 
@@ -253,9 +397,23 @@
         {% if free_houses %}
             <div class="grid gap-6 sm:grid-cols-2">
                 {% for house in free_houses %}
-                    <article class="bg-white rounded-lg border shadow-sm overflow-hidden">
-                        {% if house.img1 %}
-                            <img src="{{ house.img1.url }}" alt="{{ house.name }}" class="w-full h-48 object-cover">
+                    <article class="house-card bg-white rounded-lg border shadow-sm overflow-hidden">
+                        {% if house.gallery_images %}
+                            <div class="house-slider" data-house-slider>
+                                <div class="house-slider-track" data-slider-track>
+                                    {% for image in house.gallery_images %}
+                                        <div class="house-slide">
+                                            <img src="{{ image.url }}" alt="{{ house.name }} - фото {{ forloop.counter }}" class="w-full h-48 object-cover">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if house.gallery_images|length > 1 %}
+                                    <button type="button" class="house-slider-hit left" data-slider-hit-prev aria-label="Предыдущее фото (зона)"></button>
+                                    <button type="button" class="house-slider-hit right" data-slider-hit-next aria-label="Следующее фото (зона)"></button>
+                                    <button type="button" class="house-slider-btn prev" data-slider-prev aria-label="Предыдущее фото">&lsaquo;</button>
+                                    <button type="button" class="house-slider-btn next" data-slider-next aria-label="Следующее фото">&rsaquo;</button>
+                                {% endif %}
+                            </div>
                         {% endif %}
                         <div class="p-5">
                             <h2 class="text-xl font-semibold mb-2">{{ house.name }}</h2>
@@ -263,7 +421,7 @@
                             <div class="text-sm text-gray-700 space-y-1">
                                 <p>Максимум гостей: <span class="font-medium">{{ house.max_guests }}</span></p>
                                 {% if house.use_total_stay_cost %}
-                                    <p>Стоимость за {{ house.stay_nights }} ноч{{ house.stay_nights|pluralize:"ь,и,ей" }}: <span class="font-medium">{{ house.total_stay_cost }} ₽</span></p>
+                                    <p>Стоимость за {{ house.stay_nights }} ноч{{ house.stay_nights|ru_plural:"ь,и,ей" }}: <span class="font-medium">{{ house.total_stay_cost }} ₽</span></p>
                                 {% else %}
                                     <p>Цена за ночь: <span class="font-medium">{{ house.price }} ₽</span></p>
                                 {% endif %}
@@ -670,6 +828,56 @@
                 secondInputDate.value = "";
             }
         }
+
+        function initHouseSliders() {
+            const sliderNodes = document.querySelectorAll("[data-house-slider]");
+            sliderNodes.forEach((slider) => {
+                const track = slider.querySelector("[data-slider-track]");
+                const slides = slider.querySelectorAll(".house-slide");
+                const nextButton = slider.querySelector("[data-slider-next]");
+                const prevButton = slider.querySelector("[data-slider-prev]");
+                const hitNext = slider.querySelector("[data-slider-hit-next]");
+                const hitPrev = slider.querySelector("[data-slider-hit-prev]");
+                if (!track || !nextButton || !prevButton || !hitNext || !hitPrev) return;
+                if (!slides.length) return;
+
+                const slideWidth = () => slider.clientWidth;
+                const maxIndex = slides.length - 1;
+
+                const getCurrentIndex = () => {
+                    const width = slideWidth();
+                    if (!width) return 0;
+                    const rawIndex = Math.round(track.scrollLeft / width);
+                    if (rawIndex < 0) return 0;
+                    if (rawIndex > maxIndex) return maxIndex;
+                    return rawIndex;
+                };
+
+                const scrollToIndex = (index) => {
+                    track.scrollTo({ left: slideWidth() * index, behavior: "smooth" });
+                };
+
+                const scrollToNext = () => {
+                    const currentIndex = getCurrentIndex();
+                    const nextIndex = currentIndex >= maxIndex ? 0 : currentIndex + 1;
+                    scrollToIndex(nextIndex);
+                };
+
+                const scrollToPrev = () => {
+                    const currentIndex = getCurrentIndex();
+                    const prevIndex = currentIndex <= 0 ? maxIndex : currentIndex - 1;
+                    scrollToIndex(prevIndex);
+                };
+
+                nextButton.addEventListener("click", scrollToNext);
+                hitNext.addEventListener("click", scrollToNext);
+
+                prevButton.addEventListener("click", scrollToPrev);
+                hitPrev.addEventListener("click", scrollToPrev);
+            });
+        }
+
+        initHouseSliders();
     </script>
 </body>
 </html>

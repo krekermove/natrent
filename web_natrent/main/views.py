@@ -21,7 +21,6 @@ class MainView(View):
         return render(request, 'main/index2.html')
 
     def post(self, request):
-        print(request.POST)
         first_date = self.date_transform(request.POST.get('firstInputDate'))
         second_date = self.date_transform(request.POST.get('secondInputDate'))
         guest_count = request.POST.get('guestInputValue')
@@ -115,7 +114,11 @@ class SearchView(View):
             house.total_stay_cost = total_stay_cost
             house.use_total_stay_cost = has_all_dates_cost and stay_nights > 0
             house.stay_nights = stay_nights
-
+            house.gallery_images = [
+                image_field for image_field in [house.img1, house.img2, house.img3, house.img4] if image_field
+            ]
+        
+        print(free_houses[0].stay_nights)
         context['free_houses'] = free_houses
         context['first_date'] = first_date
         context['second_date'] = second_date
