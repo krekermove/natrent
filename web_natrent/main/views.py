@@ -1,7 +1,8 @@
 from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
-from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.db.models import Q
 from django.urls import reverse
@@ -53,6 +54,27 @@ def popular_list(request):
 
 
 class SearchView(View):
+    def calculate_house_cost(self, house, start_date, end_date):
+        stay_nights = (end_date - start_date).days
+        stay_dates = [start_date + timedelta(days=day) for day in range(stay_nights)]
+        date_costs = DateObjectCost.objects.filter(
+            house=house,
+            date__gte=start_date,
+            date__lt=end_date,
+        )
+        costs_by_date = {date_cost.date: date_cost.cost for date_cost in date_costs}
+
+        total_stay_cost = 0
+        has_all_dates_cost = stay_nights > 0
+        for stay_date in stay_dates:
+            night_cost = costs_by_date.get(stay_date)
+            if night_cost is None:
+                has_all_dates_cost = False
+                break
+            total_stay_cost += night_cost
+
+        return total_stay_cost, has_all_dates_cost, stay_nights
+
     def get(self, request):
         first_date = request.GET.get('first_date')
         second_date = request.GET.get('second_date')
@@ -86,42 +108,84 @@ class SearchView(View):
 
         start_date = datetime.strptime(first_date, "%Y-%m-%d").date()
         end_date = datetime.strptime(second_date, "%Y-%m-%d").date()
-        stay_nights = (end_date - start_date).days
-        stay_dates = [start_date + timedelta(days=day) for day in range(stay_nights)]
-
         free_houses = list(free_houses)
-        house_ids = [house.id for house in free_houses]
-        date_costs = DateObjectCost.objects.filter(
-            house_id__in=house_ids,
-            date__gte=start_date,
-            date__lt=end_date,
-        )
-
-        costs_by_house_and_date = {
-            (date_cost.house_id, date_cost.date): date_cost.cost
-            for date_cost in date_costs
-        }
 
         for house in free_houses:
-            total_stay_cost = 0
-            has_all_dates_cost = True
-            for stay_date in stay_dates:
-                night_cost = costs_by_house_and_date.get((house.id, stay_date))
-                if night_cost is None:
-                    has_all_dates_cost = False
-                    break
-                total_stay_cost += night_cost
+            total_stay_cost, has_all_dates_cost, stay_nights = self.calculate_house_cost(
+                house,
+                start_date,
+                end_date,
+            )
             house.total_stay_cost = total_stay_cost
-            house.use_total_stay_cost = has_all_dates_cost and stay_nights > 0
+            house.use_total_stay_cost = has_all_dates_cost
             house.stay_nights = stay_nights
             house.gallery_images = [
                 image_field for image_field in [house.img1, house.img2, house.img3, house.img4] if image_field
             ]
         
-        print(free_houses[0].stay_nights)
         context['free_houses'] = free_houses
         context['first_date'] = first_date
         context['second_date'] = second_date
         context['guest_count'] = guest_count
 
         return render(request, 'main/search_houses.html', context=context)
+
+
+class HouseDetailView(View):
+    def get(self, request, house_id):
+        house = get_object_or_404(RentObject, pk=house_id)
+        house.gallery_images = [image_field for image_field in [house.img1, house.img2, house.img3, house.img4] if image_field]
+        return render(request, 'main/house_detail.html', {'house': house})
+
+
+class BookHouseView(View):
+    def post(self, request):
+        house_id = request.POST.get('house_id')
+        first_date = request.POST.get('first_date')
+        second_date = request.POST.get('second_date')
+        guest_count = request.POST.get('guest_count')
+        order_cost = request.POST.get('order_cost')
+        name = request.POST.get('name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        comment = request.POST.get('comment', '').strip()
+
+        search_url = reverse('main:search_houses')
+        query_string = urlencode({
+            'first_date': first_date,
+            'second_date': second_date,
+            'guest_count': guest_count,
+        })
+
+        house = get_object_or_404(RentObject, pk=house_id)
+
+        if not all([name, phone, first_date, second_date, guest_count, order_cost]):
+            messages.error(request, 'Заполните обязательные поля для бронирования.')
+            return redirect(f'{search_url}?{query_string}')
+
+        try:
+            start_date = datetime.strptime(first_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(second_date, "%Y-%m-%d").date()
+            guests_amount = int(guest_count)
+            booking_cost = int(order_cost)
+        except (TypeError, ValueError):
+            messages.error(request, 'Некорректные данные формы бронирования.')
+            return redirect(f'{search_url}?{query_string}')
+
+        try:
+            booking = TimeTable(
+                name=name,
+                phone=phone,
+                house=house,
+                startdate=start_date,
+                enddate=end_date,
+                guests_amount=guests_amount,
+                comment=comment,
+                order_cost=booking_cost,
+            )
+            booking.save()
+        except ValueError as error:
+            messages.error(request, str(error))
+            return redirect(f'{search_url}?{query_string}')
+
+        messages.success(request, f'Заявка на бронирование "{house.name}" отправлена.')
+        return redirect(f'{search_url}?{query_string}')

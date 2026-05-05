@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ house.name }} | NatRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <main class="max-w-5xl mx-auto px-4 py-10">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-3xl font-semibold">{{ house.name }}</h1>
+            <a href="javascript:history.back()" class="text-blue-600 hover:text-blue-800">Назад</a>
+        </div>
+
+        {% if house.gallery_images %}
+            <div class="grid gap-4 md:grid-cols-2 mb-8">
+                {% for image in house.gallery_images %}
+                    <img src="{{ image.url }}" alt="{{ house.name }} - фото {{ forloop.counter }}" class="w-full h-72 object-cover rounded-lg border">
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <section class="bg-white rounded-lg border shadow-sm p-6 space-y-4">
+            <p class="text-gray-700 leading-relaxed">{{ house.description }}</p>
+            <div class="text-sm text-gray-700 space-y-1">
+                <p>Максимум гостей: <span class="font-medium">{{ house.max_guests }}</span></p>
+                <p>Цена за ночь: <span class="font-medium">{{ house.price }} ₽</span></p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

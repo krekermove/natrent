@@ -327,6 +327,21 @@
         .house-card:hover .house-slider-hit {
             opacity: 0.5;
         }
+
+        .booking-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+            padding: 16px;
+        }
+
+        .booking-modal-overlay.show {
+            display: flex;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -335,6 +350,16 @@
             <h1 class="text-3xl font-semibold">Свободные дома</h1>
             <a href="{% url 'main:main_page' %}" class="text-blue-600 hover:text-blue-800">Назад к поиску</a>
         </div>
+
+        {% if messages %}
+            <div class="mb-4 space-y-2">
+                {% for message in messages %}
+                    <div class="rounded-lg border p-3 {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div class="bg-white rounded-lg shadow-sm border p-4 mb-8 relative">
             <div id="calendar" class="date-picker-calendar-popup">
@@ -426,6 +451,17 @@
                                     <p>Цена за ночь: <span class="font-medium">{{ house.price }} ₽</span></p>
                                 {% endif %}
                             </div>
+                            <div class="mt-5 grid grid-cols-2 gap-3">
+                                <a href="{% url 'main:house_detail' house.id %}" class="text-center border border-gray-300 hover:border-gray-400 px-4 py-2 rounded-lg font-medium transition">Подробнее</a>
+                                <button
+                                    type="button"
+                                    class="open-booking-modal bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition"
+                                    data-house-id="{{ house.id }}"
+                                    data-house-name="{{ house.name }}"
+                                    data-order-cost="{% if house.use_total_stay_cost %}{{ house.total_stay_cost }}{% else %}{{ house.price }}{% endif %}">
+                                    Забронировать
+                                </button>
+                            </div>
                         </div>
                     </article>
                 {% endfor %}
@@ -437,6 +473,43 @@
             </div>
         {% endif %}
     </main>
+
+    <div id="bookingModal" class="booking-modal-overlay">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-xl p-6 relative">
+            <button id="closeBookingModal" type="button" class="absolute right-4 top-4 text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
+            <h3 class="text-2xl font-semibold mb-2">Забронировать дом</h3>
+            <p class="text-gray-600 mb-5" id="bookingHouseName"></p>
+
+            <form action="{% url 'main:book_house' %}" method="post" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="house_id" id="modalHouseId">
+                <input type="hidden" name="first_date" id="modalFirstDate" value="{{ first_date }}">
+                <input type="hidden" name="second_date" id="modalSecondDate" value="{{ second_date }}">
+                <input type="hidden" name="guest_count" id="modalGuestCount" value="{{ guest_count }}">
+                <input type="hidden" name="order_cost" id="modalOrderCost">
+
+                <div>
+                    <label for="modalName" class="block text-gray-700 font-medium mb-2">Имя</label>
+                    <input id="modalName" name="name" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                </div>
+
+                <div>
+                    <label for="modalPhone" class="block text-gray-700 font-medium mb-2">Номер телефона</label>
+                    <input id="modalPhone" name="phone" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="+7 (___) ___-__-__">
+                </div>
+
+                <div>
+                    <label for="modalComment" class="block text-gray-700 font-medium mb-2">Комментарий</label>
+                    <textarea id="modalComment" name="comment" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Дополнительные пожелания"></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-3 rounded-lg transition">
+                    Отправить заявку
+                </button>
+            </form>
+        </div>
+    </div>
+
     <script>
         const calendarGrid1 = document.querySelector(".calendar-grid-1");
         const calendarGrid2 = document.querySelector(".calendar-grid-2");
@@ -463,6 +536,14 @@
         const queryFirstDateRaw = "{{ first_date|default:''|escapejs }}";
         const querySecondDateRaw = "{{ second_date|default:''|escapejs }}";
         const queryGuestCountRaw = "{{ guest_count|default:''|escapejs }}";
+        const bookingModal = document.getElementById("bookingModal");
+        const closeBookingModalBtn = document.getElementById("closeBookingModal");
+        const modalHouseName = document.getElementById("bookingHouseName");
+        const modalHouseId = document.getElementById("modalHouseId");
+        const modalOrderCost = document.getElementById("modalOrderCost");
+        const modalFirstDate = document.getElementById("modalFirstDate");
+        const modalSecondDate = document.getElementById("modalSecondDate");
+        const modalGuestCount = document.getElementById("modalGuestCount");
 
         let calendarInitialized = false;
         const guestsLimit = 10;
@@ -527,6 +608,13 @@
             const parsedDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
             if (Number.isNaN(parsedDate.getTime())) return null;
             return parsedDate;
+        }
+
+        function toIsoDate(displayDate) {
+            if (!displayDate || displayDate.indexOf(".") === -1) return "";
+            const parts = displayDate.split(".");
+            if (parts.length !== 3) return "";
+            return parts[2] + "-" + parts[1] + "-" + parts[0];
         }
 
         function normalizeDateKey(dateObj) {
@@ -877,7 +965,81 @@
             });
         }
 
+        function openBookingModal(event) {
+            const button = event.currentTarget;
+            modalHouseId.value = button.dataset.houseId;
+            modalOrderCost.value = button.dataset.orderCost;
+            modalHouseName.textContent = button.dataset.houseName + " | " + button.dataset.orderCost + " ₽";
+            modalFirstDate.value = toIsoDate(firstInputDate.value);
+            modalSecondDate.value = toIsoDate(secondInputDate.value);
+            modalGuestCount.value = guestInputValue.value;
+            bookingModal.classList.add("show");
+            document.body.classList.add("overflow-hidden");
+        }
+
+        function closeBookingModal() {
+            bookingModal.classList.remove("show");
+            document.body.classList.remove("overflow-hidden");
+        }
+
+        function initBookingModal() {
+            const openButtons = document.querySelectorAll(".open-booking-modal");
+            openButtons.forEach((button) => {
+                button.addEventListener("click", openBookingModal);
+            });
+            closeBookingModalBtn.addEventListener("click", closeBookingModal);
+            bookingModal.addEventListener("click", (event) => {
+                if (event.target === bookingModal) closeBookingModal();
+            });
+        }
+
+        function initModalPhoneMask() {
+            const phoneInput = document.getElementById("modalPhone");
+            if (!phoneInput) return;
+
+            phoneInput.addEventListener("input", function (e) {
+                let value = e.target.value.replace(/\D/g, "");
+                let formattedValue = "";
+
+                if (value.length > 0) {
+                    formattedValue = "+7";
+                }
+
+                if (value.length > 1) {
+                    formattedValue += " (" + value.substring(1, 4);
+                }
+
+                if (value.length > 4) {
+                    formattedValue += ") " + value.substring(4, 7);
+                }
+
+                if (value.length > 7) {
+                    formattedValue += "-" + value.substring(7, 9);
+                }
+
+                if (value.length > 9) {
+                    formattedValue += "-" + value.substring(9, 11);
+                }
+
+                e.target.value = formattedValue;
+            });
+
+            phoneInput.addEventListener("focus", function () {
+                if (!this.value) {
+                    this.value = "+7";
+                }
+            });
+
+            phoneInput.addEventListener("blur", function () {
+                if (this.value === "+7") {
+                    this.value = "";
+                }
+            });
+        }
+
         initHouseSliders();
+        initBookingModal();
+        initModalPhoneMask();
     </script>
 </body>
 </html>
