@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение бронирования</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f6f8;font-family:Arial,Helvetica,sans-serif;color:#333333;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f6f8;padding:24px 12px;">
+    <tr>
+        <td align="center">
+            <table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" style="max-width:640px;width:100%;background-color:#ffffff;border:1px solid #d9dee5;">
+                <tr>
+                    <td style="background-color:#e8f0f8;padding:24px 28px 20px;">
+                        <div style="font-size:26px;line-height:1.3;font-weight:normal;color:#4a4a4a;margin:0 0 16px;">Подтверждение бронирования</div>
+                        <div style="font-size:15px;font-weight:bold;color:#333333;margin:0 0 8px;">Бронь № {{ booking_number }}</div>
+                        <div style="font-size:13px;color:#555555;margin:0 0 6px;">Дата и время бронирования: {{ booking_datetime }}</div>
+                        <div style="font-size:13px;color:#555555;">Забронировано на сайте <a href="{{ site_url }}" style="color:#1a73e8;text-decoration:underline;">{{ company_name }}</a></div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding:20px 28px 8px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td valign="top" style="width:70%;padding-right:12px;">
+                                    <div style="font-size:16px;font-weight:bold;color:#333333;margin-bottom:10px;">{{ company_name }}</div>
+                                    <div style="font-size:13px;line-height:1.7;color:#444444;">Адрес: {{ company_address }}</div>
+                                    <div style="font-size:13px;line-height:1.7;color:#444444;">Телефон: {{ company_phone }}</div>
+                                    <div style="font-size:13px;line-height:1.7;color:#444444;">Email: <a href="mailto:{{ company_email }}" style="color:#1a73e8;text-decoration:underline;">{{ company_email }}</a></div>
+                                </td>
+                                <td valign="top" align="right" style="width:30%;">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #c8ced6;">
+                                        <tr>
+                                            <td style="padding:18px 16px;font-size:13px;color:#555555;text-align:center;white-space:nowrap;">
+                                                <a href="{{ site_url }}" style="color:#333333;text-decoration:none;">Официальный сайт</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding:8px 28px 16px;">
+                        <div style="border-top:1px dotted #b8c0c8;font-size:0;line-height:0;">&nbsp;</div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding:0 28px 12px;">
+                        <div style="font-size:18px;color:#4a4a4a;margin-bottom:12px;">Детали бронирования</div>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #d0d5dc;">
+                            <tr style="background-color:#eef1f4;">
+                                <th style="border:1px solid #d0d5dc;padding:10px 8px;font-size:12px;font-weight:normal;color:#555555;">Заезд</th>
+                                <th style="border:1px solid #d0d5dc;padding:10px 8px;font-size:12px;font-weight:normal;color:#555555;">Выезд</th>
+                                <th style="border:1px solid #d0d5dc;padding:10px 8px;font-size:12px;font-weight:normal;color:#555555;">Ночей</th>
+                                <th style="border:1px solid #d0d5dc;padding:10px 8px;font-size:12px;font-weight:normal;color:#555555;">Гостей</th>
+                                <th style="border:1px solid #d0d5dc;padding:10px 8px;font-size:12px;font-weight:normal;color:#555555;">Номеров</th>
+                            </tr>
+                            <tr>
+                                <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;vertical-align:top;">
+                                    {{ check_in_date }}<br>
+                                    <span style="font-size:11px;color:#666666;">после 14:00</span>
+                                </td>
+                                <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;vertical-align:top;">
+                                    {{ check_out_date }}<br>
+                                    <span style="font-size:11px;color:#666666;">до 12:00</span>
+                                </td>
+                                <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;">{{ nights }}</td>
+                                <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;">{{ booking.guests_amount }}</td>
+                                <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;">1</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding:8px 28px 12px;">
+                        <div style="font-size:13px;font-weight:bold;color:#333333;letter-spacing:0.04em;margin-bottom:10px;">ДАННЫЕ ЗАКАЗЧИКА</div>
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                            <tr>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;width:45%;font-size:13px;color:#666666;">ФИО</td>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#333333;">{{ booking.name }}</td>
+                            </tr>
+                            <tr>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#666666;">Телефон</td>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#333333;">{{ booking.phone }}</td>
+                            </tr>
+                            <tr>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#666666;">Email</td>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#333333;">
+                                    <a href="mailto:{{ booking.email }}" style="color:#1a73e8;text-decoration:underline;">{{ booking.email }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#666666;">Подписка на email-, SMS- рассылку</td>
+                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#333333;">Нет</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding:8px 28px 16px;">
+                        <div style="border-top:1px dotted #b8c0c8;font-size:0;line-height:0;">&nbsp;</div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding:0 28px 28px;">
+                        <div style="font-size:18px;color:#4a4a4a;margin-bottom:12px;">Стоимость бронирования</div>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #d0d5dc;margin-bottom:12px;">
+                            <tr style="background-color:#eef1f4;">
+                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#666666;width:30%;">Тариф</td>
+                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;">Выгодный тариф</td>
+                            </tr>
+                        </table>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #d0d5dc;">
+                            <tr>
+                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;">№1: {{ booking.house.name }}</td>
+                                <td align="right" style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;white-space:nowrap;">{{ formatted_cost }}</td>
+                            </tr>
+                            <tr>
+                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:12px;color:#666666;">
+                                    Размещение: {{ booking.guests_amount }} взросл{% if booking.guests_amount == 1 %}ый{% elif booking.guests_amount < 5 %}ых{% else %}ых{% endif %}
+                                </td>
+                                <td align="right" style="border:1px solid #d0d5dc;padding:10px 12px;font-size:12px;color:#666666;white-space:nowrap;">
+                                    {{ booking.guests_amount }} чел.<br>{{ formatted_cost }}
+                                </td>
+                            </tr>
+                            <tr style="background-color:#e8f0f8;">
+                                <td style="border:1px solid #d0d5dc;padding:12px;font-size:14px;font-weight:bold;color:#333333;">Общая стоимость</td>
+                                <td align="right" style="border:1px solid #d0d5dc;padding:12px;font-size:14px;font-weight:bold;color:#333333;white-space:nowrap;">{{ formatted_cost }}</td>
+                            </tr>
+                        </table>
+
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #d0d5dc;border-top:none;">
+                            <tr>
+                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#666666;width:30%;">Способ оплаты</td>
+                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;">Оплата при заселении</td>
+                            </tr>
+                        </table>
+
+                        {% if booking.comment %}
+                        <div style="margin-top:16px;font-size:13px;color:#555555;">
+                            <strong>Комментарий:</strong> {{ booking.comment }}
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

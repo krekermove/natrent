@@ -135,3 +135,22 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_DIRS = [
     BASE_DIR / 'staticfiles',
 ]
+
+# Email
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.smtp.EmailBackend',
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'voenmehclowns@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'yxvdvbpaaigqffrr')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '1') == '1'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '0') == '1'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'voenmehclowns@gmail.com')
+
+NATRENT_SITE_URL = os.environ.get('NATRENT_SITE_URL', 'http://localhost:1337/')
+NATRENT_COMPANY_NAME = 'NatRent'
+NATRENT_ADDRESS = os.environ.get('NATRENT_ADDRESS', 'г. Санкт-Петербург')
+NATRENT_PHONE = os.environ.get('NATRENT_PHONE', '+7 (981) 824 21-75')
+NATRENT_CONTACT_EMAIL = os.environ.get('NATRENT_CONTACT_EMAIL', 'pavel.kobzov@gmail.com')

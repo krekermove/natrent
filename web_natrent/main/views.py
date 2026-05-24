@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
@@ -8,6 +9,9 @@ from django.db.models import Q
 from django.urls import reverse
 
 from .models import RentObject, TimeTable, DateObjectCost
+from .emails import send_booking_confirmation_email
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -138,6 +142,21 @@ class HouseDetailView(View):
         return render(request, 'main/house_detail.html', {'house': house})
 
 
+class PersonalDataConsentView(View):
+    def get(self, request):
+        return render(request, 'main/legal/personal_data_consent.html')
+
+
+class UserAgreementView(View):
+    def get(self, request):
+        return render(request, 'main/legal/user_agreement.html')
+
+
+class PrivacyPolicyView(View):
+    def get(self, request):
+        return render(request, 'main/legal/privacy_policy.html')
+
+
 class BookHouseView(View):
     def post(self, request):
         house_id = request.POST.get('house_id')
@@ -147,6 +166,7 @@ class BookHouseView(View):
         order_cost = request.POST.get('order_cost')
         name = request.POST.get('name', '').strip()
         phone = request.POST.get('phone', '').strip()
+        email = request.POST.get('email', '').strip()
         comment = request.POST.get('comment', '').strip()
 
         search_url = reverse('main:search_houses')
@@ -158,7 +178,11 @@ class BookHouseView(View):
 
         house = get_object_or_404(RentObject, pk=house_id)
 
-        if not all([name, phone, first_date, second_date, guest_count, order_cost]):
+        if not request.POST.get('personal_data_consent'):
+            messages.error(request, 'Необходимо дать согласие на обработку персональных данных.')
+            return redirect(f'{search_url}?{query_string}')
+
+        if not all([name, phone, email, first_date, second_date, guest_count, order_cost]):
             messages.error(request, 'Заполните обязательные поля для бронирования.')
             return redirect(f'{search_url}?{query_string}')
 
@@ -175,6 +199,7 @@ class BookHouseView(View):
             booking = TimeTable(
                 name=name,
                 phone=phone,
+                email=email,
                 house=house,
                 startdate=start_date,
                 enddate=end_date,
@@ -186,6 +211,14 @@ class BookHouseView(View):
         except ValueError as error:
             messages.error(request, str(error))
             return redirect(f'{search_url}?{query_string}')
+
+        try:
+            send_booking_confirmation_email(booking, request)
+        except Exception:
+            logger.exception(
+                'Не удалось отправить письмо с подтверждением бронирования %s',
+                booking.pk,
+            )
 
         messages.success(request, f'Заявка на бронирование "{house.name}" отправлена.')
         return redirect(f'{search_url}?{query_string}')

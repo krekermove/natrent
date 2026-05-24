@@ -188,6 +188,17 @@
                 {% endif %}
             </div>
             <div class="reg_field">
+                <span>Электронная почта:</span>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <ul class="errorlist" style="color: red">
+                        {% for error in form.email.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="reg_field">
                 <span>Название объекта:</span>
                 {{ form.house }}
                 {% if form.house.errors %}

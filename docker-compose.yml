@@ -13,6 +13,9 @@ services:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=ruKDgx7JZL3Bn9Q2gDctsI070bR2BA
       - POSTGRES_HOST=db
+      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+      - DEFAULT_FROM_EMAIL=NatRent <noreply@natrent.ru>
+      - NATRENT_CONTACT_EMAIL=pavel.kobzov@gmail.com
 
   db:
     image: postgres

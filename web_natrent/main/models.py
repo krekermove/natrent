@@ -4,6 +4,7 @@ from django.db import models
 class TimeTable(models.Model):
     name = models.CharField(max_length=50, verbose_name="Имя")
     phone = models.CharField(max_length=18, verbose_name="Номер телефона")
+    email = models.EmailField(max_length=254, verbose_name="Электронная почта")
     house = models.ForeignKey('RentObject', on_delete=models.CASCADE, related_name="timetables", verbose_name="Название объекта")
     startdate = models.DateField(verbose_name="Дата заселения")
     enddate = models.DateField(verbose_name="Дата выезда")

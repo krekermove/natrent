@@ -30,6 +30,10 @@ class BookingForm(forms.ModelForm):
         max_length=18,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+7 (___) ___-__-__'})
     )
+    email = forms.EmailField(
+        label=_("Электронная почта"),
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@mail.ru'})
+    )
     # house = forms.ChoiceField(
     #     label=_("Дом"),
     #     choices=RentObject.objects.all(),
@@ -57,4 +61,4 @@ class BookingForm(forms.ModelForm):
 
     class Meta:
         model = TimeTable
-        fields = ['name', 'phone', 'house', 'startdate', 'enddate', 'guests_amount', 'comment', 'order_cost']
+        fields = ['name', 'phone', 'email', 'house', 'startdate', 'enddate', 'guests_amount', 'comment', 'order_cost']

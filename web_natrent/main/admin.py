@@ -102,6 +102,7 @@ class TimeTableAdmin(admin.ModelAdmin):
                     instance = form.save(commit=False)
                     instance.name = form.cleaned_data.get('name')
                     instance.phone = form.cleaned_data.get('phone')
+                    instance.email = form.cleaned_data.get('email')
                     instance.house = form.cleaned_data.get('house')
                     instance.startdate = form.cleaned_data.get('startdate')
                     instance.enddate = form.cleaned_data.get('enddate')

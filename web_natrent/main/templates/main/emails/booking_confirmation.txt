@@ -1,0 +1,33 @@
+Подтверждение бронирования
+
+Бронь № {{ booking_number }}
+Дата и время бронирования: {{ booking_datetime }}
+Забронировано на сайте {{ company_name }}: {{ site_url }}
+
+{{ company_name }}
+Адрес: {{ company_address }}
+Телефон: {{ company_phone }}
+Email: {{ company_email }}
+
+Детали бронирования
+Заезд: {{ check_in_date }} (после 14:00)
+Выезд: {{ check_out_date }} (до 12:00)
+Ночей: {{ nights }}
+Гостей: {{ booking.guests_amount }}
+Номеров: 1
+
+ДАННЫЕ ЗАКАЗЧИКА
+ФИО: {{ booking.name }}
+Телефон: {{ booking.phone }}
+Email: {{ booking.email }}
+Подписка на email-, SMS- рассылку: Нет
+
+Стоимость бронирования
+Тариф: Выгодный тариф
+№1: {{ booking.house.name }} — {{ formatted_cost }}
+Размещение: {{ booking.guests_amount }} взрослых — {{ formatted_cost }}
+Общая стоимость: {{ formatted_cost }}
+Способ оплаты: Оплата при заселении
+{% if booking.comment %}
+Комментарий: {{ booking.comment }}
+{% endif %}

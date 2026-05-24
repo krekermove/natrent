@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block page_title %}NatRent{% endblock %} | NatRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <header class="bg-white border-b shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <span class="text-xl font-bold text-blue-600">NatRent</span>
+            <a href="{% url 'main:search_houses' %}" class="text-blue-600 hover:text-blue-800">К поиску домов</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-10 max-w-3xl">
+        <a href="javascript:history.back()" class="inline-block text-blue-600 hover:text-blue-800 mb-6">← Назад</a>
+        <h1 class="text-3xl font-bold mb-2">{% block document_title %}{% endblock %}</h1>
+        <p class="text-sm text-gray-500 mb-8">Дата публикации: 23 мая 2026 г.</p>
+
+        <article class="bg-white rounded-lg shadow-sm border p-6 md:p-8 space-y-4 text-sm leading-relaxed text-gray-700">
+            {% block legal_content %}{% endblock %}
+        </article>
+    </main>
+</body>
+</html>
