@@ -158,6 +158,254 @@
             background-color: lightgrey;
         }
 
+        .guests-picker-trigger {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #fff;
+            transition: background-color 0.3s ease;
+            user-select: none;
+        }
+
+        .guests-picker-trigger:hover,
+        .guests-picker-trigger.active {
+            background-color: lightgrey;
+        }
+
+        .guest-picker-popup {
+            position: absolute;
+            bottom: calc(100% + 15px);
+            left: 0;
+            right: 0;
+            min-width: 320px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            padding: 16px;
+            z-index: 25;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+
+        .guest-picker-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .guest-picker-popup.scrollable {
+            max-height: min(70vh, 380px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .guest-picker-popup.scrollable::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .guest-picker-popup.scrollable::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 3px;
+        }
+
+        .guest-picker-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px solid #eef0f2;
+        }
+
+        .guest-picker-row:last-child {
+            border-bottom: none;
+        }
+
+        .guest-picker-row-label {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .guest-picker-row-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 15px;
+        }
+
+        .guest-picker-row-subtitle {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .guest-picker-stepper {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .guest-picker-stepper button {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f9fafb;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            color: #374151;
+        }
+
+        .guest-picker-stepper button:hover:not([disabled]) {
+            background: #e5e7eb;
+        }
+
+        .guest-picker-stepper button[disabled] {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .guest-picker-stepper-value {
+            min-width: 28px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .guest-picker-add-btn {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 16px;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .guest-picker-add-btn:hover {
+            background: #f9fafb;
+        }
+
+        .guest-picker-add-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .guest-age-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 140px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            z-index: 30;
+            display: none;
+        }
+
+        .guest-age-dropdown.show {
+            display: block;
+        }
+
+        .guest-age-option {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 14px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .guest-age-option:hover {
+            background: #f3f4f6;
+        }
+
+        .guest-child-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 0 10px 0;
+            border-bottom: 1px solid #eef0f2;
+        }
+
+        .guest-child-remove {
+            border: none;
+            background: none;
+            color: #9ca3af;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .guest-child-remove:hover {
+            color: #374151;
+        }
+
+        .guest-pet-toggle {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .guest-pet-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .guest-pet-toggle-slider {
+            position: absolute;
+            inset: 0;
+            background-color: #e5e7eb;
+            border-radius: 28px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .guest-pet-toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .guest-pet-toggle input:checked + .guest-pet-toggle-slider {
+            background-color: #2563eb;
+        }
+
+        .guest-pet-toggle input:checked + .guest-pet-toggle-slider::before {
+            transform: translateX(20px);
+        }
+
         .calendar-module {
             display: flex;
             flex-direction: column; /* Элементы внутри модуля располагаются вертикально */
@@ -350,6 +598,12 @@
                 gap: 10px;
                 bottom: calc(100% + 10px);
             }
+
+            .guest-picker-popup {
+                min-width: 0;
+                left: 0;
+                right: 0;
+            }
         }
     </style>
 </head>
@@ -459,15 +713,47 @@
                         </div>
 
                         <div>
-                            <label for="guests" class="block text-gray-700 font-medium mb-2">Количество гостей</label>
+                            <label for="guestsTrigger" class="block text-gray-700 font-medium mb-2">Количество гостей</label>
                             <div class="relative">
-                                <input type="hidden" name="guestInputValue" value="1">
-                                <div class="guests_counter_inline booking-control w-full">
-                                    <button class="dec_guests_number" type="button" disabled>-</button>
-                                    <div id="guests">
-                                        <span class="guests_value">1 гость</span>
+                                <input type="hidden" name="guestInputValue" id="guestInputValue" value="1">
+                                <input type="hidden" name="guest_count" id="guestCountInput" value="1">
+                                <input type="hidden" name="children_under_3" id="childrenUnder3Input" value="0">
+                                <input type="hidden" name="has_pet" id="hasPetInput" value="false">
+                                <div id="guestsTrigger" class="guests-picker-trigger booking-control w-full" role="button" tabindex="0">
+                                    <span class="guests_value" id="guestsSummary">1 гость</span>
+                                </div>
+                                <div id="guestPicker" class="guest-picker-popup">
+                                    <div class="guest-picker-row">
+                                        <div class="guest-picker-row-label">
+                                            <div class="guest-picker-row-title">Взрослые</div>
+                                            <div class="guest-picker-row-subtitle">Старше 18 лет</div>
+                                        </div>
+                                        <div class="guest-picker-stepper">
+                                            <button type="button" class="dec_guests_number" disabled>−</button>
+                                            <span class="guest-picker-stepper-value" id="adultsCountDisplay">1</span>
+                                            <button type="button" class="inc_guests_number">+</button>
+                                        </div>
                                     </div>
-                                    <button class="inc_guests_number" type="button">+</button>
+                                    <div class="guest-picker-row">
+                                        <div class="guest-picker-row-label">
+                                            <div class="guest-picker-row-title">Дети</div>
+                                            <div class="guest-picker-row-subtitle">До 18 лет</div>
+                                        </div>
+                                        <div class="guest-picker-add-wrap">
+                                            <button type="button" class="guest-picker-add-btn" id="addChildBtn">Добавить</button>
+                                            <div class="guest-age-dropdown" id="guestAgeDropdown"></div>
+                                        </div>
+                                    </div>
+                                    <div id="childrenList"></div>
+                                    <div class="guest-picker-row">
+                                        <div class="guest-picker-row-label">
+                                            <div class="guest-picker-row-title">С питомцем</div>
+                                        </div>
+                                        <label class="guest-pet-toggle">
+                                            <input type="checkbox" id="hasPetCheckbox">
+                                            <span class="guest-pet-toggle-slider"></span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1108,69 +1394,183 @@
         var calendarFlag = false;
         const calendarClearBtn = document.getElementsByClassName("clear-button")[0];
 
-        const input_guests = document.getElementById('guests');
-        const guestsLabel = input_guests.querySelector('.guests_value');
-        var guestInputValue = document.getElementsByName('guestInputValue')[0];
-
+        const guestPicker = document.getElementById('guestPicker');
+        const guestsTrigger = document.getElementById('guestsTrigger');
+        const guestsSummary = document.getElementById('guestsSummary');
+        const guestInputValue = document.getElementById('guestInputValue');
+        const guestCountInput = document.getElementById('guestCountInput');
+        const childrenUnder3Input = document.getElementById('childrenUnder3Input');
+        const hasPetInput = document.getElementById('hasPetInput');
+        const hasPetCheckbox = document.getElementById('hasPetCheckbox');
+        const adultsCountDisplay = document.getElementById('adultsCountDisplay');
         const decrementBtn = document.querySelector('.dec_guests_number');
         const incrementBtn = document.querySelector('.inc_guests_number');
+        const addChildBtn = document.getElementById('addChildBtn');
+        const guestAgeDropdown = document.getElementById('guestAgeDropdown');
+        const childrenList = document.getElementById('childrenList');
+        const bookingForm = document.getElementById('bookingForm');
 
         const guestsLimit = 10;
-        let currentValue = 1
+        let adultsCount = 1;
+        let children = [];
+        let guestPickerFlag = false;
 
+        const CHILD_ORDINALS = ['1-й', '2-й', '3-й', '4-й', '5-й', '6-й', '7-й', '8-й', '9-й'];
 
-        // Устанавливаем начальное значение
-        guestsLabel.textContent = "1 гость";
+        function formatGuestLabel(count) {
+            if (count === 1) return '1 гость';
+            if (count > 4) return String(count) + ' гостей';
+            return String(count) + ' гостя';
+        }
 
-        // Обработчик для кнопки уменьшения
-        decrementBtn.addEventListener('click', () => {
-            currentValue -= 1;
-            incrementBtn.removeAttribute('disabled');
-            if (currentValue < 2) {
-                currentValue = 1;
-                guestInputValue.value = currentValue;
-                guestsLabel.textContent = "1 гость";
-                decrementBtn.setAttribute('disabled', '');
-                return;
+        function formatChildAgeLabel(age) {
+            if (age === 0) return 'До года';
+            if (age === 1) return '1 год';
+            if (age >= 2 && age <= 4) return age + ' года';
+            return age + ' лет';
+        }
+
+        function getTotalGuests() {
+            return adultsCount + children.length;
+        }
+
+        function syncGuestFormFields() {
+            const total = getTotalGuests();
+            const childrenUnder3 = children.filter((child) => child.age < 3).length;
+
+            guestInputValue.value = adultsCount;
+            guestCountInput.value = total;
+            childrenUnder3Input.value = childrenUnder3;
+            hasPetInput.value = hasPetCheckbox.checked ? 'true' : 'false';
+            adultsCountDisplay.textContent = adultsCount;
+            guestsSummary.textContent = formatGuestLabel(total);
+
+            decrementBtn.toggleAttribute('disabled', adultsCount <= 1);
+            incrementBtn.toggleAttribute('disabled', total >= guestsLimit);
+            addChildBtn.toggleAttribute('disabled', total >= guestsLimit);
+        }
+
+        function updateGuestPickerScroll() {
+            guestPicker.classList.toggle('scrollable', children.length >= 4);
+        }
+
+        function renderChildrenList() {
+            childrenList.innerHTML = '';
+            children.forEach((child, index) => {
+                const row = document.createElement('div');
+                row.className = 'guest-child-row';
+                row.innerHTML = `
+                    <div class="guest-picker-row-label">
+                        <div class="guest-picker-row-title">${CHILD_ORDINALS[index] || ((index + 1) + '-й')} ребёнок</div>
+                        <div class="guest-picker-row-subtitle">${formatChildAgeLabel(child.age)}</div>
+                    </div>
+                    <button type="button" class="guest-child-remove" data-child-index="${index}" aria-label="Удалить ребёнка">&times;</button>
+                `;
+                childrenList.appendChild(row);
+            });
+            childrenList.querySelectorAll('.guest-child-remove').forEach((btn) => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const idx = parseInt(btn.dataset.childIndex, 10);
+                    children.splice(idx, 1);
+                    renderChildrenList();
+                    syncGuestFormFields();
+                });
+            });
+            updateGuestPickerScroll();
+        }
+
+        function buildAgeDropdown() {
+            guestAgeDropdown.innerHTML = '';
+            for (let age = 0; age <= 17; age += 1) {
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'guest-age-option';
+                option.textContent = formatChildAgeLabel(age);
+                option.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    if (getTotalGuests() >= guestsLimit) return;
+                    children.push({ age });
+                    guestAgeDropdown.classList.remove('show');
+                    renderChildrenList();
+                    syncGuestFormFields();
+                });
+                guestAgeDropdown.appendChild(option);
             }
-            guestInputValue.value = currentValue;
-            if (currentValue === 1) {
-                guestsLabel.textContent = String(currentValue) + " гость";
-            }
-            else if (currentValue > 4) {
-                guestsLabel.textContent = String(currentValue) + " гостей";
-            }
-            else {
-                guestsLabel.textContent = String(currentValue) + " гостя";
+        }
+
+        function closeGuestPicker() {
+            guestPicker.classList.remove('show');
+            guestsTrigger.classList.remove('active');
+            guestAgeDropdown.classList.remove('show');
+        }
+
+        function openGuestPicker() {
+            closeCalendar();
+            input_dates.classList.remove('active');
+            guestPicker.classList.add('show');
+            guestsTrigger.classList.add('active');
+            guestPickerFlag = true;
+        }
+
+        buildAgeDropdown();
+        syncGuestFormFields();
+
+        decrementBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (adultsCount <= 1) return;
+            adultsCount -= 1;
+            syncGuestFormFields();
+        });
+
+        incrementBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (getTotalGuests() >= guestsLimit) return;
+            adultsCount += 1;
+            syncGuestFormFields();
+        });
+
+        addChildBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (getTotalGuests() >= guestsLimit) return;
+            guestAgeDropdown.classList.toggle('show');
+        });
+
+        hasPetCheckbox.addEventListener('change', () => {
+            syncGuestFormFields();
+        });
+
+        guestsTrigger.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (guestPicker.classList.contains('show')) {
+                closeGuestPicker();
+            } else if (guestPickerFlag) {
+                openGuestPicker();
+            } else {
+                openGuestPicker();
             }
         });
 
-        // Обработчик для кнопки увеличения
-        incrementBtn.addEventListener('click', () => {
-            currentValue += 1;
-            decrementBtn.removeAttribute('disabled');
-            if (currentValue < guestsLimit){
-                incrementBtn.removeAttribute('disabled');
-                guestInputValue.value = currentValue;
-                if (currentValue === 1) {
-                    guestsLabel.textContent = String(currentValue) + " гость";
-                }
-                else if (currentValue > 4) {
-                    guestsLabel.textContent = String(currentValue) + " гостей";
-                }
-                else {
-                    guestsLabel.textContent = String(currentValue) + " гостя";
-                }
-            }
-            else if (currentValue === guestsLimit){
-                guestInputValue.value = currentValue;
-                guestsLabel.textContent = String(currentValue) + " гостей";
-                incrementBtn.setAttribute('disabled', '');
+        guestsTrigger.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                guestsTrigger.click();
             }
         });
+
+        guestPicker.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        if (bookingForm) {
+            bookingForm.addEventListener('submit', () => {
+                syncGuestFormFields();
+            });
+        }
 
         input_dates.addEventListener("click", function (event){
             event.stopPropagation();
+            closeGuestPicker();
             if (calendar.classList.contains("show")) {
                 calendar.classList.remove("show");
                 input_dates.classList.remove("active");
@@ -1217,12 +1617,21 @@
 
         window.addEventListener("click", function(event) {
             const modalCalendar = document.getElementById("calendar");
-
             const isInsideCalendar = modalCalendar.contains(event.target);
+            const isInsideGuestPicker = guestPicker.contains(event.target);
+            const isGuestsTrigger = guestsTrigger.contains(event.target);
 
             if (modalCalendar.classList.contains("show") && !isInsideCalendar) {
                 closeCalendar();
                 input_dates.classList.remove("active");
+            }
+
+            if (guestPicker.classList.contains("show") && !isInsideGuestPicker && !isGuestsTrigger) {
+                closeGuestPicker();
+            }
+
+            if (!addChildBtn.contains(event.target) && !guestAgeDropdown.contains(event.target)) {
+                guestAgeDropdown.classList.remove('show');
             }
         });
 

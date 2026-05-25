@@ -28,7 +28,10 @@ class MainView(View):
     def post(self, request):
         first_date = self.date_transform(request.POST.get('firstInputDate'))
         second_date = self.date_transform(request.POST.get('secondInputDate'))
-        guest_count = request.POST.get('guestInputValue')
+        guest_count = request.POST.get('guest_count')
+        guests_amount = request.POST.get('guestInputValue')
+        children_under_3 = request.POST.get('children_under_3', '0')
+        has_pet = request.POST.get('has_pet', 'false')
 
         context = {}
         if not first_date or not second_date:
@@ -38,7 +41,20 @@ class MainView(View):
         try:
             guest_count = int(guest_count)
         except (TypeError, ValueError):
-            guest_count = 1
+            try:
+                guest_count = int(guests_amount)
+            except (TypeError, ValueError):
+                guest_count = 1
+
+        try:
+            guests_amount = int(guests_amount)
+        except (TypeError, ValueError):
+            guests_amount = guest_count
+
+        try:
+            children_under_3 = int(children_under_3)
+        except (TypeError, ValueError):
+            children_under_3 = 0
 
         if second_date <= first_date:
             context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
@@ -48,6 +64,9 @@ class MainView(View):
             'first_date': first_date,
             'second_date': second_date,
             'guest_count': guest_count,
+            'guests_amount': guests_amount,
+            'children_under_3': children_under_3,
+            'has_pet': has_pet,
         })
         search_url = reverse('main:search_houses')
         return redirect(f'{search_url}?{query_string}')
@@ -83,6 +102,9 @@ class SearchView(View):
         first_date = request.GET.get('first_date')
         second_date = request.GET.get('second_date')
         guest_count = request.GET.get('guest_count')
+        guests_amount = request.GET.get('guests_amount')
+        children_under_3 = request.GET.get('children_under_3', '0')
+        has_pet = request.GET.get('has_pet', 'false')
 
         context = {}
         if not first_date or not second_date:
@@ -93,6 +115,16 @@ class SearchView(View):
             guest_count = int(guest_count)
         except (TypeError, ValueError):
             guest_count = 1
+
+        try:
+            guests_amount = int(guests_amount)
+        except (TypeError, ValueError):
+            guests_amount = guest_count
+
+        try:
+            children_under_3 = int(children_under_3)
+        except (TypeError, ValueError):
+            children_under_3 = 0
 
         if second_date <= first_date:
             context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
@@ -131,6 +163,9 @@ class SearchView(View):
         context['first_date'] = first_date
         context['second_date'] = second_date
         context['guest_count'] = guest_count
+        context['guests_amount'] = guests_amount
+        context['children_under_3'] = children_under_3
+        context['has_pet'] = has_pet
 
         return render(request, 'main/search_houses.html', context=context)
 
@@ -163,6 +198,9 @@ class BookHouseView(View):
         first_date = request.POST.get('first_date')
         second_date = request.POST.get('second_date')
         guest_count = request.POST.get('guest_count')
+        guests_amount = request.POST.get('guests_amount')
+        children_under_3 = request.POST.get('children_under_3', '0')
+        has_pet = request.POST.get('has_pet', 'false')
         order_cost = request.POST.get('order_cost')
         name = request.POST.get('name', '').strip()
         phone = request.POST.get('phone', '').strip()
@@ -189,7 +227,9 @@ class BookHouseView(View):
         try:
             start_date = datetime.strptime(first_date, "%Y-%m-%d").date()
             end_date = datetime.strptime(second_date, "%Y-%m-%d").date()
-            guests_amount = int(guest_count)
+            guests_amount = int(guests_amount or guest_count)
+            children_under_3 = int(children_under_3)
+            has_pet = str(has_pet).lower() in ('true', '1', 'on', 'yes')
             booking_cost = int(order_cost)
         except (TypeError, ValueError):
             messages.error(request, 'Некорректные данные формы бронирования.')
@@ -204,6 +244,8 @@ class BookHouseView(View):
                 startdate=start_date,
                 enddate=end_date,
                 guests_amount=guests_amount,
+                children_under_3=children_under_3,
+                has_pet=has_pet,
                 comment=comment,
                 order_cost=booking_cost,
             )

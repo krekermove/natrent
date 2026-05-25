@@ -9,6 +9,11 @@ class TimeTable(models.Model):
     startdate = models.DateField(verbose_name="Дата заселения")
     enddate = models.DateField(verbose_name="Дата выезда")
     guests_amount = models.PositiveIntegerField(verbose_name="Количество гостей")
+    children_under_3 = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Количество детей до 3 лет",
+    )
+    has_pet = models.BooleanField(default=False, verbose_name="Наличие питомца")
     comment = models.TextField(max_length=200, null=True, blank=True, default=None, verbose_name="Комментарий")
     order_cost = models.PositiveIntegerField(verbose_name="Стоимость заказа")
     status = models.BooleanField(default=True, blank=True, verbose_name="Статус аренды")
@@ -50,6 +55,12 @@ class RentObject(models.Model):
     description = models.TextField(max_length=1000, verbose_name="Описание")
     max_guests = models.PositiveIntegerField(verbose_name="Максимальное количеcтво гостей")
     price = models.PositiveIntegerField(verbose_name="Стоимость")
+    extra_guest_fee = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Дополнительная плата за гостя",
+        help_text="Добавляется к стоимости брони за каждого дополнительного гостя "
+                  "(гость сверх 2, а также ребёнок старше 3 лет)",
+    )
 
     class Meta:
         verbose_name = "Объект аренды"

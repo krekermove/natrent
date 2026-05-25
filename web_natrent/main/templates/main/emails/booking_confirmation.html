@@ -71,7 +71,7 @@
                                 </td>
                                 <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;">{{ nights }}</td>
                                 <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;">{{ booking.guests_amount }}</td>
-                                <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;">1</td>
+                                <td align="center" style="border:1px solid #d0d5dc;padding:12px 8px;font-size:13px;color:#333333;">{{ booking.house.name }}</td>
                             </tr>
                         </table>
                     </td>
@@ -95,10 +95,6 @@
                                     <a href="mailto:{{ booking.email }}" style="color:#1a73e8;text-decoration:underline;">{{ booking.email }}</a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#666666;">Подписка на email-, SMS- рассылку</td>
-                                <td style="border-top:1px solid #d8dde3;padding:10px 0;font-size:13px;color:#333333;">Нет</td>
-                            </tr>
                         </table>
                     </td>
                 </tr>
@@ -113,16 +109,9 @@
                     <td style="padding:0 28px 28px;">
                         <div style="font-size:18px;color:#4a4a4a;margin-bottom:12px;">Стоимость бронирования</div>
 
-                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #d0d5dc;margin-bottom:12px;">
-                            <tr style="background-color:#eef1f4;">
-                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#666666;width:30%;">Тариф</td>
-                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;">Выгодный тариф</td>
-                            </tr>
-                        </table>
-
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #d0d5dc;">
                             <tr>
-                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;">№1: {{ booking.house.name }}</td>
+                                <td style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;">{{ booking.house.name }}</td>
                                 <td align="right" style="border:1px solid #d0d5dc;padding:10px 12px;font-size:13px;color:#333333;white-space:nowrap;">{{ formatted_cost }}</td>
                             </tr>
                             <tr>
