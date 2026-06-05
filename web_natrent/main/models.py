@@ -61,6 +61,11 @@ class RentObject(models.Model):
         help_text="Добавляется к стоимости брони за каждого дополнительного гостя "
                   "(гость сверх 2, а также ребёнок старше 3 лет)",
     )
+    extra_pet_fee = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Дополнительная плата за питомца",
+        help_text="Добавляется к стоимости брони за каждого питомца",
+    )
 
     class Meta:
         verbose_name = "Объект аренды"

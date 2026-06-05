@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.db.models import Q
@@ -14,62 +15,45 @@ from .emails import send_booking_confirmation_email
 logger = logging.getLogger(__name__)
 
 
+def date_transform(date):
+    if not date:
+        return None
+    return '-'.join(reversed(date.split('.')))
+
+
+def normalize_search_data(data):
+    return {
+        'first_date': data.get('first_date') or date_transform(data.get('firstInputDate')),
+        'second_date': data.get('second_date') or date_transform(data.get('secondInputDate')),
+        'guest_count': data.get('guest_count'),
+        'guests_amount': data.get('guests_amount') or data.get('guestInputValue'),
+        'children_under_3': data.get('children_under_3', '0'),
+        'has_pet': data.get('has_pet', 'false'),
+    }
+
+
 # Create your views here.
 
 class MainView(View):
-    def date_transform(self, date):
-        if not date:
-            return None
-        return '-'.join(reversed(date.split('.')))
 
     def get(self, request):
         return render(request, 'main/index2.html')
 
     def post(self, request):
-        first_date = self.date_transform(request.POST.get('firstInputDate'))
-        second_date = self.date_transform(request.POST.get('secondInputDate'))
-        guest_count = request.POST.get('guest_count')
-        guests_amount = request.POST.get('guestInputValue')
-        children_under_3 = request.POST.get('children_under_3', '0')
-        has_pet = request.POST.get('has_pet', 'false')
+        search_data = normalize_search_data(request.POST)
+        first_date = search_data['first_date']
+        second_date = search_data['second_date']
 
         context = {}
         if not first_date or not second_date:
             context['date_input_error'] = 'Вы не полностью выбрали даты проживания'
             return render(request, template_name='main/index2.html', context=context)
 
-        try:
-            guest_count = int(guest_count)
-        except (TypeError, ValueError):
-            try:
-                guest_count = int(guests_amount)
-            except (TypeError, ValueError):
-                guest_count = 1
-
-        try:
-            guests_amount = int(guests_amount)
-        except (TypeError, ValueError):
-            guests_amount = guest_count
-
-        try:
-            children_under_3 = int(children_under_3)
-        except (TypeError, ValueError):
-            children_under_3 = 0
-
         if second_date <= first_date:
             context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
             return render(request, template_name='main/index2.html', context=context)
 
-        query_string = urlencode({
-            'first_date': first_date,
-            'second_date': second_date,
-            'guest_count': guest_count,
-            'guests_amount': guests_amount,
-            'children_under_3': children_under_3,
-            'has_pet': has_pet,
-        })
-        search_url = reverse('main:search_houses')
-        return redirect(f'{search_url}?{query_string}')
+        return HttpResponseRedirect(reverse('main:search_houses'), status=307)
 
 
 def popular_list(request):
@@ -77,7 +61,15 @@ def popular_list(request):
 
 
 class SearchView(View):
-    def calculate_house_cost(self, house, start_date, end_date):
+    def calculate_house_cost(
+        self,
+        house,
+        start_date,
+        end_date,
+        guest_count=1,
+        children_under_3=0,
+        has_pet=False,
+    ):
         stay_nights = (end_date - start_date).days
         stay_dates = [start_date + timedelta(days=day) for day in range(stay_nights)]
         date_costs = DateObjectCost.objects.filter(
@@ -85,26 +77,32 @@ class SearchView(View):
             date__gte=start_date,
             date__lt=end_date,
         )
-        costs_by_date = {date_cost.date: date_cost.cost for date_cost in date_costs}
-
+        costs_by_date = {
+            date_cost.date: date_cost.cost if date_cost.cost is not None else house.price
+            for date_cost in date_costs
+        }
         total_stay_cost = 0
         has_all_dates_cost = stay_nights > 0
         for stay_date in stay_dates:
-            night_cost = costs_by_date.get(stay_date)
-            if night_cost is None:
-                has_all_dates_cost = False
-                break
+            night_cost = costs_by_date.get(stay_date, house.price)
             total_stay_cost += night_cost
+
+        if has_all_dates_cost:
+            if guest_count > 2:
+                extra_guests = max(0, guest_count - children_under_3 - 2)
+                total_stay_cost += extra_guests * house.extra_guest_fee
+            if has_pet:
+                total_stay_cost += house.extra_pet_fee
 
         return total_stay_cost, has_all_dates_cost, stay_nights
 
-    def get(self, request):
-        first_date = request.GET.get('first_date')
-        second_date = request.GET.get('second_date')
-        guest_count = request.GET.get('guest_count')
-        guests_amount = request.GET.get('guests_amount')
-        children_under_3 = request.GET.get('children_under_3', '0')
-        has_pet = request.GET.get('has_pet', 'false')
+    def render_search_results(self, request, data):
+        first_date = data.get('first_date')
+        second_date = data.get('second_date')
+        guest_count = data.get('guest_count')
+        guests_amount = data.get('guests_amount')
+        children_under_3 = data.get('children_under_3', '0')
+        has_pet = data.get('has_pet', 'false')
 
         context = {}
         if not first_date or not second_date:
@@ -125,6 +123,8 @@ class SearchView(View):
             children_under_3 = int(children_under_3)
         except (TypeError, ValueError):
             children_under_3 = 0
+
+        has_pet_bool = str(has_pet).lower() in ('true', '1', 'on', 'yes')
 
         if second_date <= first_date:
             context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
@@ -151,6 +151,9 @@ class SearchView(View):
                 house,
                 start_date,
                 end_date,
+                guest_count=guest_count,
+                children_under_3=children_under_3,
+                has_pet=has_pet_bool,
             )
             house.total_stay_cost = total_stay_cost
             house.use_total_stay_cost = has_all_dates_cost
@@ -158,6 +161,7 @@ class SearchView(View):
             house.gallery_images = [
                 image_field for image_field in [house.img1, house.img2, house.img3, house.img4] if image_field
             ]
+            print(house.total_stay_cost, house.use_total_stay_cost, house.stay_nights)
         
         context['free_houses'] = free_houses
         context['first_date'] = first_date
@@ -166,8 +170,14 @@ class SearchView(View):
         context['guests_amount'] = guests_amount
         context['children_under_3'] = children_under_3
         context['has_pet'] = has_pet
-
+        print(context)
         return render(request, 'main/search_houses.html', context=context)
+
+    def get(self, request):
+        return self.render_search_results(request, request.GET)
+
+    def post(self, request):
+        return self.render_search_results(request, normalize_search_data(request.POST))
 
 
 class HouseDetailView(View):

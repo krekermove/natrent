@@ -573,7 +573,7 @@
                 </div>
             </div>
 
-            <form id="bookingForm" action="{% url 'main:main_page' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4" method="post">
+            <form id="bookingForm" action="{% url 'main:search_houses' %}" class="grid grid-cols-1 md:grid-cols-4 gap-4" method="post">
                 {% csrf_token %}
                 <div class="md:col-span-2">
                     <input type="hidden" name="firstInputDate" value="">
