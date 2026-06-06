@@ -1,32 +1,35 @@
+version: "3.9"
+
 services:
   web:
-    build: ./web_natrent
-    command: python manage.py runserver 0.0.0.0:8000
+    build:
+      context: ./web_natrent
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4
+    env_file:
+      - .env
     volumes:
-      - ./web_natrent:/usr/src/app/
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/media
     ports:
-      - 1337:8000
-    environment:
-      - DEBUG=1
-      - SECRET_KEY=django-insecure-kdbc_ud&-shv0zehg93f1lbv0kb*ovwhr(xu$e#)=43_#0qig6
-      - POSTGRES_DB=natrent_db
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=ruKDgx7JZL3Bn9Q2gDctsI070bR2BA
-      - POSTGRES_HOST=db
-      - EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
-      - DEFAULT_FROM_EMAIL=NatRent <noreply@natrent.ru>
-      - NATRENT_CONTACT_EMAIL=pavel.kobzov@gmail.com
+      - "1337:8000"
+    restart: unless-stopped
+    depends_on:
+      - db
 
   db:
-    image: postgres
-    environment:
-      POSTGRES_DB: natrent_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: ruKDgx7JZL3Bn9Q2gDctsI070bR2BA
-    ports:
-      - "5432:5432"
+    image: postgres:16-alpine
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:

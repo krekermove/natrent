@@ -81,3 +81,11 @@ def send_booking_confirmation_email(booking, request=None):
     )
     message.attach_alternative(html_body, 'text/html')
     message.send()
+    message_to_admin = EmailMultiAlternatives(
+        subject=subject,
+        body=text_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[settings.NATRENT_CONTACT_EMAIL],
+    )
+    message_to_admin.attach_alternative(html_body, 'text/html')
+    message_to_admin.send()
