@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% load russian_plural %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование — {{ house.name }} | NatRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .booking-summary {
+            position: sticky;
+            top: 24px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <main class="max-w-6xl mx-auto px-4 py-10">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-semibold">Бронирование</h1>
+            <form action="{% url 'main:search_houses' %}" method="post" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="first_date" value="{{ first_date }}">
+                <input type="hidden" name="second_date" value="{{ second_date }}">
+                <input type="hidden" name="guest_count" value="{{ guest_count }}">
+                <input type="hidden" name="children_under_3" value="{{ children_under_3 }}">
+                <input type="hidden" name="has_pet" value="{{ has_pet }}">
+                <button type="submit" class="text-blue-600 hover:text-blue-800">Назад к поиску</button>
+            </form>
+        </div>
+
+        {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                    <div class="rounded-lg border p-3 {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <section class="lg:col-span-2 bg-white rounded-xl border shadow-sm p-6 md:p-8">
+                <h2 class="text-2xl font-semibold mb-6">Введите свои данные</h2>
+
+                <form id="bookingForm" action="{% url 'main:book_house' house.id %}" method="post" class="space-y-5">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_action" value="submit">
+                    <input type="hidden" name="first_date" value="{{ first_date }}">
+                    <input type="hidden" name="second_date" value="{{ second_date }}">
+                    <input type="hidden" name="guest_count" value="{{ guest_count }}">
+                    <input type="hidden" name="children_under_3" value="{{ children_under_3 }}">
+                    <input type="hidden" name="has_pet" value="{{ has_pet }}">
+
+                    <div>
+                        <label for="bookingName" class="block text-gray-700 font-medium mb-2">Имя</label>
+                        <input id="bookingName" name="name" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5" value="{{ form_data.name|default:'' }}">
+                    </div>
+
+                    <div>
+                        <label for="bookingPhone" class="block text-gray-700 font-medium mb-2">Номер телефона</label>
+                        <input id="bookingPhone" name="phone" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5" placeholder="+7 (___) ___-__-__" value="{{ form_data.phone|default:'' }}">
+                    </div>
+
+                    <div>
+                        <label for="bookingEmail" class="block text-gray-700 font-medium mb-2">Электронная почта</label>
+                        <input id="bookingEmail" name="email" type="email" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5" placeholder="example@mail.ru" value="{{ form_data.email|default:'' }}">
+                    </div>
+
+                    <div>
+                        <label for="bookingComment" class="block text-gray-700 font-medium mb-2">Комментарий</label>
+                        <textarea id="bookingComment" name="comment" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2.5" placeholder="Дополнительные пожелания">{{ form_data.comment|default:'' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label for="personalDataConsent" class="flex items-start gap-3">
+                            <input id="personalDataConsent" name="personal_data_consent" type="checkbox" required class="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"{% if form_data.personal_data_consent %} checked{% endif %}>
+                            <span class="text-sm text-gray-700">
+                                Я даю
+                                <a href="{% url 'main:personal_data_consent' %}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">согласие на обработку персональных данных</a>
+                                и подтверждаю ознакомление с
+                                <a href="{% url 'main:user_agreement' %}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">пользовательским соглашением</a>
+                                и
+                                <a href="{% url 'main:privacy_policy' %}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">политикой конфиденциальности</a>
+                            </span>
+                        </label>
+                        <p id="consentError" class="hidden text-sm text-red-600 mt-2">Необходимо дать согласие на обработку персональных данных.</p>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-3 rounded-lg transition">
+                        Отправить заявку
+                    </button>
+                </form>
+            </section>
+
+            <aside class="booking-summary">
+                <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+                    <div class="px-5 py-4 border-b">
+                        <h2 class="text-xl font-semibold">Ваше бронирование</h2>
+                    </div>
+
+                    <div class="bg-amber-50 px-5 py-3 text-sm font-medium text-gray-800 border-b">
+                        {{ cost_data.stay_nights }} ноч{{ cost_data.stay_nights|ru_plural:"ь,и,ей" }}
+                    </div>
+
+                    <div class="px-5 py-4 border-b space-y-2">
+                        <p class="text-lg font-medium">{{ date_range_display }}</p>
+                        <p class="text-sm text-gray-600 capitalize">{{ check_in_weekday }} с 14:00</p>
+                        <p class="text-sm text-gray-600 capitalize">{{ check_out_weekday }} до 12:00</p>
+                    </div>
+
+                    <div class="px-5 py-4 border-b">
+                        <div class="flex gap-2">
+                            {% if house.gallery_images %}
+                                <img src="{{ house.gallery_images.0.url }}" alt="{{ house.name }}" class="w-20 h-20 rounded-lg object-cover shrink-0">
+                            {% endif %}
+                            <div class="min-w-0">
+                                <p class="font-semibold text-gray-900">{{ house.name }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-5 py-4 border-b space-y-2 text-sm text-gray-700">
+                        <p>
+                            <span class="text-gray-500">Гостей:</span>
+                            <span class="font-medium">{{ guest_count }}</span>
+                        </p>
+                        <p>
+                            <span class="text-gray-500">Детей до 3 лет:</span>
+                            <span class="font-medium">{{ children_under_3 }}</span>
+                        </p>
+                        <p>
+                            <span class="text-gray-500">Питомец:</span>
+                            <span class="font-medium">{% if has_pet_bool %}Да{% else %}Нет{% endif %}</span>
+                        </p>
+                    </div>
+
+                    <div class="px-5 py-4 space-y-3">
+                        <div class="flex justify-between items-start gap-4 text-sm">
+                            <span class="text-gray-700">
+                                Проживание ({{ cost_data.stay_nights }} ноч{{ cost_data.stay_nights|ru_plural:"ь,и,ей" }})
+                            </span>
+                            <span class="font-medium whitespace-nowrap">{{ cost_data.base_cost }} ₽</span>
+                        </div>
+
+                        {% if cost_data.extra_guests_cost %}
+                            <div class="flex justify-between items-start gap-4 text-sm">
+                                <span class="text-gray-700">
+                                    Доплата за дополнительных гостей ({{ cost_data.extra_guests }})
+                                </span>
+                                <span class="font-medium whitespace-nowrap">{{ cost_data.extra_guests_cost }} ₽</span>
+                            </div>
+                        {% endif %}
+
+                        {% if cost_data.pet_cost %}
+                            <div class="flex justify-between items-start gap-4 text-sm">
+                                <span class="text-gray-700">Доплата за питомца</span>
+                                <span class="font-medium whitespace-nowrap">{{ cost_data.pet_cost }} ₽</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="border-t pt-4 flex justify-between items-center">
+                            <span class="text-lg font-semibold">Итого</span>
+                            <span class="text-2xl font-bold">{{ cost_data.total_cost }} ₽</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        const bookingForm = document.getElementById("bookingForm");
+        const consentCheckbox = document.getElementById("personalDataConsent");
+        const consentError = document.getElementById("consentError");
+        const phoneInput = document.getElementById("bookingPhone");
+
+        if (bookingForm && consentCheckbox) {
+            bookingForm.addEventListener("submit", (event) => {
+                if (!consentCheckbox.checked) {
+                    event.preventDefault();
+                    consentError?.classList.remove("hidden");
+                    consentCheckbox.focus();
+                }
+            });
+
+            consentCheckbox.addEventListener("change", () => {
+                if (consentCheckbox.checked) {
+                    consentError?.classList.add("hidden");
+                }
+            });
+        }
+
+        if (phoneInput) {
+            phoneInput.addEventListener("input", function (event) {
+                let value = event.target.value.replace(/\D/g, "");
+                let formattedValue = "";
+
+                if (value.length > 0) {
+                    formattedValue = "+7";
+                }
+                if (value.length > 1) {
+                    formattedValue += " (" + value.substring(1, 4);
+                }
+                if (value.length > 4) {
+                    formattedValue += ") " + value.substring(4, 7);
+                }
+                if (value.length > 7) {
+                    formattedValue += "-" + value.substring(7, 9);
+                }
+                if (value.length > 9) {
+                    formattedValue += "-" + value.substring(9, 11);
+                }
+
+                event.target.value = formattedValue;
+            });
+
+            phoneInput.addEventListener("focus", function () {
+                if (!this.value) {
+                    this.value = "+7";
+                }
+            });
+
+            phoneInput.addEventListener("blur", function () {
+                if (this.value === "+7") {
+                    this.value = "";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

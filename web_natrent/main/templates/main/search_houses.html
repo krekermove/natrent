@@ -518,20 +518,6 @@
             opacity: 0.5;
         }
 
-        .booking-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(17, 24, 39, 0.55);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 40;
-            padding: 16px;
-        }
-
-        .booking-modal-overlay.show {
-            display: flex;
-        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -590,7 +576,6 @@
                 <div>
                     <label for="guestsTrigger" class="block text-gray-700 font-medium mb-2">Количество гостей</label>
                     <div class="relative">
-                        <input type="hidden" name="guestInputValue" id="guestInputValue" value="1">
                         <input type="hidden" name="guest_count" id="guestCountInput" value="1">
                         <input type="hidden" name="children_under_3" id="childrenUnder3Input" value="0">
                         <input type="hidden" name="has_pet" id="hasPetInput" value="false">
@@ -600,8 +585,7 @@
                         <div id="guestPicker" class="guest-picker-popup">
                             <div class="guest-picker-row">
                                 <div class="guest-picker-row-label">
-                                    <div class="guest-picker-row-title">Взрослые</div>
-                                    <div class="guest-picker-row-subtitle">Старше 18 лет</div>
+                                    <div class="guest-picker-row-title">Гости</div>
                                 </div>
                                 <div class="guest-picker-stepper">
                                     <button type="button" class="dec_guests_number" disabled>−</button>
@@ -612,14 +596,15 @@
                             <div class="guest-picker-row">
                                 <div class="guest-picker-row-label">
                                     <div class="guest-picker-row-title">Дети</div>
-                                    <div class="guest-picker-row-subtitle">До 18 лет</div>
+                                    <div class="guest-picker-row-subtitle">До 3 лет (бесплатно)</div>
                                 </div>
-                                <div class="guest-picker-add-wrap">
-                                    <button type="button" class="guest-picker-add-btn" id="addChildBtn">Добавить</button>
-                                    <div class="guest-age-dropdown" id="guestAgeDropdown"></div>
+                            
+                                <div class="guest-picker-stepper">
+                                    <button type="button" id="decChildrenBtn">−</button>
+                                    <span class="guest-picker-stepper-value" id="childrenCountDisplay">0</span>
+                                    <button type="button" id="incChildrenBtn">+</button>
                                 </div>
                             </div>
-                            <div id="childrenList"></div>
                             <div class="guest-picker-row">
                                 <div class="guest-picker-row-label">
                                     <div class="guest-picker-row-title">С питомцем</div>
@@ -675,14 +660,18 @@
                             </div>
                             <div class="mt-5 grid grid-cols-2 gap-3">
                                 <a href="{% url 'main:house_detail' house.id %}" class="text-center border border-gray-300 hover:border-gray-400 px-4 py-2 rounded-lg font-medium transition">Подробнее</a>
-                                <button
-                                    type="button"
-                                    class="open-booking-modal bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition"
-                                    data-house-id="{{ house.id }}"
-                                    data-house-name="{{ house.name }}"
-                                    data-order-cost="{% if house.use_total_stay_cost %}{{ house.total_stay_cost }}{% else %}{{ house.price }}{% endif %}">
-                                    Забронировать
-                                </button>
+                                <form action="{% url 'main:book_house' house.id %}" method="post" class="book-house-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_action" value="show">
+                                    <input type="hidden" name="first_date" value="{{ first_date }}">
+                                    <input type="hidden" name="second_date" value="{{ second_date }}">
+                                    <input type="hidden" name="guest_count" value="{{ guest_count }}">
+                                    <input type="hidden" name="children_under_3" value="{{ children_under_3|default:0 }}">
+                                    <input type="hidden" name="has_pet" value="{{ has_pet|default:'false' }}">
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition">
+                                        Забронировать
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </article>
@@ -695,65 +684,6 @@
             </div>
         {% endif %}
     </main>
-
-    <div id="bookingModal" class="booking-modal-overlay">
-        <div class="bg-white w-full max-w-lg rounded-xl shadow-xl p-6 relative">
-            <button id="closeBookingModal" type="button" class="absolute right-4 top-4 text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
-            <h3 class="text-2xl font-semibold mb-2">Забронировать дом</h3>
-            <p class="text-gray-600 mb-5" id="bookingHouseName"></p>
-
-            <form id="modalBookingForm" action="{% url 'main:book_house' %}" method="post" class="space-y-4">
-                {% csrf_token %}
-                <input type="hidden" name="house_id" id="modalHouseId">
-                <input type="hidden" name="first_date" id="modalFirstDate" value="{{ first_date }}">
-                <input type="hidden" name="second_date" id="modalSecondDate" value="{{ second_date }}">
-                <input type="hidden" name="guest_count" id="modalGuestCount" value="{{ guest_count }}">
-                <input type="hidden" name="guests_amount" id="modalGuestsAmount" value="{{ guests_amount|default:guest_count }}">
-                <input type="hidden" name="children_under_3" id="modalChildrenUnder3" value="{{ children_under_3|default:0 }}">
-                <input type="hidden" name="has_pet" id="modalHasPet" value="{{ has_pet|default:'false' }}">
-                <input type="hidden" name="order_cost" id="modalOrderCost">
-
-                <div>
-                    <label for="modalName" class="block text-gray-700 font-medium mb-2">Имя</label>
-                    <input id="modalName" name="name" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
-                </div>
-
-                <div>
-                    <label for="modalPhone" class="block text-gray-700 font-medium mb-2">Номер телефона</label>
-                    <input id="modalPhone" name="phone" type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="+7 (___) ___-__-__">
-                </div>
-
-                <div>
-                    <label for="modalEmail" class="block text-gray-700 font-medium mb-2">Электронная почта</label>
-                    <input id="modalEmail" name="email" type="email" required class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="example@mail.ru">
-                </div>
-
-                <div>
-                    <label for="modalComment" class="block text-gray-700 font-medium mb-2">Комментарий</label>
-                    <textarea id="modalComment" name="comment" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Дополнительные пожелания"></textarea>
-                </div>
-
-                <div>
-                    <label for="modalPersonalDataConsent" class="flex items-start gap-3">
-                        <input id="modalPersonalDataConsent" name="personal_data_consent" type="checkbox" required class="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
-                        <span class="text-sm text-gray-700">
-                            Я даю
-                            <a href="{% url 'main:personal_data_consent' %}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800" onclick="event.stopPropagation()">согласие на обработку персональных данных</a>
-                            и подтверждаю ознакомление с
-                            <a href="{% url 'main:user_agreement' %}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800" onclick="event.stopPropagation()">пользовательским соглашением</a>
-                            и
-                            <a href="{% url 'main:privacy_policy' %}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800" onclick="event.stopPropagation()">политикой конфиденциальности</a>
-                        </span>
-                    </label>
-                    <p id="modalConsentError" class="hidden text-sm text-red-600 mt-2">Необходимо дать согласие на обработку персональных данных.</p>
-                </div>
-
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-3 rounded-lg transition">
-                    Отправить заявку
-                </button>
-            </form>
-        </div>
-    </div>
 
     <script>
         const calendarGrid1 = document.querySelector(".calendar-grid-1");
@@ -775,7 +705,6 @@
         const guestPicker = document.getElementById("guestPicker");
         const guestsTrigger = document.getElementById("guestsTrigger");
         const guestsSummary = document.getElementById("guestsSummary");
-        const guestInputValue = document.getElementById("guestInputValue");
         const guestCountInput = document.getElementById("guestCountInput");
         const childrenUnder3Input = document.getElementById("childrenUnder3Input");
         const hasPetInput = document.getElementById("hasPetInput");
@@ -783,33 +712,21 @@
         const adultsCountDisplay = document.getElementById("adultsCountDisplay");
         const decrementBtn = document.querySelector(".dec_guests_number");
         const incrementBtn = document.querySelector(".inc_guests_number");
-        const addChildBtn = document.getElementById("addChildBtn");
-        const guestAgeDropdown = document.getElementById("guestAgeDropdown");
-        const childrenList = document.getElementById("childrenList");
         const bookingForm = document.getElementById("bookingForm");
+
+        const decChildrenBtn = document.getElementById("decChildrenBtn");
+        const incChildrenBtn = document.getElementById("incChildrenBtn");
 
         const queryFirstDateRaw = "{{ first_date|default:''|escapejs }}";
         const querySecondDateRaw = "{{ second_date|default:''|escapejs }}";
         const queryGuestCountRaw = "{{ guest_count|default:''|escapejs }}";
-        const queryGuestsAmountRaw = "{{ guests_amount|default:''|escapejs }}";
         const queryChildrenUnder3Raw = "{{ children_under_3|default:0|escapejs }}";
         const queryHasPetRaw = "{{ has_pet|default:'false'|escapejs }}";
-        const bookingModal = document.getElementById("bookingModal");
-        const closeBookingModalBtn = document.getElementById("closeBookingModal");
-        const modalHouseName = document.getElementById("bookingHouseName");
-        const modalHouseId = document.getElementById("modalHouseId");
-        const modalOrderCost = document.getElementById("modalOrderCost");
-        const modalFirstDate = document.getElementById("modalFirstDate");
-        const modalSecondDate = document.getElementById("modalSecondDate");
-        const modalGuestCount = document.getElementById("modalGuestCount");
-        const modalGuestsAmount = document.getElementById("modalGuestsAmount");
-        const modalChildrenUnder3 = document.getElementById("modalChildrenUnder3");
-        const modalHasPet = document.getElementById("modalHasPet");
 
         let calendarInitialized = false;
         const guestsLimit = 10;
         let adultsCount = 1;
-        let children = [];
+        let childrenUnder3Count = 0;
         let guestPickerFlag = false;
 
         const CHILD_ORDINALS = ["1-й", "2-й", "3-й", "4-й", "5-й", "6-й", "7-й", "8-й", "9-й"];
@@ -826,86 +743,38 @@
             return String(count) + " гостя";
         }
 
-        function formatChildAgeLabel(age) {
-            if (age === 0) return "До года";
-            if (age === 1) return "1 год";
-            if (age >= 2 && age <= 4) return age + " года";
-            return age + " лет";
-        }
 
         function getTotalGuests() {
-            return adultsCount + children.length;
+            return adultsCount + childrenUnder3Count;
         }
 
         function syncGuestFormFields() {
             const total = getTotalGuests();
-            const childrenUnder3 = children.filter((child) => child.age < 3).length;
 
-            guestInputValue.value = adultsCount;
             guestCountInput.value = total;
-            childrenUnder3Input.value = childrenUnder3;
             hasPetInput.value = hasPetCheckbox.checked ? "true" : "false";
             adultsCountDisplay.textContent = adultsCount;
             guestsSummary.textContent = formatGuestLabel(total);
+            childrenUnder3Input.value = childrenUnder3Count;
+            document.getElementById("childrenCountDisplay").textContent = childrenUnder3Count;
 
             decrementBtn.toggleAttribute("disabled", adultsCount <= 1);
             incrementBtn.toggleAttribute("disabled", total >= guestsLimit);
-            addChildBtn.toggleAttribute("disabled", total >= guestsLimit);
-        }
+            decChildrenBtn.toggleAttribute(
+                "disabled",
+                childrenUnder3Count <= 0
+            );
 
-        function updateGuestPickerScroll() {
-            guestPicker.classList.toggle("scrollable", children.length >= 4);
+            incChildrenBtn.toggleAttribute(
+                "disabled",
+                getTotalGuests() >= guestsLimit
+            );
         }
-
-        function renderChildrenList() {
-            childrenList.innerHTML = "";
-            children.forEach((child, index) => {
-                const row = document.createElement("div");
-                row.className = "guest-child-row";
-                row.innerHTML = `
-                    <div class="guest-picker-row-label">
-                        <div class="guest-picker-row-title">${CHILD_ORDINALS[index] || ((index + 1) + "-й")} ребёнок</div>
-                        <div class="guest-picker-row-subtitle">${formatChildAgeLabel(child.age)}</div>
-                    </div>
-                    <button type="button" class="guest-child-remove" data-child-index="${index}" aria-label="Удалить ребёнка">&times;</button>
-                `;
-                childrenList.appendChild(row);
-            });
-            childrenList.querySelectorAll(".guest-child-remove").forEach((btn) => {
-                btn.addEventListener("click", (event) => {
-                    event.stopPropagation();
-                    const idx = parseInt(btn.dataset.childIndex, 10);
-                    children.splice(idx, 1);
-                    renderChildrenList();
-                    syncGuestFormFields();
-                });
-            });
-            updateGuestPickerScroll();
-        }
-
-        function buildAgeDropdown() {
-            guestAgeDropdown.innerHTML = "";
-            for (let age = 0; age <= 17; age += 1) {
-                const option = document.createElement("button");
-                option.type = "button";
-                option.className = "guest-age-option";
-                option.textContent = formatChildAgeLabel(age);
-                option.addEventListener("click", (event) => {
-                    event.stopPropagation();
-                    if (getTotalGuests() >= guestsLimit) return;
-                    children.push({ age });
-                    guestAgeDropdown.classList.remove("show");
-                    renderChildrenList();
-                    syncGuestFormFields();
-                });
-                guestAgeDropdown.appendChild(option);
-            }
-        }
+        
 
         function closeGuestPicker() {
             guestPicker.classList.remove("show");
             guestsTrigger.classList.remove("active");
-            guestAgeDropdown.classList.remove("show");
         }
 
         function openGuestPicker() {
@@ -922,35 +791,18 @@
                 total = 1;
             }
 
-            let adults = Number(queryGuestsAmountRaw);
-            if (!Number.isInteger(adults) || adults < 1) {
-                adults = total;
-            }
-            if (adults > total) {
-                adults = total;
-            }
-
-            const childCount = total - adults;
             let under3 = Number(queryChildrenUnder3Raw);
             if (!Number.isInteger(under3) || under3 < 0) {
                 under3 = 0;
             }
-            under3 = Math.min(under3, childCount);
+            under3 = Math.min(under3, total - 1);
 
-            adultsCount = adults;
-            children = [];
-            for (let i = 0; i < under3; i += 1) {
-                children.push({ age: i % 3 });
-            }
-            for (let i = under3; i < childCount; i += 1) {
-                children.push({ age: 3 });
-            }
+            adultsCount = total - under3;
+            childrenUnder3Count = under3;
             hasPetCheckbox.checked = queryHasPetRaw === "true";
-            renderChildrenList();
             syncGuestFormFields();
         }
 
-        buildAgeDropdown();
         restoreGuestsFromQuery();
 
         decrementBtn.addEventListener("click", (event) => {
@@ -967,11 +819,6 @@
             syncGuestFormFields();
         });
 
-        addChildBtn.addEventListener("click", (event) => {
-            event.stopPropagation();
-            if (getTotalGuests() >= guestsLimit) return;
-            guestAgeDropdown.classList.toggle("show");
-        });
 
         hasPetCheckbox.addEventListener("change", () => {
             syncGuestFormFields();
@@ -1043,6 +890,25 @@
             return day + "." + parts[1] + "." + parts[0];
         }
 
+        decChildrenBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            if (childrenUnder3Count <= 0) return;
+
+            childrenUnder3Count--;
+            syncGuestFormFields();
+        });
+
+        incChildrenBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            if (getTotalGuests() >= guestsLimit) return;
+
+            childrenUnder3Count++;
+            syncGuestFormFields();
+        });
+
+        
         function applyInitialSearchParams() {
             const displayFirstDate = toDisplayDate(queryFirstDateRaw);
             const displaySecondDate = toDisplayDate(querySecondDateRaw);
@@ -1141,10 +1007,6 @@
 
             if (guestPicker.classList.contains("show") && !isInsideGuestPicker && !isGuestsTrigger) {
                 closeGuestPicker();
-            }
-
-            if (!addChildBtn.contains(event.target) && !guestAgeDropdown.contains(event.target)) {
-                guestAgeDropdown.classList.remove("show");
             }
         });
 
@@ -1381,110 +1243,21 @@
             });
         }
 
-        function openBookingModal(event) {
-            const button = event.currentTarget;
-            modalHouseId.value = button.dataset.houseId;
-            modalOrderCost.value = button.dataset.orderCost;
-            modalHouseName.textContent = button.dataset.houseName + " | " + button.dataset.orderCost + " ₽";
-            modalFirstDate.value = toIsoDate(firstInputDate.value);
-            modalSecondDate.value = toIsoDate(secondInputDate.value);
-            modalGuestCount.value = guestCountInput.value;
-            if (modalGuestsAmount) {
-                modalGuestsAmount.value = guestInputValue.value;
-            }
-            if (modalChildrenUnder3) {
-                modalChildrenUnder3.value = childrenUnder3Input.value;
-            }
-            if (modalHasPet) {
-                modalHasPet.value = hasPetInput.value;
-            }
-            bookingModal.classList.add("show");
-            document.body.classList.add("overflow-hidden");
-        }
-
-        function closeBookingModal() {
-            bookingModal.classList.remove("show");
-            document.body.classList.remove("overflow-hidden");
-        }
-
-        function initBookingModal() {
-            const openButtons = document.querySelectorAll(".open-booking-modal");
-            openButtons.forEach((button) => {
-                button.addEventListener("click", openBookingModal);
-            });
-            closeBookingModalBtn.addEventListener("click", closeBookingModal);
-            bookingModal.addEventListener("click", (event) => {
-                if (event.target === bookingModal) closeBookingModal();
-            });
-
-            const bookingForm = document.getElementById("modalBookingForm");
-            const consentCheckbox = document.getElementById("modalPersonalDataConsent");
-            const consentError = document.getElementById("modalConsentError");
-
-            if (bookingForm && consentCheckbox) {
-                bookingForm.addEventListener("submit", (event) => {
-                    if (!consentCheckbox.checked) {
-                        event.preventDefault();
-                        consentError?.classList.remove("hidden");
-                        consentCheckbox.focus();
-                    }
+        function initBookHouseForms() {
+            const bookForms = document.querySelectorAll(".book-house-form");
+            bookForms.forEach((form) => {
+                form.addEventListener("submit", () => {
+                    form.querySelector('[name="first_date"]').value = toIsoDate(firstInputDate.value);
+                    form.querySelector('[name="second_date"]').value = toIsoDate(secondInputDate.value);
+                    form.querySelector('[name="guest_count"]').value = guestCountInput.value;
+                    form.querySelector('[name="children_under_3"]').value = childrenUnder3Input.value;
+                    form.querySelector('[name="has_pet"]').value = hasPetInput.value;
                 });
-
-                consentCheckbox.addEventListener("change", () => {
-                    if (consentCheckbox.checked) {
-                        consentError?.classList.add("hidden");
-                    }
-                });
-            }
-        }
-
-        function initModalPhoneMask() {
-            const phoneInput = document.getElementById("modalPhone");
-            if (!phoneInput) return;
-
-            phoneInput.addEventListener("input", function (e) {
-                let value = e.target.value.replace(/\D/g, "");
-                let formattedValue = "";
-
-                if (value.length > 0) {
-                    formattedValue = "+7";
-                }
-
-                if (value.length > 1) {
-                    formattedValue += " (" + value.substring(1, 4);
-                }
-
-                if (value.length > 4) {
-                    formattedValue += ") " + value.substring(4, 7);
-                }
-
-                if (value.length > 7) {
-                    formattedValue += "-" + value.substring(7, 9);
-                }
-
-                if (value.length > 9) {
-                    formattedValue += "-" + value.substring(9, 11);
-                }
-
-                e.target.value = formattedValue;
-            });
-
-            phoneInput.addEventListener("focus", function () {
-                if (!this.value) {
-                    this.value = "+7";
-                }
-            });
-
-            phoneInput.addEventListener("blur", function () {
-                if (this.value === "+7") {
-                    this.value = "";
-                }
             });
         }
 
         initHouseSliders();
-        initBookingModal();
-        initModalPhoneMask();
+        initBookHouseForms();
     </script>
 </body>
 </html>

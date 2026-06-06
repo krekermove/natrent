@@ -715,7 +715,6 @@
                         <div>
                             <label for="guestsTrigger" class="block text-gray-700 font-medium mb-2">Количество гостей</label>
                             <div class="relative">
-                                <input type="hidden" name="guestInputValue" id="guestInputValue" value="1">
                                 <input type="hidden" name="guest_count" id="guestCountInput" value="1">
                                 <input type="hidden" name="children_under_3" id="childrenUnder3Input" value="0">
                                 <input type="hidden" name="has_pet" id="hasPetInput" value="false">
@@ -725,8 +724,7 @@
                                 <div id="guestPicker" class="guest-picker-popup">
                                     <div class="guest-picker-row">
                                         <div class="guest-picker-row-label">
-                                            <div class="guest-picker-row-title">Взрослые</div>
-                                            <div class="guest-picker-row-subtitle">Старше 18 лет</div>
+                                            <div class="guest-picker-row-title">Гости</div>
                                         </div>
                                         <div class="guest-picker-stepper">
                                             <button type="button" class="dec_guests_number" disabled>−</button>
@@ -737,14 +735,15 @@
                                     <div class="guest-picker-row">
                                         <div class="guest-picker-row-label">
                                             <div class="guest-picker-row-title">Дети</div>
-                                            <div class="guest-picker-row-subtitle">До 18 лет</div>
+                                            <div class="guest-picker-row-subtitle">До 3 лет (бесплатно)</div>
                                         </div>
-                                        <div class="guest-picker-add-wrap">
-                                            <button type="button" class="guest-picker-add-btn" id="addChildBtn">Добавить</button>
-                                            <div class="guest-age-dropdown" id="guestAgeDropdown"></div>
+                                    
+                                        <div class="guest-picker-stepper">
+                                            <button type="button" id="decChildrenBtn">−</button>
+                                            <span class="guest-picker-stepper-value" id="childrenCountDisplay">0</span>
+                                            <button type="button" id="incChildrenBtn">+</button>
                                         </div>
                                     </div>
-                                    <div id="childrenList"></div>
                                     <div class="guest-picker-row">
                                         <div class="guest-picker-row-label">
                                             <div class="guest-picker-row-title">С питомцем</div>
@@ -1397,7 +1396,6 @@
         const guestPicker = document.getElementById('guestPicker');
         const guestsTrigger = document.getElementById('guestsTrigger');
         const guestsSummary = document.getElementById('guestsSummary');
-        const guestInputValue = document.getElementById('guestInputValue');
         const guestCountInput = document.getElementById('guestCountInput');
         const childrenUnder3Input = document.getElementById('childrenUnder3Input');
         const hasPetInput = document.getElementById('hasPetInput');
@@ -1405,14 +1403,13 @@
         const adultsCountDisplay = document.getElementById('adultsCountDisplay');
         const decrementBtn = document.querySelector('.dec_guests_number');
         const incrementBtn = document.querySelector('.inc_guests_number');
-        const addChildBtn = document.getElementById('addChildBtn');
-        const guestAgeDropdown = document.getElementById('guestAgeDropdown');
-        const childrenList = document.getElementById('childrenList');
         const bookingForm = document.getElementById('bookingForm');
+        const decChildrenBtn = document.getElementById("decChildrenBtn");
+        const incChildrenBtn = document.getElementById("incChildrenBtn");
 
         const guestsLimit = 10;
         let adultsCount = 1;
-        let children = [];
+        let childrenUnder3Count = 0;
         let guestPickerFlag = false;
 
         const CHILD_ORDINALS = ['1-й', '2-й', '3-й', '4-й', '5-й', '6-й', '7-й', '8-й', '9-й'];
@@ -1423,86 +1420,37 @@
             return String(count) + ' гостя';
         }
 
-        function formatChildAgeLabel(age) {
-            if (age === 0) return 'До года';
-            if (age === 1) return '1 год';
-            if (age >= 2 && age <= 4) return age + ' года';
-            return age + ' лет';
-        }
-
         function getTotalGuests() {
-            return adultsCount + children.length;
+            return adultsCount + childrenUnder3Count;
         }
 
         function syncGuestFormFields() {
             const total = getTotalGuests();
-            const childrenUnder3 = children.filter((child) => child.age < 3).length;
 
-            guestInputValue.value = adultsCount;
             guestCountInput.value = total;
-            childrenUnder3Input.value = childrenUnder3;
+            childrenUnder3Input.value = childrenUnder3Count;
             hasPetInput.value = hasPetCheckbox.checked ? 'true' : 'false';
             adultsCountDisplay.textContent = adultsCount;
             guestsSummary.textContent = formatGuestLabel(total);
+            document.getElementById("childrenCountDisplay").textContent = childrenUnder3Count;
 
             decrementBtn.toggleAttribute('disabled', adultsCount <= 1);
             incrementBtn.toggleAttribute('disabled', total >= guestsLimit);
-            addChildBtn.toggleAttribute('disabled', total >= guestsLimit);
-        }
 
-        function updateGuestPickerScroll() {
-            guestPicker.classList.toggle('scrollable', children.length >= 4);
-        }
+            decChildrenBtn.toggleAttribute(
+                "disabled",
+                childrenUnder3Count <= 0
+            );
 
-        function renderChildrenList() {
-            childrenList.innerHTML = '';
-            children.forEach((child, index) => {
-                const row = document.createElement('div');
-                row.className = 'guest-child-row';
-                row.innerHTML = `
-                    <div class="guest-picker-row-label">
-                        <div class="guest-picker-row-title">${CHILD_ORDINALS[index] || ((index + 1) + '-й')} ребёнок</div>
-                        <div class="guest-picker-row-subtitle">${formatChildAgeLabel(child.age)}</div>
-                    </div>
-                    <button type="button" class="guest-child-remove" data-child-index="${index}" aria-label="Удалить ребёнка">&times;</button>
-                `;
-                childrenList.appendChild(row);
-            });
-            childrenList.querySelectorAll('.guest-child-remove').forEach((btn) => {
-                btn.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    const idx = parseInt(btn.dataset.childIndex, 10);
-                    children.splice(idx, 1);
-                    renderChildrenList();
-                    syncGuestFormFields();
-                });
-            });
-            updateGuestPickerScroll();
-        }
-
-        function buildAgeDropdown() {
-            guestAgeDropdown.innerHTML = '';
-            for (let age = 0; age <= 17; age += 1) {
-                const option = document.createElement('button');
-                option.type = 'button';
-                option.className = 'guest-age-option';
-                option.textContent = formatChildAgeLabel(age);
-                option.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    if (getTotalGuests() >= guestsLimit) return;
-                    children.push({ age });
-                    guestAgeDropdown.classList.remove('show');
-                    renderChildrenList();
-                    syncGuestFormFields();
-                });
-                guestAgeDropdown.appendChild(option);
-            }
+            incChildrenBtn.toggleAttribute(
+                "disabled",
+                getTotalGuests() >= guestsLimit
+            );
         }
 
         function closeGuestPicker() {
             guestPicker.classList.remove('show');
             guestsTrigger.classList.remove('active');
-            guestAgeDropdown.classList.remove('show');
         }
 
         function openGuestPicker() {
@@ -1513,7 +1461,6 @@
             guestPickerFlag = true;
         }
 
-        buildAgeDropdown();
         syncGuestFormFields();
 
         decrementBtn.addEventListener('click', (event) => {
@@ -1530,11 +1477,6 @@
             syncGuestFormFields();
         });
 
-        addChildBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (getTotalGuests() >= guestsLimit) return;
-            guestAgeDropdown.classList.toggle('show');
-        });
 
         hasPetCheckbox.addEventListener('change', () => {
             syncGuestFormFields();
@@ -1630,11 +1572,25 @@
                 closeGuestPicker();
             }
 
-            if (!addChildBtn.contains(event.target) && !guestAgeDropdown.contains(event.target)) {
-                guestAgeDropdown.classList.remove('show');
-            }
         });
 
+        decChildrenBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            if (childrenUnder3Count <= 0) return;
+
+            childrenUnder3Count--;
+            syncGuestFormFields();
+        });
+
+        incChildrenBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            if (getTotalGuests() >= guestsLimit) return;
+
+            childrenUnder3Count++;
+            syncGuestFormFields();
+        });
 
 
         function generateCalendar(calendarGrid, monthYearElement, month, year) {
