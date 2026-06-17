@@ -52,6 +52,8 @@
 
     function midnight() { var d = new Date(); d.setHours(0,0,0,0); return d.getTime(); }
     function fmtShort(ms) { var d = new Date(ms); return d.getDate() + ' ' + MONTHS_SHORT[d.getMonth()]; }
+    function pad2(n) { return n < 10 ? '0' + n : String(n); }
+    function fmtInputDate(ms) { var d = new Date(ms); return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + d.getFullYear(); }
     function isMobile() { return window.matchMedia('(max-width:760px)').matches; }
 
     function plural(c) {
@@ -156,10 +158,26 @@
       else if (state.start != null) dl = fmtShort(state.start) + ' — …';
       el.datesLabel.textContent = dl;
 
+      if (el.form) {
+        var inp1 = el.form.querySelector('[name="firstInputDate"]');
+        var inp2 = el.form.querySelector('[name="secondInputDate"]');
+        if (inp1) inp1.value = state.start != null ? fmtInputDate(state.start) : '';
+        if (inp2) inp2.value = state.end != null ? fmtInputDate(state.end) : '';
+      }
+
       var total = state.adults + state.children;
       var gl = plural(total);
       if (state.pet) gl += ' · питомец';
       el.guestsLabel.textContent = gl;
+
+      if (el.form) {
+        var gIn = el.form.querySelector('[name="guest_count"]');
+        var cIn = el.form.querySelector('[name="children_under_3"]');
+        var pIn = el.form.querySelector('[name="has_pet"]');
+        if (gIn) gIn.value = total;
+        if (cIn) cIn.value = state.children;
+        if (pIn) pIn.value = state.pet ? 'true' : 'false';
+      }
     }
 
     // --- гости ---
@@ -246,12 +264,7 @@
     // ресайз — снять блокировку при переходе на десктоп
     window.addEventListener('resize', lockBody);
 
-    // отправка формы — прокрутка к объектам
-    if (el.form) el.form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var t = document.getElementById('properties');
-      if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
-    });
+    // отправка формы — данные уже записаны в скрытые поля, отправляем нормально
 
     // первый рендер
     renderCalendar();

@@ -49,6 +49,10 @@
       <!-- ===== ФОРМА БРОНИРОВАНИЯ ===== -->
       <div id="booking" class="booking">
         <form class="booking-form" action="{% url 'main:main_page' %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="guest_count" value="1">
+          <input type="hidden" name="children_under_3" value="0">
+          <input type="hidden" name="has_pet" value="false">
 
           <!-- Даты -->
           <div class="pop" data-pop="cal">
