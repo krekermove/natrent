@@ -1,0 +1,245 @@
+/* ==========================================================================
+   NatRent — стили сайта посуточной аренды
+   Подключается в шаблоне через {% static 'rental/css/site.css' %}
+   ========================================================================== */
+
+:root{
+  --accent:#5C7185;
+  --navy:#1C2A38;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:'Manrope',system-ui,-apple-system,Segoe UI,sans-serif;
+  color:#1C1F23;
+  background:#F7F8F9;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+section{scroll-margin-top:88px;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;display:block;}
+::selection{background:color-mix(in srgb, var(--accent) 22%, #fff);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+
+.page{overflow-x:hidden;}
+
+/* ---------- Навигация ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(247,248,249,.82);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid #ECEEF0;}
+.nav__inner{max-width:1200px;margin:0 auto;padding:0 28px;height:72px;display:flex;align-items:center;justify-content:space-between;}
+.nav__logo{display:flex;align-items:center;gap:10px;}
+.nav__mark{width:30px;height:30px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;}
+.nav__brand{font-size:19px;font-weight:700;letter-spacing:-.01em;}
+.nav__right{display:flex;align-items:center;gap:8px;}
+.nav__links{display:flex;align-items:center;gap:8px;}
+.nav__link{padding:9px 14px;font-size:14px;font-weight:500;color:#41474E;border-radius:9px;transition:background .15s,color .15s;}
+.nav__link:hover{color:#1C1F23;background:#EEF0F2;}
+.nav__cta{padding:11px 20px;font-size:14px;font-weight:600;color:#fff;background:var(--accent);border-radius:10px;white-space:nowrap;transition:background .2s;}
+.nav__cta:hover{background:color-mix(in srgb, var(--accent) 84%, #000);}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.hero__bg{position:absolute;inset:0;background-size:cover;background-position:center 42%;}
+.hero__veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,24,34,.52) 0%,rgba(16,24,34,.26) 36%,rgba(16,24,34,.84) 100%);}
+.hero__body{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;width:100%;max-width:940px;margin:0 auto;padding:150px 28px 30px;}
+.hero__badge{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:100px;font-size:13px;font-weight:600;color:#EAEFF3;letter-spacing:.01em;margin-bottom:26px;}
+.hero__badge span{width:6px;height:6px;border-radius:50%;background:#fff;}
+.hero__title{font-size:clamp(38px,5.6vw,66px);font-weight:800;line-height:1.04;letter-spacing:-.025em;margin:0;color:#fff;text-wrap:balance;text-shadow:0 2px 34px rgba(10,16,24,.4);}
+.hero__lead{max-width:600px;margin:24px auto 0;font-size:clamp(16px,1.5vw,19px);line-height:1.6;color:rgba(255,255,255,.9);text-wrap:pretty;text-shadow:0 1px 16px rgba(10,16,24,.4);}
+.hero__booking{position:relative;z-index:2;width:100%;padding:0 28px 44px;}
+
+/* ---------- Форма бронирования ---------- */
+.booking{margin:0 auto;max-width:1040px;background:#fff;border:1px solid rgba(255,255,255,.5);border-radius:22px;padding:24px;box-shadow:0 30px 80px rgba(8,14,22,.4);scroll-margin-top:110px;}
+.booking-form{display:grid;grid-template-columns:1.35fr 1fr auto;gap:16px;align-items:end;}
+.pop{position:relative;}
+.field-label{display:block;font-size:12px;font-weight:700;color:#6B7682;margin-bottom:9px;letter-spacing:.03em;text-transform:uppercase;}
+.field{height:56px;border:1px solid #E3E6E9;border-radius:13px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;cursor:pointer;background:#fff;font-size:15px;color:#1C1F23;transition:border-color .15s;}
+.field:hover{border-color:var(--accent);}
+.field i,.field svg{width:17px;height:17px;color:#9AA3AC;flex-shrink:0;}
+.submit-btn{height:56px;padding:0 30px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .2s;}
+.submit-btn:hover{background:color-mix(in srgb, var(--accent) 84%, #000);}
+
+/* Поповеры (десктоп) */
+.backdrop{display:none;}
+.cal-pop,.guest-pop{position:absolute;left:0;background:#fff;border-radius:18px;box-shadow:0 22px 60px rgba(20,28,40,.18);z-index:80;border:1px solid #ECEEF1;bottom:calc(100% + 14px);transition:opacity .2s, transform .2s;opacity:0;visibility:hidden;transform:translateY(8px);pointer-events:none;}
+.cal-pop{padding:20px;}
+.guest-pop{right:0;min-width:320px;padding:8px 18px 14px;}
+.cal-pop.open,.guest-pop.open{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+
+.cal-mobile{display:none;}
+.cal-desktop{display:flex;gap:30px;}
+.cal-month{width:266px;}
+.cal-month__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-month__title{font-size:15px;font-weight:700;color:#1C1F23;}
+.cal-nav{width:34px;height:34px;border:1px solid #E3E6E9;border-radius:9px;background:#fff;cursor:pointer;font-size:18px;line-height:1;color:#41474E;font-family:inherit;display:flex;align-items:center;justify-content:center;}
+.cal-nav--spacer{width:34px;visibility:hidden;}
+.cal-nav.is-hidden{visibility:hidden;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;}
+.cal-wd{font-size:11px;color:#9AA3AC;font-weight:700;height:26px;display:flex;align-items:center;justify-content:center;text-transform:uppercase;letter-spacing:.03em;}
+.cal-foot{margin-top:10px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #F0F2F3;padding-top:12px;}
+.cal-foot__note{font-size:13px;color:#9AA3AC;}
+.link-btn{background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);font-family:inherit;text-decoration:underline;text-underline-offset:3px;}
+
+/* Ячейки дней */
+.day{display:flex;align-items:center;justify-content:center;height:38px;font-size:14px;border-radius:10px;cursor:pointer;color:#1C1F23;user-select:none;transition:background .15s;background:transparent;border:none;padding:0;font-family:inherit;}
+.day.is-empty{visibility:hidden;cursor:default;}
+.day.is-past{color:#CBD0D5;cursor:default;}
+.day.is-today{box-shadow:inset 0 0 0 1px var(--accent);}
+.day.is-inrange{background:color-mix(in srgb, var(--accent) 13%, #fff);border-radius:0;}
+.day.is-edge{background:var(--accent);color:#fff;font-weight:600;}
+
+/* Гости */
+.guest-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #F0F2F3;}
+.guest-row:last-of-type{border-bottom:none;padding-bottom:4px;}
+.guest-row__title{font-weight:700;font-size:15px;color:#1C1F23;}
+.guest-row__sub{font-size:13px;color:#9AA3AC;margin-top:2px;}
+.stepper{display:flex;align-items:center;border:1px solid #E3E6E9;border-radius:11px;overflow:hidden;}
+.stepper button{width:40px;height:40px;border:none;background:#fff;cursor:pointer;font-size:18px;line-height:1;color:#1C1F23;font-family:inherit;}
+.stepper button:disabled{cursor:not-allowed;opacity:.32;}
+.stepper__val{min-width:36px;text-align:center;font-weight:700;font-size:15px;}
+.switch{width:48px;height:28px;border-radius:28px;border:none;cursor:pointer;position:relative;transition:background .2s;background:#E3E6E9;padding:0;flex-shrink:0;}
+.switch.on{background:var(--accent);}
+.switch__knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.22);}
+.switch.on .switch__knob{left:23px;}
+
+/* Элементы шторки (только мобайл) */
+.sheet-handle,.sheet-head,.sheet-weekdays,.sheet-foot,.sheet-done{display:none;}
+
+/* ---------- Секции-заголовки ---------- */
+.wrap{max-width:1200px;margin:0 auto;}
+.eyebrow{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+.eyebrow--light{color:#9DB4C6;}
+.h2{font-size:clamp(28px,3.4vw,42px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:0;color:#15181C;}
+.h2--light{color:#fff;}
+.section-lead{margin:16px 0 0;font-size:17px;line-height:1.6;color:#6B7682;}
+
+/* ---------- Объекты ---------- */
+.properties{padding:96px 28px 0;}
+.cards{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:22px;}
+.card{background:#fff;border:1px solid #ECEEF0;border-radius:18px;overflow:hidden;transition:box-shadow .25s, transform .25s;}
+.card:hover{box-shadow:0 22px 46px rgba(20,28,40,.12);transform:translateY(-4px);}
+.card__media{position:relative;height:218px;background-color:#E7EBEE;background-size:cover;background-position:center;}
+.card__media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,16,22,0) 55%,rgba(10,16,22,.26));}
+.card__price{position:absolute;top:14px;right:14px;background:#fff;font-size:13px;font-weight:700;padding:7px 13px;border-radius:100px;box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:1;}
+.card__price span{color:#9AA3AC;font-weight:500;}
+.card__body{padding:20px;}
+.card__title{font-size:18px;font-weight:700;margin:0;letter-spacing:-.01em;}
+.card__loc{display:flex;align-items:center;gap:6px;margin-top:8px;color:#6B7682;font-size:14px;}
+.card__loc i,.card__loc svg{width:14px;height:14px;}
+.card__meta{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid #F0F2F3;}
+.card__facts{display:flex;gap:16px;color:#6B7682;font-size:14px;}
+.card__facts span{display:flex;align-items:center;gap:5px;}
+.card__facts i,.card__facts svg{width:14px;height:14px;}
+.card__rating{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;}
+.card__rating i,.card__rating svg{width:14px;height:14px;color:var(--accent);}
+
+/* ---------- О нас / Контакты (тёмные) ---------- */
+.section-dark{background:var(--navy);padding:96px 28px;}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:60px;align-items:center;}
+.about__media{height:clamp(360px,34vw,460px);border-radius:22px;background-color:#0f1820;background-size:cover;background-position:center;box-shadow:0 24px 60px rgba(0,0,0,.35);}
+.about__badge{position:absolute;right:-14px;bottom:-22px;background:#fff;border:1px solid #ECEEF0;box-shadow:0 16px 40px rgba(20,28,40,.12);border-radius:16px;padding:18px 22px;}
+.about__badge b{display:block;font-size:34px;font-weight:800;color:var(--accent);letter-spacing:-.02em;line-height:1;}
+.about__badge small{display:block;font-size:14px;color:#6B7682;margin-top:6px;}
+.section-lead--light{color:rgba(255,255,255,.74);}
+.feature-list{margin-top:34px;display:flex;flex-direction:column;gap:24px;}
+.feature{display:flex;gap:16px;}
+.feature__icon{flex-shrink:0;width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#B7C9D6;}
+.feature__icon i,.feature__icon svg{width:20px;height:20px;}
+.feature h3{font-size:17px;font-weight:700;margin:0;color:#fff;}
+.feature p{margin:6px 0 0;font-size:15px;line-height:1.55;color:rgba(255,255,255,.62);}
+
+/* ---------- Отзывы ---------- */
+.reviews{padding:96px 28px 100px;}
+.review{background:#fff;border:1px solid #ECEEF0;border-radius:18px;padding:28px;}
+.review__stars{color:var(--accent);font-size:16px;letter-spacing:3px;}
+.review__text{margin:16px 0 0;font-size:16px;line-height:1.6;color:#3A4047;text-wrap:pretty;}
+.review__author{display:flex;align-items:center;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #F0F2F3;}
+.review__avatar{width:42px;height:42px;border-radius:50%;background:color-mix(in srgb, var(--accent) 14%, #fff);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
+.review__name{font-weight:700;font-size:15px;}
+.review__when{font-size:13px;color:#9AA3AC;}
+
+/* ---------- Контакты ---------- */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;}
+.contact-list{margin-top:34px;display:flex;flex-direction:column;gap:22px;}
+.contact-item{display:flex;gap:15px;align-items:center;}
+.contact-item__icon{flex-shrink:0;width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#B7C9D6;}
+.contact-item__icon i,.contact-item__icon svg{width:19px;height:19px;}
+.contact-item__label{font-size:13px;color:rgba(255,255,255,.5);font-weight:600;}
+.contact-item__value{font-size:16px;font-weight:600;margin-top:2px;color:#fff;}
+.contact-card{background:#fff;border:1px solid rgba(255,255,255,.6);border-radius:20px;padding:30px;box-shadow:0 24px 60px rgba(0,0,0,.32);}
+.contact-card h3{font-size:22px;font-weight:700;margin:0 0 22px;letter-spacing:-.01em;}
+.form-col{display:flex;flex-direction:column;gap:16px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-field label{display:block;font-size:13px;font-weight:600;color:#6B7682;margin-bottom:7px;}
+.form-field input,.form-field textarea{width:100%;border:1px solid #E3E6E9;border-radius:11px;font-size:15px;font-family:inherit;outline:none;background:#fff;color:#1C1F23;transition:border-color .15s,box-shadow .15s;}
+.form-field input{height:48px;padding:0 14px;}
+.form-field textarea{padding:12px 14px;resize:vertical;}
+.form-field input:focus,.form-field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 16%, #fff);}
+.contact-submit{height:52px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;}
+.contact-submit:hover{background:color-mix(in srgb, var(--accent) 84%, #000);}
+
+/* ---------- Футер ---------- */
+.footer{background:#15181C;color:#C7CDD3;padding:60px 28px 32px;}
+.footer__cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;}
+.footer__brand{max-width:280px;}
+.footer__brandrow{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.footer__mark{width:30px;height:30px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;}
+.footer__brandname{font-size:18px;font-weight:700;color:#fff;}
+.footer__about{margin:0;font-size:14px;line-height:1.6;color:#8B939B;}
+.footer__h{font-size:13px;font-weight:700;color:#7A828A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:16px;}
+.footer__list{display:flex;flex-direction:column;gap:11px;font-size:14px;}
+.footer__list a,.footer__list span{color:#C7CDD3;}
+.footer__list a:hover{color:#fff;}
+.footer__bottom{margin-top:44px;padding-top:24px;border-top:1px solid #262B31;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;font-size:13px;color:#7A828A;}
+.footer__legal{display:flex;gap:22px;}
+.footer__legal a{color:#7A828A;}
+.footer__legal a:hover{color:#C7CDD3;}
+
+/* ==========================================================================
+   Мобильная версия (<760px): календарь и гости — нижние шторки
+   ========================================================================== */
+@media (max-width:760px){
+  .nav__links{display:none;}
+  .booking-form{grid-template-columns:1fr;gap:14px;}
+
+  /* затемнение фона */
+  .backdrop{display:block;position:fixed;inset:0;background:rgba(12,18,26,.45);z-index:200;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s;}
+  .backdrop.open{opacity:1;visibility:visible;pointer-events:auto;}
+
+  /* общий каркас шторки */
+  .cal-pop,.guest-pop{position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;min-width:0;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -12px 44px rgba(12,18,26,.2);z-index:201;transform:translateY(101%);opacity:1;visibility:visible;transition:transform .32s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;}
+  .cal-pop{top:7vh;padding:0;}
+  .guest-pop{max-height:84vh;overflow-y:auto;padding:0 20px 22px;}
+  .cal-pop.open,.guest-pop.open{transform:translateY(0);pointer-events:auto;}
+
+  /* переключение месяцев: прячем десктоп, показываем вертикальный список */
+  .cal-desktop{display:none;}
+  .cal-mobile{display:flex;flex-direction:column;flex:1;min-height:0;}
+
+  .sheet-handle{display:flex;justify-content:center;padding:10px 0 2px;flex-shrink:0;}
+  .sheet-handle span{width:38px;height:5px;border-radius:3px;background:#D9DDE1;}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:6px 18px 14px;flex-shrink:0;}
+  .guest-pop .sheet-head{padding:6px 0 12px;border-bottom:1px solid #F0F2F3;}
+  .sheet-head__title{font-size:17px;font-weight:700;color:#1C1F23;}
+  .sheet-x{width:36px;height:36px;border:none;background:none;cursor:pointer;font-size:22px;line-height:1;color:#1C1F23;font-family:inherit;display:flex;align-items:center;justify-content:center;margin-left:-8px;}
+  .sheet-x--spacer{width:36px;visibility:hidden;}
+  .sheet-reset{background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--accent);font-family:inherit;}
+
+  .sheet-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;padding:0 18px 12px;border-bottom:1px solid #F0F2F3;flex-shrink:0;}
+  .sheet-weekdays span{font-size:11px;color:#9AA3AC;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+
+  .cal-scroll{flex:1;overflow-y:auto;padding:16px 18px 8px;-webkit-overflow-scrolling:touch;}
+  .cal-scroll__month{margin-bottom:22px;}
+  .cal-scroll__title{text-align:center;font-size:16px;font-weight:700;color:#1C1F23;margin:2px 0 14px;}
+  .cal-mobile .cal-grid{gap:3px;}
+  .cal-mobile .day{height:48px;font-size:16px;}
+
+  .sheet-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;border-top:1px solid #F0F2F3;flex-shrink:0;}
+  .sheet-foot__note{font-size:13px;color:#9AA3AC;flex-shrink:0;}
+  .sheet-apply{flex:1;max-width:200px;height:52px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .cal-foot{display:none;}
+
+  .sheet-done{display:block;width:100%;height:52px;margin-top:18px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+}

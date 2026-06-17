@@ -145,8 +145,8 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'voenmehclowns@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'yxvdvbpaaigqffrr')
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '1') == '1'
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '0') == '1'
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '1')
+# EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '0') == '1'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'voenmehclowns@gmail.com')
 
 NATRENT_SITE_URL = os.environ.get('NATRENT_SITE_URL', 'http://localhost:1337/')

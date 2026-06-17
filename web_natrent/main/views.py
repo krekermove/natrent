@@ -157,7 +157,7 @@ def build_booking_query_string(params):
 class MainView(View):
 
     def get(self, request):
-        return render(request, 'main/index2.html')
+        return render(request, 'main/index.html')
 
     def post(self, request):
         search_data = normalize_search_data(request.POST)
@@ -167,17 +167,17 @@ class MainView(View):
         context = {}
         if not first_date or not second_date:
             context['date_input_error'] = 'Вы не полностью выбрали даты проживания'
-            return render(request, template_name='main/index2.html', context=context)
+            return render(request, template_name='main/index.html', context=context)
 
         if second_date <= first_date:
             context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
-            return render(request, template_name='main/index2.html', context=context)
+            return render(request, template_name='main/index.html', context=context)
 
         return HttpResponseRedirect(reverse('main:search_houses'), status=307)
 
 
 def popular_list(request):
-    return render(request,'main/index2.html')
+    return render(request,'main/index.html')
 
 
 class SearchView(View):
