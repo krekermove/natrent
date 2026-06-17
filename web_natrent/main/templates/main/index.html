@@ -1,4 +1,5 @@
 {% load static %}
+{% load russian_plural %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -183,87 +184,87 @@
   </section>
 
   <!-- ===== ОБЪЕКТЫ ===== -->
+  {% if search_applied %}<div id="search-applied-flag" hidden></div>{% endif %}
+  <div id="properties-wrapper" class="properties-wrapper">
   <section id="properties" class="properties">
     <div class="wrap">
-      <div style="max-width:560px;">
+      <div>
         <div class="eyebrow">Объекты</div>
-        <h2 class="h2">Дома и апартаменты для вашего отдыха</h2>
-        <p class="section-lead">Загородные дома в тихих местах Ленинградской области и квартира в центре Петербурга — выбирайте под формат поездки.</p>
+        {% if search_applied %}
+          <h2 class="h2">Свободные дома</h2>
+<!--          <p class="section-lead">Доступны на выбранные даты, подходят по количеству гостей.</p>-->
+        {% else %}
+          <h2 class="h2">Дома и апартаменты для вашего отдыха</h2>
+<!--          <p class="section-lead">Загородные дома в тихих местах Ленинградской области и квартира в центре Петербурга — выбирайте под формат поездки.</p>-->
+        {% endif %}
       </div>
 
-      <div class="cards">
-
-        <article class="card">
-          <div class="card__media" style="background-image:url('{% static 'main/img/house1.jpg' %}');">
-            <span class="card__price">от 18 000 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Дом с баней и сибирским чаном</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · Приозерское напр.</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>6 гостей</span>
-                <span><i data-feather="home"></i>2 спальни</span>
+      {% if houses %}
+        <div class="cards">
+          {% for house in houses %}
+            <article class="card">
+              <div class="card__slider">
+                <div class="card__slides">
+                  {% if house.img1 %}<div class="card__slide" style="background-image:url('{{ house.img1.url }}')"></div>{% endif %}
+                  {% if house.img2 %}<div class="card__slide" style="background-image:url('{{ house.img2.url }}')"></div>{% endif %}
+                  {% if house.img3 %}<div class="card__slide" style="background-image:url('{{ house.img3.url }}')"></div>{% endif %}
+                  {% if house.img4 %}<div class="card__slide" style="background-image:url('{{ house.img4.url }}')"></div>{% endif %}
+                  {% if not house.img1 and not house.img2 and not house.img3 and not house.img4 %}<div class="card__slide" style="background-image:url('{% static 'main/img/house1.jpg' %}')"></div>{% endif %}
+                </div>
+                <span class="card__price">
+                  {% if search_applied and house.use_total_stay_cost %}
+                    {{ house.total_stay_cost }} ₽<span> / {{ house.stay_nights }} ноч{{ house.stay_nights|ru_plural:"ь,и,ей" }}</span>
+                  {% else %}
+                    от {{ house.price }} ₽<span> / ночь</span>
+                  {% endif %}
+                </span>
+                <button class="card__slider-btn card__slider-btn--prev" type="button" aria-label="Назад">&#8249;</button>
+                <button class="card__slider-btn card__slider-btn--next" type="button" aria-label="Вперёд">&#8250;</button>
+                <div class="card__dots">
+                  {% if house.img1 %}<div class="card__dot is-active"></div>{% endif %}
+                  {% if house.img2 %}<div class="card__dot"></div>{% endif %}
+                  {% if house.img3 %}<div class="card__dot"></div>{% endif %}
+                  {% if house.img4 %}<div class="card__dot"></div>{% endif %}
+                </div>
               </div>
-              <span class="card__rating"><i data-feather="star"></i>4.9</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 24 000 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Дом с бассейном и баней</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · Выборгское напр.</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>8 гостей</span>
-                <span><i data-feather="home"></i>3 спальни</span>
+              <div class="card__body">
+                <h3 class="card__title">{{ house.name }}</h3>
+                <p class="card__desc">{{ house.description|truncatechars:90 }}</p>
+                <div class="card__meta">
+                  <div class="card__facts">
+                    <span><i data-feather="users"></i>до {{ house.max_guests }} гост{{ house.max_guests|ru_plural:"ь,я,ей" }}</span>
+                  </div>
+                </div>
+                <div class="card__actions">
+                  <a href="{% url 'main:house_detail' house.id %}" class="btn-outline">Подробнее</a>
+                  {% if search_applied %}
+                    <form action="{% url 'main:book_house' house.id %}" method="post" class="book-house-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="form_action" value="show">
+                      <input type="hidden" name="first_date" value="{{ first_date }}">
+                      <input type="hidden" name="second_date" value="{{ second_date }}">
+                      <input type="hidden" name="guest_count" value="{{ guest_count }}">
+                      <input type="hidden" name="children_under_3" value="{{ children_under_3|default:0 }}">
+                      <input type="hidden" name="has_pet" value="{{ has_pet|default:'false' }}">
+                      <button type="submit" class="btn-accent">Забронировать</button>
+                    </form>
+                  {% else %}
+                    <a href="{% url 'main:house_detail' house.id %}" class="btn-accent">Выбрать даты</a>
+                  {% endif %}
+                </div>
               </div>
-              <span class="card__rating"><i data-feather="star"></i>4.8</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 15 000 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Дом у леса с панорамной баней</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · у Лосевских порогов</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>4 гостя</span>
-                <span><i data-feather="home"></i>2 спальни</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.9</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 6 500 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Апартаменты на Ленинском пр.</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Санкт-Петербург · рядом с клиникой «Скандинавия»</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>4 гостя</span>
-                <span><i data-feather="home"></i>1 спальня</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.7</span>
-            </div>
-          </div>
-        </article>
-
-      </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% elif search_applied %}
+        <div class="no-results">
+          <p>На выбранные даты свободных домов нет.</p>
+          <p>Попробуйте изменить даты или количество гостей.</p>
+        </div>
+      {% endif %}
     </div>
   </section>
+  </div>
 
   <!-- ===== О НАС ===== -->
   <section id="about" class="section-dark" style="margin-top:96px;">
@@ -307,7 +308,7 @@
   <!-- ===== ОТЗЫВЫ ===== -->
   <section id="reviews" class="reviews">
     <div class="wrap">
-      <div style="max-width:560px;">
+      <div>
         <div class="eyebrow">Отзывы</div>
         <h2 class="h2">Что говорят наши гости</h2>
       </div>
@@ -467,5 +468,146 @@
 <!-- Логика бронирования -->
 <script src="{% static 'main/js/booking.js' %}"></script>
 <script>if (window.feather) feather.replace();</script>
+
+<script>
+/* ---- Sticky booking form ---- */
+(function () {
+  'use strict';
+
+  var NAV_H = 72;
+  var bookingEl = document.getElementById('booking');
+  var bookingParent = bookingEl && bookingEl.parentElement;
+  var propertiesWrapper = document.getElementById('properties-wrapper');
+  var propertiesSection = document.getElementById('properties');
+
+  if (!bookingEl || !propertiesWrapper || !propertiesSection) return;
+
+  var ph = document.createElement('div');
+  ph.id = 'booking-ph';
+  ph.style.display = 'none';
+  bookingParent.insertBefore(ph, bookingEl);
+
+  var isSticky = false;
+  var lastOverlap = -1;
+  var phRafId = null;
+  var scrollRafId = null;
+
+  function setCSSVar(name, val) { document.documentElement.style.setProperty(name, val); }
+  function closeAllPopups() { document.dispatchEvent(new CustomEvent('booking:closePopups')); }
+
+  function makeSticky() {
+    if (isSticky) return;
+    var h = bookingEl.offsetHeight;
+    ph.style.height = h + 'px';
+    ph.style.display = 'block';
+    bookingEl.classList.add('booking--sticky');
+    // setCSSVar('--booking-sticky-h', h + 'px');
+    isSticky = true;
+    closeAllPopups();
+    /* rAF loop — плавно синхронизирует placeholder с высотой формы во время CSS-перехода */
+    if (phRafId) cancelAnimationFrame(phRafId);
+    var deadline = Date.now() + 290;
+    (function syncPh() {
+      if (!isSticky) { phRafId = null; return; }
+      var curH = bookingEl.offsetHeight;
+      var curStr = curH + 'px';
+      if (ph.style.height !== curStr) {
+        ph.style.height = curStr;
+        // setCSSVar('--booking-sticky-h', curStr);
+      }
+      phRafId = Date.now() < deadline ? requestAnimationFrame(syncPh) : null;
+    }());
+  }
+
+  function makeNormal() {
+    if (!isSticky) return;
+    if (phRafId) { cancelAnimationFrame(phRafId); phRafId = null; }
+    closeAllPopups();
+    ph.style.display = 'none';
+    bookingEl.classList.remove('booking--sticky');
+    bookingEl.style.top = '';
+    setCSSVar('--booking-sticky-h', '0px');
+    isSticky = false;
+    if (lastOverlap !== 0) { lastOverlap = 0; propertiesSection.style.paddingTop = ''; }
+  }
+
+  function update() {
+    var naturalEl = isSticky ? ph : bookingEl;
+    var naturalRect = naturalEl.getBoundingClientRect();
+    var wrapperRect = propertiesWrapper.getBoundingClientRect();
+    var formH = bookingEl.offsetHeight;
+
+    var shouldStick = isSticky ? naturalRect.top < NAV_H + 4 : naturalRect.top < NAV_H - 4;
+
+    if (shouldStick) {
+      makeSticky();
+      bookingEl.style.top = wrapperRect.top > NAV_H ? '' : wrapperRect.top + 'px';
+      var overlap = Math.round(Math.max(30, Math.min(NAV_H + formH - wrapperRect.top, formH)));
+      if (overlap !== lastOverlap) {
+        lastOverlap = overlap;
+        propertiesSection.style.paddingTop = overlap > 0 ? overlap + 'px' : '';
+      }
+    } else {
+      makeNormal();
+    }
+  }
+
+  function onScroll() {
+    if (!scrollRafId) {
+      scrollRafId = requestAnimationFrame(function () { scrollRafId = null; update(); });
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { makeNormal(); setTimeout(update, 50); }, { passive: true });
+
+  if (document.getElementById('search-applied-flag')) {
+    function scrollToProps() {
+      var top = propertiesWrapper.getBoundingClientRect().top + window.pageYOffset - NAV_H;
+      window.scrollTo({ top: Math.max(0, top) });
+    }
+    scrollToProps();
+    window.addEventListener('load', scrollToProps, { once: true });
+  }
+})();
+
+/* ---- Card image sliders ---- */
+(function () {
+  'use strict';
+  document.querySelectorAll('.card__slider').forEach(function (slider) {
+    var slides = slider.querySelectorAll('.card__slide');
+    if (slides.length <= 1) { slider.classList.add('card__slider--single'); return; }
+
+    var track = slider.querySelector('.card__slides');
+    var dots  = slider.querySelectorAll('.card__dot');
+    var idx = 0;
+
+    function goTo(n) {
+      idx = (n + slides.length) % slides.length;
+      track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+      dots.forEach(function (d, i) { d.classList.toggle('is-active', i === idx); });
+    }
+
+    slider.querySelector('.card__slider-btn--prev').addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation(); goTo(idx - 1);
+    });
+    slider.querySelector('.card__slider-btn--next').addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation(); goTo(idx + 1);
+    });
+    dots.forEach(function (d, i) {
+      d.addEventListener('click', function (e) { e.stopPropagation(); goTo(i); });
+    });
+
+    var touchStartX = 0;
+    slider.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+    slider.addEventListener('touchend', function (e) {
+      var diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) goTo(idx + (diff > 0 ? 1 : -1));
+    }, { passive: true });
+
+    goTo(0);
+  });
+})();
+</script>
 </body>
 </html>

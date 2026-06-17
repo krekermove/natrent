@@ -156,24 +156,81 @@ def build_booking_query_string(params):
 
 class MainView(View):
 
+    def _load_houses(self):
+        houses = list(RentObject.objects.all())
+        for house in houses:
+            house.gallery_images = [
+                img for img in [house.img1, house.img2, house.img3, house.img4] if img
+            ]
+        return houses
+
     def get(self, request):
-        return render(request, 'main/index.html')
+        return render(request, 'main/index.html', {'houses': self._load_houses()})
 
     def post(self, request):
         search_data = normalize_search_data(request.POST)
         first_date = search_data['first_date']
         second_date = search_data['second_date']
 
-        context = {}
+        base_context = {}
+
         if not first_date or not second_date:
-            context['date_input_error'] = 'Вы не полностью выбрали даты проживания'
-            return render(request, template_name='main/index.html', context=context)
+            base_context['date_input_error'] = 'Вы не полностью выбрали даты проживания'
+            base_context['houses'] = self._load_houses()
+            return render(request, 'main/index.html', context=base_context)
 
         if second_date <= first_date:
-            context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
-            return render(request, template_name='main/index.html', context=context)
+            base_context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
+            base_context['houses'] = self._load_houses()
+            return render(request, 'main/index.html', context=base_context)
 
-        return HttpResponseRedirect(reverse('main:search_houses'), status=307)
+        try:
+            guest_count = int(search_data.get('guest_count') or 1)
+        except (TypeError, ValueError):
+            guest_count = 1
+        try:
+            children_under_3 = int(search_data.get('children_under_3') or 0)
+        except (TypeError, ValueError):
+            children_under_3 = 0
+        has_pet = search_data.get('has_pet', 'false')
+        has_pet_bool = str(has_pet).lower() in ('true', '1', 'on', 'yes')
+
+        busy_ids = TimeTable.objects.filter(
+            Q(startdate__lt=second_date),
+            Q(enddate__gt=first_date),
+            status=True,
+        ).values_list('house_id', flat=True)
+
+        free_houses = list(RentObject.objects.filter(
+            max_guests__gte=guest_count
+        ).exclude(id__in=busy_ids))
+
+        start_date = datetime.strptime(first_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(second_date, '%Y-%m-%d').date()
+
+        for house in free_houses:
+            cost_data = calculate_booking_cost(
+                house, start_date, end_date,
+                guest_count=guest_count,
+                children_under_3=children_under_3,
+                has_pet=has_pet_bool,
+            )
+            house.total_stay_cost = cost_data['total_cost']
+            house.use_total_stay_cost = cost_data['has_all_dates_cost']
+            house.stay_nights = cost_data['stay_nights']
+            house.gallery_images = [
+                img for img in [house.img1, house.img2, house.img3, house.img4] if img
+            ]
+
+        return render(request, 'main/index.html', {
+            'houses': free_houses,
+            'first_date': first_date,
+            'second_date': second_date,
+            'guest_count': guest_count,
+            'children_under_3': children_under_3,
+            'has_pet': has_pet,
+            'search_applied': True,
+        })
 
 
 def popular_list(request):

@@ -211,8 +211,13 @@
     }
 
     // ==== события ====
-    el.datesTrigger.addEventListener('click', function (e) { e.stopPropagation(); setCal(!state.calOpen); });
-    el.guestsTrigger.addEventListener('click', function (e) { e.stopPropagation(); setGuests(!state.guestsOpen); });
+    // определяем скролл vs тап — не открываем попапы если палец двигался
+    var touchScrolling = false;
+    document.addEventListener('touchstart', function () { touchScrolling = false; }, { passive: true });
+    document.addEventListener('touchmove',  function () { touchScrolling = true;  }, { passive: true });
+
+    el.datesTrigger.addEventListener('click', function (e) { if (touchScrolling) return; e.stopPropagation(); setCal(!state.calOpen); });
+    el.guestsTrigger.addEventListener('click', function (e) { if (touchScrolling) return; e.stopPropagation(); setGuests(!state.guestsOpen); });
 
     el.prevBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -264,7 +269,35 @@
     // ресайз — снять блокировку при переходе на десктоп
     window.addEventListener('resize', lockBody);
 
-    // отправка формы — данные уже записаны в скрытые поля, отправляем нормально
+    // закрытие попапов по сигналу от sticky-скрипта
+    document.addEventListener('booking:closePopups', function () {
+      if (state.calOpen) setCal(false);
+      if (state.guestsOpen) setGuests(false);
+    });
+
+    // сохраняем состояние перед отправкой формы
+    if (el.form) {
+      el.form.addEventListener('submit', function () {
+        sessionStorage.setItem('bk_restore', JSON.stringify({
+          start: state.start, end: state.end,
+          adults: state.adults, children: state.children, pet: state.pet
+        }));
+      });
+    }
+
+    // восстанавливаем состояние после перезагрузки (после POST)
+    var _saved = sessionStorage.getItem('bk_restore');
+    if (_saved) {
+      try {
+        var _s = JSON.parse(_saved);
+        sessionStorage.removeItem('bk_restore');
+        if (_s.start   != null) state.start    = _s.start;
+        if (_s.end     != null) state.end      = _s.end;
+        if (_s.adults   > 0)   state.adults   = _s.adults;
+        if (_s.children >= 0)  state.children = _s.children;
+        if (_s.pet     != null) state.pet      = !!_s.pet;
+      } catch (e) { /* ignore */ }
+    }
 
     // первый рендер
     renderCalendar();
