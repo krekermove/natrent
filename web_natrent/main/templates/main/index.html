@@ -1,251 +1,467 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NatRent - Аренда частных домов для отдыха</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .hero {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('web_natrent/media/houses/house1.jpg');
-            background-size: cover;
-            background-position: center;
-            height: 70vh;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NatRent — дома с баней, чаном и бассейном · Санкт-Петербург и Ленобласть</title>
 
-        .booking-form {
-            transform: translateY(50%);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        @media (max-width: 768px) {
-            .hero {
-                height: 60vh;
-            }
-            .booking-form {
-                transform: translateY(20%);
-            }
-        }
-    </style>
+  <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
 </head>
-<body class="font-sans bg-gray-50">
-    <!-- Навигационная панель -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-home text-2xl text-blue-600"></i>
-                    <span class="text-xl font-bold text-gray-800">NatRent</span>
-                </div>
+<body>
+<div class="page">
 
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-blue-600 font-medium">Главная</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">Дома</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">О нас</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">Отзывы</a>
-                    <a href="#" class="text-gray-600 hover:text-blue-600 transition">Контакты</a>
-                </div>
-
-                <div class="md:hidden">
-                    <button class="text-gray-600 focus:outline-none">
-                        <i class="fas fa-bars text-2xl"></i>
-                    </button>
-                </div>
-            </div>
+  <!-- ===== НАВИГАЦИЯ ===== -->
+  <nav class="nav">
+    <div class="nav__inner">
+      <a href="#top" class="nav__logo">
+        <span class="nav__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+        <span class="nav__brand">NatRent</span>
+      </a>
+      <div class="nav__right">
+        <div class="nav__links">
+          <a href="#properties" class="nav__link">Объекты</a>
+          <a href="#about" class="nav__link">О нас</a>
+          <a href="#reviews" class="nav__link">Отзывы</a>
+          <a href="#contact" class="nav__link">Контакты</a>
         </div>
-    </nav>
+        <a href="#booking" class="nav__cta">Забронировать</a>
+      </div>
+    </div>
+  </nav>
 
-    <!-- Герой-секция -->
-    <section class="hero relative flex items-center">
-        <div class="container mx-auto px-4 text-center text-white">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">Аренда элитных домов для отдыха</h1>
-            <p class="text-xl md:text-2xl mb-8">Найдите свой идеальный дом для незабываемого отдыха</p>
-            <a href="#booking" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 inline-block">
-                Забронировать сейчас
-            </a>
+  <!-- ===== HERO ===== -->
+  <section id="top" class="hero">
+    <div class="hero__bg" aria-hidden="true" style="background-image:url('{% static 'main/img/house1.jpg' %}');"></div>
+    <div class="hero__veil" aria-hidden="true"></div>
+
+    <div class="hero__body">
+      <div class="hero__badge"><span></span>Санкт-Петербург · Ленинградская область</div>
+      <h1 class="hero__title">Загородные дома с баней, чаном и бассейном</h1>
+      <p class="hero__lead">Уютный отдых под Петербургом и квартира в центре города. Премиальная баня от уральских мастеров, банный чан под открытым небом и подогреваемый бассейн.</p>
+    </div>
+
+    <div class="hero__booking">
+      <!-- ===== ФОРМА БРОНИРОВАНИЯ ===== -->
+      <div id="booking" class="booking">
+        <form class="booking-form" action="{% url 'main:main_page' %}" method="post">
+
+          <!-- Даты -->
+          <div class="pop" data-pop="cal">
+            <label class="field-label">Даты проживания</label>
+            <div class="field" data-trigger="cal" role="button" tabindex="0">
+              <input type="hidden" name="firstInputDate" value="">
+              <input type="hidden" name="secondInputDate" value="">
+              <span data-label="dates">Выберите даты</span>
+              <i data-feather="calendar"></i>
+            </div>
+            {% if date_input_error %}
+                <div class="date_input_error" style="position:absolute; color: red">
+                    <span>{{ date_input_error }}</span>
+                </div>
+            {% endif %}
+            <div class="backdrop" data-backdrop="cal"></div>
+
+            <div class="cal-pop" data-pop-el="cal">
+              <!-- Шапка шторки (только мобайл) -->
+              <div class="sheet-handle"><span></span></div>
+              <div class="sheet-head">
+                <button type="button" class="sheet-x" data-action="close-cal">✕</button>
+                <span class="sheet-head__title">Даты</span>
+                <button type="button" class="sheet-reset" data-action="clear-dates">Сбросить</button>
+              </div>
+              <div class="sheet-weekdays">
+                <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+              </div>
+
+              <!-- Мобайл: вертикальный список месяцев -->
+              <div class="cal-mobile" data-cal-mobile>
+                <div class="cal-scroll" data-cal-scroll></div>
+                <div class="sheet-foot">
+                  <span class="sheet-foot__note">Минимум 2 ночи</span>
+                  <button type="button" class="sheet-apply" data-action="close-cal">Применить</button>
+                </div>
+              </div>
+
+              <!-- Десктоп: два месяца рядом -->
+              <div class="cal-desktop" data-cal-desktop>
+                <div class="cal-month">
+                  <div class="cal-month__head">
+                    <button type="button" class="cal-nav" data-cal="prev">‹</button>
+                    <span class="cal-month__title" data-cal="leftTitle"></span>
+                    <span class="cal-nav--spacer"></span>
+                  </div>
+                  <div class="cal-grid">
+                    <span class="cal-wd">Пн</span><span class="cal-wd">Вт</span><span class="cal-wd">Ср</span><span class="cal-wd">Чт</span><span class="cal-wd">Пт</span><span class="cal-wd">Сб</span><span class="cal-wd">Вс</span>
+                  </div>
+                  <div class="cal-grid" data-cal="leftGrid"></div>
+                </div>
+                <div class="cal-month">
+                  <div class="cal-month__head">
+                    <span class="cal-nav--spacer"></span>
+                    <span class="cal-month__title" data-cal="rightTitle"></span>
+                    <button type="button" class="cal-nav" data-cal="next">›</button>
+                  </div>
+                  <div class="cal-grid">
+                    <span class="cal-wd">Пн</span><span class="cal-wd">Вт</span><span class="cal-wd">Ср</span><span class="cal-wd">Чт</span><span class="cal-wd">Пт</span><span class="cal-wd">Сб</span><span class="cal-wd">Вс</span>
+                  </div>
+                  <div class="cal-grid" data-cal="rightGrid"></div>
+                </div>
+              </div>
+
+              <div class="cal-foot">
+                <span class="cal-foot__note">Минимум 2 ночи</span>
+                <button type="button" class="link-btn" data-action="clear-dates">Очистить даты</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Гости -->
+          <div class="pop" data-pop="guests">
+            <label class="field-label">Гости</label>
+            <div class="field" data-trigger="guests" role="button" tabindex="0">
+              <span data-label="guests">1 гость</span>
+              <i data-feather="users"></i>
+            </div>
+            <div class="backdrop" data-backdrop="guests"></div>
+
+            <div class="guest-pop" data-pop-el="guests">
+              <div class="sheet-handle"><span></span></div>
+              <div class="sheet-head">
+                <button type="button" class="sheet-x" data-action="close-guests">✕</button>
+                <span class="sheet-head__title">Гости</span>
+                <span class="sheet-x--spacer"></span>
+              </div>
+
+              <div class="guest-row">
+                <div>
+                  <div class="guest-row__title">Взрослые</div>
+                  <div class="guest-row__sub">От 13 лет</div>
+                </div>
+                <div class="stepper">
+                  <button type="button" data-step="adults-dec">−</button>
+                  <span class="stepper__val" data-val="adults">1</span>
+                  <button type="button" data-step="adults-inc">+</button>
+                </div>
+              </div>
+              <div class="guest-row">
+                <div>
+                  <div class="guest-row__title">Дети</div>
+                  <div class="guest-row__sub">До 3 лет — бесплатно</div>
+                </div>
+                <div class="stepper">
+                  <button type="button" data-step="children-dec">−</button>
+                  <span class="stepper__val" data-val="children">0</span>
+                  <button type="button" data-step="children-inc">+</button>
+                </div>
+              </div>
+              <div class="guest-row">
+                <div>
+                  <div class="guest-row__title">С питомцем</div>
+                  <div class="guest-row__sub">Размещение с животными</div>
+                </div>
+                <button type="button" class="switch" data-switch="pet"><span class="switch__knob"></span></button>
+              </div>
+
+              <button type="button" class="sheet-done" data-action="close-guests">Готово</button>
+            </div>
+          </div>
+
+          <!-- Поиск -->
+          <button type="submit" class="submit-btn">Найти дома</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ОБЪЕКТЫ ===== -->
+  <section id="properties" class="properties">
+    <div class="wrap">
+      <div style="max-width:560px;">
+        <div class="eyebrow">Объекты</div>
+        <h2 class="h2">Дома и апартаменты для вашего отдыха</h2>
+        <p class="section-lead">Загородные дома в тихих местах Ленинградской области и квартира в центре Петербурга — выбирайте под формат поездки.</p>
+      </div>
+
+      <div class="cards">
+
+        <article class="card">
+          <div class="card__media" style="background-image:url('{% static 'main/img/house1.jpg' %}');">
+            <span class="card__price">от 18 000 ₽<span> / ночь</span></span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Дом с баней и сибирским чаном</h3>
+            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · Приозерское напр.</span></div>
+            <div class="card__meta">
+              <div class="card__facts">
+                <span><i data-feather="users"></i>6 гостей</span>
+                <span><i data-feather="home"></i>2 спальни</span>
+              </div>
+              <span class="card__rating"><i data-feather="star"></i>4.9</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80&auto=format&fit=crop');">
+            <span class="card__price">от 24 000 ₽<span> / ночь</span></span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Дом с бассейном и баней</h3>
+            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · Выборгское напр.</span></div>
+            <div class="card__meta">
+              <div class="card__facts">
+                <span><i data-feather="users"></i>8 гостей</span>
+                <span><i data-feather="home"></i>3 спальни</span>
+              </div>
+              <span class="card__rating"><i data-feather="star"></i>4.8</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80&auto=format&fit=crop');">
+            <span class="card__price">от 15 000 ₽<span> / ночь</span></span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Дом у леса с панорамной баней</h3>
+            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · у Лосевских порогов</span></div>
+            <div class="card__meta">
+              <div class="card__facts">
+                <span><i data-feather="users"></i>4 гостя</span>
+                <span><i data-feather="home"></i>2 спальни</span>
+              </div>
+              <span class="card__rating"><i data-feather="star"></i>4.9</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop');">
+            <span class="card__price">от 6 500 ₽<span> / ночь</span></span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Апартаменты на Ленинском пр.</h3>
+            <div class="card__loc"><i data-feather="map-pin"></i><span>Санкт-Петербург · рядом с клиникой «Скандинавия»</span></div>
+            <div class="card__meta">
+              <div class="card__facts">
+                <span><i data-feather="users"></i>4 гостя</span>
+                <span><i data-feather="home"></i>1 спальня</span>
+              </div>
+              <span class="card__rating"><i data-feather="star"></i>4.7</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== О НАС ===== -->
+  <section id="about" class="section-dark" style="margin-top:96px;">
+    <div class="wrap split">
+      <div style="position:relative;">
+        <div class="about__media" style="background-image:url('https://images.unsplash.com/photo-1554995207-c18c203602cb?w=1000&q=80&auto=format&fit=crop');"></div>
+        <div class="about__badge"><b>4+</b><small>года принимаем гостей</small></div>
+      </div>
+      <div>
+        <div class="eyebrow eyebrow--light">О нас</div>
+        <h2 class="h2 h2--light">Свой дом для отдыха под Петербургом</h2>
+        <p class="section-lead section-lead--light" style="margin-top:18px;line-height:1.65;text-wrap:pretty;">Сдаём собственные дома в Ленинградской области и квартиру в Петербурге. Баня премиум-класса собрана уральскими мастерами, во дворе — сибирский банный чан под открытым небом и подогреваемый бассейн. Всё готово к вашему приезду.</p>
+
+        <div class="feature-list">
+          <div class="feature">
+            <span class="feature__icon"><i data-feather="key"></i></span>
+            <div>
+              <h3>Свои объекты, без посредников</h3>
+              <p>Сдаём напрямую — честная цена и быстрые ответы на любые вопросы.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="feature__icon"><i data-feather="droplet"></i></span>
+            <div>
+              <h3>Баня, чан и бассейн</h3>
+              <p>Премиальная парная от уральских мастеров и банный чан под открытым небом круглый год.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <span class="feature__icon"><i data-feather="message-circle"></i></span>
+            <div>
+              <h3>На связи в любое время</h3>
+              <p>Поможем с заселением, трансфером и подбором свободных дат.</p>
+            </div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <!-- Основной контент -->
-    <main class="container mx-auto px-4 py-16 md:py-24">
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold text-center mb-12">Популярные направления</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
-                    <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Дом в горах" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Горные коттеджи</h3>
-                        <p class="text-gray-600 mb-4">Уединенные дома с потрясающими видами на горы.</p>
-                        <a href="#" class="text-blue-600 font-medium">Смотреть варианты →</a>
-                    </div>
-                </div>
+  <!-- ===== ОТЗЫВЫ ===== -->
+  <section id="reviews" class="reviews">
+    <div class="wrap">
+      <div style="max-width:560px;">
+        <div class="eyebrow">Отзывы</div>
+        <h2 class="h2">Что говорят наши гости</h2>
+      </div>
 
-                <div class="bg-white rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
-                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Дом у озера" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Дома у воды</h3>
-                        <p class="text-gray-600 mb-4">Уютные домики с выходом к озеру или реке.</p>
-                        <a href="#" class="text-blue-600 font-medium">Смотреть варианты →</a>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105">
-                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Загородный дом" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Загородные виллы</h3>
-                        <p class="text-gray-600 mb-4">Просторные дома с современным дизайном.</p>
-                        <a href="#" class="text-blue-600 font-medium">Смотреть варианты →</a>
-                    </div>
-                </div>
+      <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));">
+        <div class="review">
+          <div class="review__stars">★★★★★</div>
+          <p class="review__text">Снимали дом с чаном на выходные — топили баню и сразу в чан под звёздами. Дом тёплый, всё чисто и продумано. Обязательно вернёмся зимой!</p>
+          <div class="review__author">
+            <span class="review__avatar">АК</span>
+            <div>
+              <div class="review__name">Анна К.</div>
+              <div class="review__when">Приозерское напр. · январь 2026</div>
             </div>
-        </section>
-
-        <section class="mb-16">
-            <h2 class="text-3xl font-bold text-center mb-12">Почему выбирают нас</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-check-circle text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Проверенные дома</h3>
-                    <p class="text-gray-600">Все дома проходят тщательную проверку перед добавлением в каталог.</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-headset text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Круглосуточная поддержка</h3>
-                    <p class="text-gray-600">Наша служба поддержки всегда на связи, чтобы помочь вам.</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-map-marked-alt text-blue-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Лучшие локации</h3>
-                    <p class="text-gray-600">Дома расположены в самых живописных местах страны.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Форма бронирования -->
-    <section id="booking" class="bg-gray-100 pt-32 pb-16">
-        <div class="container mx-auto px-4">
-            <div class="booking-form bg-white rounded-xl p-8 max-w-4xl mx-auto">
-                <h2 class="text-2xl font-bold mb-6 text-center">Найти идеальный дом для отдыха</h2>
-                <form id="bookingForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="md:col-span-2">
-                        <label for="dates" class="block text-gray-700 font-medium mb-2">Даты проживания</label>
-                        <div class="relative">
-                            <input type="text" id="dates" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Выберите даты">
-                            <i class="fas fa-calendar-alt absolute right-3 top-3 text-gray-400"></i>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="guests" class="block text-gray-700 font-medium mb-2">Гости</label>
-                        <select id="guests" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="1">1 гость</option>
-                            <option value="2">2 гостя</option>
-                            <option value="3">3 гостя</option>
-                            <option value="4">4 гостя</option>
-                            <option value="5">5+ гостей</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
-                            Найти дома
-                        </button>
-                    </div>
-                </form>
-            </div>
+          </div>
         </div>
-    </section>
-
-    <!-- Футер -->
-    <footer class="bg-gray-800 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">EliteHouses</h3>
-                    <p class="text-gray-400">Мы предлагаем лучшие частные дома для аренды по всей стране.</p>
-                </div>
-
-                <div>
-                    <h4 class="font-bold mb-4">Навигация</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Главная</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Дома</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">О нас</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Отзывы</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-bold mb-4">Контакты</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li class="flex items-center space-x-2">
-                            <i class="fas fa-phone"></i>
-                            <span>+7 (123) 456-78-90</span>
-                        </li>
-                        <li class="flex items-center space-x-2">
-                            <i class="fas fa-envelope"></i>
-                            <span>info@elitehouses.ru</span>
-                        </li>
-                        <li class="flex items-center space-x-2">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Москва, ул. Примерная, 123</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-bold mb-4">Подписаться</h4>
-                    <p class="text-gray-400 mb-4">Будьте в курсе наших новых предложений.</p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook-f text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-telegram text-xl"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-vk text-xl"></i></a>
-                    </div>
-                </div>
+        <div class="review">
+          <div class="review__stars">★★★★★</div>
+          <p class="review__text">Брали дом с бассейном на компанию. Вода тёплая, мангал, тихий участок у леса. Хозяева всегда на связи, заехали без единой заминки.</p>
+          <div class="review__author">
+            <span class="review__avatar">ДС</span>
+            <div>
+              <div class="review__name">Дмитрий С.</div>
+              <div class="review__when">Выборгское напр. · август 2025</div>
             </div>
-
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <p>© 2023 EliteHouses. Все права защищены.</p>
-            </div>
+          </div>
         </div>
-    </footer>
+        <div class="review">
+          <div class="review__stars">★★★★★</div>
+          <p class="review__text">Останавливались в квартире на Ленинском рядом со «Скандинавией» — очень удобно перед приёмом. Чисто, тихо, до метро пять минут пешком.</p>
+          <div class="review__author">
+            <span class="review__avatar">ЕМ</span>
+            <div>
+              <div class="review__name">Елена М.</div>
+              <div class="review__when">Санкт-Петербург · март 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <script>
-        // Обработка формы бронирования
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+  <!-- ===== КОНТАКТЫ ===== -->
+  <section id="contact" class="section-dark">
+    <div class="wrap contact-grid">
+      <div>
+        <div class="eyebrow eyebrow--light">Контакты</div>
+        <h2 class="h2 h2--light">Свяжитесь с нами</h2>
+        <p class="section-lead section-lead--light" style="max-width:440px;">Ответим на вопросы по объектам, поможем выбрать даты и забронировать. Пишите удобным способом.</p>
 
-            const dates = document.getElementById('dates').value;
-            const guests = document.getElementById('guests').value;
+        <div class="contact-list">
+          <div class="contact-item">
+            <span class="contact-item__icon"><i data-feather="phone"></i></span>
+            <div>
+              <div class="contact-item__label">Телефон</div>
+              <div class="contact-item__value">+7 (921) 000-00-00</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-item__icon"><i data-feather="message-circle"></i></span>
+            <div>
+              <div class="contact-item__label">Telegram / WhatsApp</div>
+              <div class="contact-item__value">@natrent</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-item__icon"><i data-feather="mail"></i></span>
+            <div>
+              <div class="contact-item__label">Почта</div>
+              <div class="contact-item__value">hello@natrent.ru</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-item__icon"><i data-feather="clock"></i></span>
+            <div>
+              <div class="contact-item__label">Часы работы</div>
+              <div class="contact-item__value">Ежедневно, 9:00 — 21:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            if(!dates) {
-                alert('Пожалуйста, выберите даты проживания');
-                return;
-            }
+      <div class="contact-card">
+        <h3>Написать нам</h3>
+        {# Подключите CSRF и обработку POST на стороне Django: добавьте {% csrf_token %} и method="post" #}
+        <form class="form-col" action="" method="post">
+          <div class="form-row">
+            <div class="form-field">
+              <label>Ваше имя</label>
+              <input type="text" name="name" placeholder="Имя">
+            </div>
+            <div class="form-field">
+              <label>Телефон</label>
+              <input type="tel" name="phone" placeholder="+7 (___) ___-__-__">
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Сообщение</label>
+            <textarea name="message" rows="4" placeholder="Какие даты и объект вас интересуют?"></textarea>
+          </div>
+          <button type="submit" class="contact-submit">Отправить сообщение</button>
+        </form>
+      </div>
+    </div>
+  </section>
 
-            // Здесь будет логика поиска домов
-            alert(`Ищем дома для ${guests} гостей на период ${dates}. В реальном приложении здесь был бы переход к результатам поиска.`);
+  <!-- ===== ФУТЕР ===== -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__cols">
+        <div class="footer__brand">
+          <div class="footer__brandrow">
+            <span class="footer__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+            <span class="footer__brandname">NatRent</span>
+          </div>
+          <p class="footer__about">Дома с баней, чаном и бассейном в Ленинградской области и квартира в центре Петербурга.</p>
+        </div>
+        <div>
+          <div class="footer__h">Объекты</div>
+          <div class="footer__list">
+            <a href="#properties">Дома с баней</a>
+            <a href="#properties">Дом с бассейном</a>
+            <a href="#properties">Квартира в СПб</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Компания</div>
+          <div class="footer__list">
+            <a href="#about">О нас</a>
+            <a href="#reviews">Отзывы</a>
+            <a href="#contact">Контакты</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Мы на связи</div>
+          <div class="footer__list">
+            <span>+7 (921) 000-00-00</span>
+            <span>hello@natrent.ru</span>
+            <a href="#">Telegram · @natrent</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© 2026 NatRent. Все права защищены.</span>
+        <div class="footer__legal">
+          <a href="#">Политика конфиденциальности</a>
+          <a href="#">Условия аренды</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-            // В реальном приложении здесь был бы редирект или AJAX запрос
-            // window.location.href = `/search?dates=${dates}&guests=${guests}`;
-        });
+</div>
 
-        // Инициализация выбора дат (в реальном приложении можно подключить datepicker)
-        document.getElementById('dates').addEventListener('focus', function() {
-            this.type = 'date';
-        });
-    </script>
+<!-- Иконки -->
+<script src="https://unpkg.com/feather-icons"></script>
+<!-- Логика бронирования -->
+<script src="{% static 'main/js/booking.js' %}"></script>
+<script>if (window.feather) feather.replace();</script>
 </body>
 </html>
