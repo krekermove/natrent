@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.23/dist/lenis.css">
 </head>
 <body>
 <div class="page">
@@ -71,7 +72,7 @@
             {% endif %}
             <div class="backdrop" data-backdrop="cal"></div>
 
-            <div class="cal-pop" data-pop-el="cal">
+            <div class="cal-pop" data-pop-el="cal" data-lenis-prevent>
               <!-- Шапка шторки (только мобайл) -->
               <div class="sheet-handle"><span></span></div>
               <div class="sheet-head">
@@ -134,7 +135,7 @@
             </div>
             <div class="backdrop" data-backdrop="guests"></div>
 
-            <div class="guest-pop" data-pop-el="guests">
+            <div class="guest-pop" data-pop-el="guests" data-lenis-prevent>
               <div class="sheet-handle"><span></span></div>
               <div class="sheet-head">
                 <button type="button" class="sheet-x" data-action="close-guests">✕</button>
@@ -465,9 +466,23 @@
 
 <!-- Иконки -->
 <script src="https://unpkg.com/feather-icons"></script>
+<!-- Плавный скролл -->
+<script src="https://unpkg.com/lenis@1.3.23/dist/lenis.min.js"></script>
 <!-- Логика бронирования -->
 <script src="{% static 'main/js/booking.js' %}"></script>
 <script>if (window.feather) feather.replace();</script>
+
+<script>
+/* ---- Lenis smooth scroll ---- */
+(function () {
+  'use strict';
+  window.lenis = new Lenis({
+    autoRaf: true,
+    anchors: { offset: 72 },
+    allowNestedScroll: true,
+  });
+})();
+</script>
 
 <script>
 /* ---- Sticky booking form ---- */
@@ -488,11 +503,8 @@
   bookingParent.insertBefore(ph, bookingEl);
 
   var isSticky = false;
-  var lastOverlap = -1;
   var phRafId = null;
-  var scrollRafId = null;
 
-  function setCSSVar(name, val) { document.documentElement.style.setProperty(name, val); }
   function closeAllPopups() { document.dispatchEvent(new CustomEvent('booking:closePopups')); }
 
   function makeSticky() {
@@ -501,20 +513,16 @@
     ph.style.height = h + 'px';
     ph.style.display = 'block';
     bookingEl.classList.add('booking--sticky');
-    // setCSSVar('--booking-sticky-h', h + 'px');
     isSticky = true;
     closeAllPopups();
-    /* rAF loop — плавно синхронизирует placeholder с высотой формы во время CSS-перехода */
+    /* rAF loop — синхронизирует placeholder с высотой формы во время CSS-перехода padding */
     if (phRafId) cancelAnimationFrame(phRafId);
     var deadline = Date.now() + 290;
     (function syncPh() {
       if (!isSticky) { phRafId = null; return; }
       var curH = bookingEl.offsetHeight;
       var curStr = curH + 'px';
-      if (ph.style.height !== curStr) {
-        ph.style.height = curStr;
-        // setCSSVar('--booking-sticky-h', curStr);
-      }
+      if (ph.style.height !== curStr) ph.style.height = curStr;
       phRafId = Date.now() < deadline ? requestAnimationFrame(syncPh) : null;
     }());
   }
@@ -526,9 +534,8 @@
     ph.style.display = 'none';
     bookingEl.classList.remove('booking--sticky');
     bookingEl.style.top = '';
-    setCSSVar('--booking-sticky-h', '0px');
     isSticky = false;
-    if (lastOverlap !== 0) { lastOverlap = 0; propertiesSection.style.paddingTop = ''; }
+    propertiesSection.style.paddingTop = '';
   }
 
   function update() {
@@ -541,24 +548,27 @@
 
     if (shouldStick) {
       makeSticky();
-      bookingEl.style.top = wrapperRect.top > NAV_H ? '' : wrapperRect.top + 'px';
-      var overlap = Math.round(Math.max(30, Math.min(NAV_H + formH - wrapperRect.top, formH)));
-      if (overlap !== lastOverlap) {
-        lastOverlap = overlap;
-        propertiesSection.style.paddingTop = overlap > 0 ? overlap + 'px' : '';
-      }
+      /* Явно задаём top каждый кадр — избегаем рассинхрона между CSS-значением и inline */
+      bookingEl.style.top = Math.min(wrapperRect.top, NAV_H) + 'px';
+      /* Без Math.round() — субпиксельные значения дают плавный сдвиг секции */
+      var overlap = Math.max(30, Math.min(NAV_H + formH - wrapperRect.top, formH));
+      propertiesSection.style.paddingTop = overlap + 'px';
     } else {
       makeNormal();
     }
   }
 
-  function onScroll() {
-    if (!scrollRafId) {
-      scrollRafId = requestAnimationFrame(function () { scrollRafId = null; update(); });
-    }
+  /* Подписка на Lenis-скролл: update() запускается в том же RAF-кадре, что и Lenis,
+     без дополнительной задержки. Fallback — нативный scroll для мобильных. */
+  if (window.lenis) {
+    window.lenis.on('scroll', update);
+  } else {
+    var raf = null;
+    window.addEventListener('scroll', function () {
+      if (!raf) raf = requestAnimationFrame(function () { raf = null; update(); });
+    }, { passive: true });
   }
 
-  window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', function () { makeNormal(); setTimeout(update, 50); }, { passive: true });
 
   if (document.getElementById('search-applied-flag')) {
