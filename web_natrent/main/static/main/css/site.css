@@ -53,7 +53,7 @@ img{max-width:100%;display:block;}
 .hero__booking{position:relative;z-index:10;width:100%;padding:0 28px 44px;}
 
 /* ---------- Форма бронирования ---------- */
-.booking{margin:0 auto;max-width:1040px;background:#fff;border:1px solid rgba(255,255,255,.5);border-radius:22px;padding:24px;box-shadow:0 30px 50px rgba(8,14,22,.2);scroll-margin-top:110px;transition:padding .25s ease;}
+.booking{margin:0 auto;max-width:1040px;background:#fff;border:1px solid rgba(255,255,255,.5);border-radius:22px;padding:24px;box-shadow:0 30px 50px rgba(8,14,22,.2);scroll-margin-top:110px;transition:padding .18s ease,border-radius .18s ease;}
 .booking-form{display:grid;grid-template-columns:1.35fr 1fr auto;gap:16px;align-items:end;}
 .pop{position:relative;}
 .field-label{display:block;font-size:12px;font-weight:700;color:#6B7682;margin-bottom:9px;letter-spacing:.03em;text-transform:uppercase;}
@@ -127,8 +127,8 @@ img{max-width:100%;display:block;}
   margin-left:auto;
   margin-right:auto;
   z-index:98;
-  border-radius:0 0 22px 22px;
   padding:12px 24px;
+  border-radius:0 0 22px 22px;
 }
 /* Попапы открываются ВНИЗ когда форма зафиксирована (только десктоп) */
 @media(min-width:761px){
@@ -305,4 +305,5 @@ img{max-width:100%;display:block;}
   .booking--sticky .field{height:44px;}
   .booking--sticky .submit-btn{height:44px;}
   .booking--sticky .booking-form{gap:8px;}
+
 }

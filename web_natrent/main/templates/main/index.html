@@ -503,33 +503,28 @@
   bookingParent.insertBefore(ph, bookingEl);
 
   var isSticky = false;
-  var phRafId = null;
+  var frozenTop = NAV_H;
 
   function closeAllPopups() { document.dispatchEvent(new CustomEvent('booking:closePopups')); }
 
   function makeSticky() {
     if (isSticky) return;
-    var h = bookingEl.offsetHeight;
-    ph.style.height = h + 'px';
+
+    /* Запоминаем точную визуальную позицию — форма "заморозится" здесь без скачка */
+    frozenTop = bookingEl.getBoundingClientRect().top;
+
+    ph.style.height = bookingEl.offsetHeight + 'px';
     ph.style.display = 'block';
+
+    /* inline top переопределяет CSS var(--nav-h) — форма остаётся ровно на месте */
+    bookingEl.style.top = frozenTop + 'px';
     bookingEl.classList.add('booking--sticky');
     isSticky = true;
     closeAllPopups();
-    /* rAF loop — синхронизирует placeholder с высотой формы во время CSS-перехода padding */
-    if (phRafId) cancelAnimationFrame(phRafId);
-    var deadline = Date.now() + 290;
-    (function syncPh() {
-      if (!isSticky) { phRafId = null; return; }
-      var curH = bookingEl.offsetHeight;
-      var curStr = curH + 'px';
-      if (ph.style.height !== curStr) ph.style.height = curStr;
-      phRafId = Date.now() < deadline ? requestAnimationFrame(syncPh) : null;
-    }());
   }
 
   function makeNormal() {
     if (!isSticky) return;
-    if (phRafId) { cancelAnimationFrame(phRafId); phRafId = null; }
     closeAllPopups();
     ph.style.display = 'none';
     bookingEl.classList.remove('booking--sticky');
@@ -544,22 +539,19 @@
     var wrapperRect = propertiesWrapper.getBoundingClientRect();
     var formH = bookingEl.offsetHeight;
 
-    var shouldStick = isSticky ? naturalRect.top < NAV_H + 4 : naturalRect.top < NAV_H - 4;
+    var shouldStick = isSticky ? naturalRect.top < NAV_H + 1 : naturalRect.top < NAV_H - 1;
 
     if (shouldStick) {
       makeSticky();
-      /* Явно задаём top каждый кадр — избегаем рассинхрона между CSS-значением и inline */
-      bookingEl.style.top = Math.min(wrapperRect.top, NAV_H) + 'px';
-      /* Без Math.round() — субпиксельные значения дают плавный сдвиг секции */
-      var overlap = Math.max(30, Math.min(NAV_H + formH - wrapperRect.top, formH));
-      propertiesSection.style.paddingTop = overlap + 'px';
+      /* Форма уезжает вверх только когда секция properties начинает её "выталкивать" */
+      bookingEl.style.top = Math.min(wrapperRect.top, frozenTop) + 'px';
+      var overlap = Math.max(30, Math.min(frozenTop + formH - wrapperRect.top, formH));
+      propertiesSection.style.paddingTop = overlap > 0 ? overlap + 'px' : '';
     } else {
       makeNormal();
     }
   }
 
-  /* Подписка на Lenis-скролл: update() запускается в том же RAF-кадре, что и Lenis,
-     без дополнительной задержки. Fallback — нативный scroll для мобильных. */
   if (window.lenis) {
     window.lenis.on('scroll', update);
   } else {
