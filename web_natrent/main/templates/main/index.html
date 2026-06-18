@@ -504,11 +504,28 @@
 
   var isSticky = false;
   var frozenTop = NAV_H;
+  /* Итоговая высота формы в компактном режиме — измеряется один раз без анимации,
+     используется в расчёте overlap вместо живого offsetHeight, который меняется
+     во время CSS-перехода padding и вызывает дёргание на мобильном. */
+  var compactFormH = 0;
 
   function closeAllPopups() { document.dispatchEvent(new CustomEvent('booking:closePopups')); }
 
+  function measureCompactHeight() {
+    bookingEl.style.transition = 'none';
+    bookingEl.classList.add('booking--sticky');
+    void bookingEl.offsetWidth;
+    var h = bookingEl.offsetHeight;
+    bookingEl.classList.remove('booking--sticky');
+    void bookingEl.offsetWidth;
+    bookingEl.style.transition = '';
+    return h;
+  }
+
   function makeSticky() {
     if (isSticky) return;
+
+    if (!compactFormH) compactFormH = measureCompactHeight();
 
     /* Запоминаем точную визуальную позицию — форма "заморозится" здесь без скачка */
     frozenTop = bookingEl.getBoundingClientRect().top;
@@ -537,12 +554,14 @@
     var naturalEl = isSticky ? ph : bookingEl;
     var naturalRect = naturalEl.getBoundingClientRect();
     var wrapperRect = propertiesWrapper.getBoundingClientRect();
-    var formH = bookingEl.offsetHeight;
 
     var shouldStick = isSticky ? naturalRect.top < NAV_H + 1 : naturalRect.top < NAV_H - 1;
 
     if (shouldStick) {
       makeSticky();
+      /* Используем стабильную compactFormH, а не живой offsetHeight —
+         это предотвращает дёргание paddingTop во время CSS-анимации сжатия */
+      var formH = compactFormH;
       /* Форма уезжает вверх только когда секция properties начинает её "выталкивать" */
       bookingEl.style.top = Math.min(wrapperRect.top, frozenTop) + 'px';
       var overlap = Math.max(30, Math.min(frozenTop + formH - wrapperRect.top, formH));
@@ -561,7 +580,7 @@
     }, { passive: true });
   }
 
-  window.addEventListener('resize', function () { makeNormal(); setTimeout(update, 50); }, { passive: true });
+  window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
 
   if (document.getElementById('search-applied-flag')) {
     function scrollToProps() {
