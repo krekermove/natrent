@@ -559,11 +559,6 @@
     isSticky = false;
     propertiesSection.style.paddingTop = '';
     propertiesSection.style.zIndex = '';
-    propertiesSection.style.position = '';
-    propertiesSection.style.top = '';
-    propertiesSection.style.left = '';
-    propertiesSection.style.width = '';
-    propertiesSection.style.transform = '';
     placeholder.style.height = '';
   }
 
@@ -587,40 +582,21 @@
     var bookingTop = Math.min(wrapperRect.top, frozenTop + delta);
     bookingEl.style.top = bookingTop + 'px';
 
-    var overlap = Math.max(30, Math.min(bookingTop + formH - wrapperRect.top, formH));
-    // console.log(bookingTop + formH - wrapperRect.top);
-    // console.log(formH);
-    if (bookingTop + formH - wrapperRect.top >= formH) {
-      propertiesSection.style.top = '';
-      propertiesSection.style.position = '';
-      propertiesSection.style.transform = 'translateY(' + Math.max(0, overlap - 30) + 'px)';
+    var overlap = bookingTop + formH - wrapperRect.top;
+
+    var overlapThreshold = window.matchMedia('(max-width: 768px)').matches ? 10 : 30;
+    if (overlap > overlapThreshold) {
+      /* Форма перекрывает секцию — отодвигаем через paddingTop */
+      propertiesSection.style.paddingTop = Math.max(0, overlap) + 'px';
       propertiesSection.style.zIndex = '1';
       placeholder.style.height = '';
       fixedTop = 0;
-    } else if (bookingTop + formH - wrapperRect.top > 30) {
-      if (propertiesSection.style.position !== 'fixed') {
-        /* Первый раз переходим в fixed — снимаем позицию ДО присвоения */
-        var ps = propertiesSection.getBoundingClientRect();
-        placeholder.style.height = propertiesSection.offsetHeight + 'px';
-        propertiesSection.style.transform = '';
-        propertiesSection.style.position = 'fixed';
-        propertiesSection.style.zIndex = '1';
-        fixedTop = ps.top;
-        propertiesSection.style.top = fixedTop + 'px';
-        propertiesSection.style.left = ps.left + 'px';
-        propertiesSection.style.width = ps.width + 'px';
-        wrapperFixedWidth = propertiesWrapper.offsetWidth;
-      } else {
-        /* Уже fixed — корректируем top при изменении адресной строки */
-        propertiesSection.style.top = (fixedTop + delta) + 'px';
-      }
     } else {
+      /* Форма не перекрывает — сбрасываем paddingTop */
       placeholder.style.height = '';
-      propertiesSection.style.top = '';
-      propertiesSection.style.position = '';
+      propertiesSection.style.paddingTop = '';
       propertiesSection.style.zIndex = '';
       propertiesWrapper.style.height = '';
-      propertiesSection.style.transform = '';
       fixedTop = 0;
     }
   }
