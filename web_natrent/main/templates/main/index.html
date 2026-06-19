@@ -497,6 +497,7 @@
   var propertiesSection = document.getElementById('properties');
   var placeholder = document.getElementById('properties-placeholder');
   var propertiesSectionHeight = propertiesSection.offsetHeight;
+  var wrapperFixedWidth = 0;
 
   if (!bookingEl || !propertiesWrapper || !propertiesSection) return;
 
@@ -584,6 +585,7 @@
           propertiesSection.style.top = ps.top + 'px';
           propertiesSection.style.left = ps.left + 'px';
           propertiesSection.style.width = ps.width + 'px';
+          wrapperFixedWidth = propertiesWrapper.offsetWidth;
         }
       }
       else {
@@ -607,7 +609,22 @@
     }, { passive: true });
   }
 
-  window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
+   /* Полный resize (смена ориентации, ресайз окна): сброс состояния */
+ window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
+
+
+  /* visualViewport resize — адресная строка мобильного браузера:
+     только обновляем ширину wrapper, состояние НЕ сбрасываем */
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', function () {
+      if (isSticky) {
+        var newW = propertiesWrapper.parentElement
+          ? propertiesWrapper.parentElement.offsetWidth
+          : wrapperFixedWidth;
+        propertiesWrapper.style.width = newW + 'px';
+      }
+    });
+  }
 
   if (document.getElementById('search-applied-flag')) {
     function scrollToProps() {
