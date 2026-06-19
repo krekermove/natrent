@@ -53,7 +53,7 @@ img{max-width:100%;display:block;}
 .hero__booking{position:relative;z-index:10;width:100%;padding:0 28px 44px;}
 
 /* ---------- Форма бронирования ---------- */
-.booking{margin:0 auto;max-width:1040px;background:#fff;border:1px solid rgba(255,255,255,.5);border-radius:22px;padding:24px;box-shadow:0 30px 50px rgba(8,14,22,.2);scroll-margin-top:110px;}
+.booking{margin:0 auto;max-width:1040px;background:#fff;border:1px solid rgba(255,255,255,.5);border-radius:22px;padding:24px;box-shadow:0 30px 50px rgba(8,14,22,.2);scroll-margin-top:110px;transition: all .2s ease;}
 .booking-form{display:grid;grid-template-columns:1.35fr 1fr auto;gap:16px;align-items:end;}
 .pop{position:relative;}
 .field-label{display:block;font-size:12px;font-weight:700;color:#6B7682;margin-bottom:9px;letter-spacing:.03em;text-transform:uppercase;}
@@ -129,7 +129,7 @@ img{max-width:100%;display:block;}
   margin-right:auto;
   z-index:9999;
   isolation:isolate;
-  transition: all .5s ease;
+  transition: all .2s ease;
   padding:calc(24px - 12px * var(--sq,0)) 24px;
   border-top-left-radius:calc(22px * (1 - var(--sq,0)));
   border-top-right-radius:calc(22px * (1 - var(--sq,0)));
@@ -305,7 +305,7 @@ img{max-width:100%;display:block;}
   .sheet-done{display:block;width:100%;height:52px;margin-top:18px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
 
   /* Компактная форма в sticky-режиме — управляется через --sq */
-  .booking--sticky{padding:calc(24px - 16px * var(--sq,0)) 14px;left:12px;right:12px;}
+  .booking--sticky{padding:calc(24px - 16px * var(--sq,0)) 14px;}
   .booking--sticky .field-label{overflow:hidden;max-height:calc(30px * (1 - var(--sq,0)));margin-bottom:calc(9px * (1 - var(--sq,0)));opacity:calc(1 - var(--sq,0));}
   .booking--sticky .field{height:calc(56px - 12px * var(--sq,0));}
   .booking--sticky .submit-btn{height:calc(56px - 12px * var(--sq,0));}
