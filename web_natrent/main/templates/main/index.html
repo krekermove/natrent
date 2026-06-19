@@ -187,6 +187,7 @@
   <!-- ===== ОБЪЕКТЫ ===== -->
   {% if search_applied %}<div id="search-applied-flag" hidden></div>{% endif %}
   <div id="properties-wrapper" class="properties-wrapper">
+  <div id="properties-placeholder"></div>
   <section id="properties" class="properties">
     <div class="wrap">
       <div>
@@ -494,6 +495,8 @@
   var bookingParent = bookingEl && bookingEl.parentElement;
   var propertiesWrapper = document.getElementById('properties-wrapper');
   var propertiesSection = document.getElementById('properties');
+  var placeholder = document.getElementById('properties-placeholder');
+  var propertiesSectionHeight = propertiesSection.offsetHeight;
 
   if (!bookingEl || !propertiesWrapper || !propertiesSection) return;
 
@@ -554,6 +557,7 @@
     var naturalEl = isSticky ? ph : bookingEl;
     var naturalRect = naturalEl.getBoundingClientRect();
     var wrapperRect = propertiesWrapper.getBoundingClientRect();
+    var ps = propertiesSection.getBoundingClientRect();
 
     var shouldStick = isSticky ? naturalRect.top < NAV_H + 1 : naturalRect.top < NAV_H - 1;
 
@@ -565,7 +569,30 @@
       /* Форма уезжает вверх только когда секция properties начинает её "выталкивать" */
       bookingEl.style.top = Math.min(wrapperRect.top, frozenTop) + 'px';
       var overlap = Math.max(30, Math.min(frozenTop + formH - wrapperRect.top, formH));
-      propertiesSection.style.paddingTop = overlap > 0 ? overlap + 'px' : '';
+      if (frozenTop + formH - wrapperRect.top > formH) {
+        propertiesSection.style.top = '';
+        propertiesSection.style.position = '';
+        propertiesSection.style.transform = `translateY(${Math.max(0, overlap-30)}px)`;
+        placeholder.style.height = '';
+      }
+      else if (frozenTop + formH - wrapperRect.top > 30) {
+        if (propertiesSection.style.position !== 'fixed') {
+
+          placeholder.style.height = propertiesSection.offsetHeight + 'px';
+          propertiesSection.style.transform = ``;
+          propertiesSection.style.position = 'fixed';
+          propertiesSection.style.top = ps.top + 'px';
+          propertiesSection.style.left = ps.left + 'px';
+          propertiesSection.style.width = ps.width + 'px';
+        }
+      }
+      else {
+        placeholder.style.height = '';
+        propertiesSection.style.top = '';
+        propertiesSection.style.position = '';
+        propertiesWrapper.style.height = '';
+        propertiesSection.style.transform = ``;
+      }
     } else {
       makeNormal();
     }
