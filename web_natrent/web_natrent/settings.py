@@ -29,6 +29,10 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://natrent.ru",
+    "https://www.natrent.ru",
+]
 
 # Application definition
 
