@@ -639,17 +639,8 @@
     }
   }
 
-  if (window.lenis) {
-    window.lenis.on('scroll', update);
-  } else {
-    var raf = null;
-    window.addEventListener('scroll', function () {
-      if (!raf) raf = requestAnimationFrame(function () { raf = null; update(); });
-    }, { passive: true });
-  }
-
    /* Полный resize (смена ориентации, ресайз окна): сброс состояния */
- window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
+ // window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
 
   /* visualViewport resize + scroll — адресная строка мобильного браузера.
      На некоторых браузерах (Chrome Android) показ/скрытие строки вызывает
@@ -661,6 +652,14 @@
     };
     window.visualViewport.addEventListener('resize', handleViewportChange);
     window.visualViewport.addEventListener('scroll', handleViewportChange);
+  }
+  if (window.lenis) {
+      window.lenis.on('scroll', update);
+  } else {
+    var raf = null;
+    window.addEventListener('scroll', function () {
+      if (!raf) raf = requestAnimationFrame(function () { raf = null; update(); });
+    }, { passive: true });
   }
 
   if (document.getElementById('search-applied-flag')) {
