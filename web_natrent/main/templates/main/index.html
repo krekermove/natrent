@@ -622,26 +622,20 @@
    /* Полный resize (смена ориентации, ресайз окна): сброс состояния */
  window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
 
-
+  // function updateStickyPosition() {
+  //
+  // }
   /* visualViewport resize — адресная строка мобильного браузера:
      только обновляем ширину wrapper, состояние НЕ сбрасываем */
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', function () {
       if (isSticky) {
         /* Если properties был зафиксирован, освобождаем — update() пересчитает позицию */
-        if (propertiesSection.style.position === 'fixed') {
-          propertiesSection.style.position = '';
-          propertiesSection.style.top = '';
-          propertiesSection.style.left = '';
-          propertiesSection.style.width = '';
-          propertiesSection.style.zIndex = '';
-          placeholder.style.height = '';
-        }
         var newW = propertiesWrapper.parentElement
           ? propertiesWrapper.parentElement.offsetWidth
           : wrapperFixedWidth;
         propertiesWrapper.style.width = newW + 'px';
-        update();
+        requestAnimationFrame(update);
       }
     });
   }
