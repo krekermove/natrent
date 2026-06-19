@@ -146,6 +146,7 @@ img{max-width:100%;display:block;}
 .properties-wrapper .properties{
   padding:30px 28px 28px;
   background:#F7F8F9;
+  transition: padding-top 0.2s ease;
 }
 .properties-wrapper .h2{font-size:clamp(20px,2.4vw,30px);}
 .cards{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:22px;}

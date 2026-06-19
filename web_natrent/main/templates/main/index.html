@@ -508,6 +508,7 @@
 
   var isSticky = false;
   var frozenTop = NAV_H;
+  var lastPaddingTop = -1;
   /* Итоговая высота формы в компактном режиме — измеряется один раз без анимации,
      используется в расчёте overlap вместо живого offsetHeight, который меняется
      во время CSS-перехода padding и вызывает дёргание на мобильном. */
@@ -546,6 +547,7 @@
     /* inline top переопределяет CSS var(--nav-h) — форма остаётся ровно на месте */
     bookingEl.style.top = frozenTop + 'px';
     bookingEl.classList.add('booking--sticky');
+    propertiesSection.style.willChange = 'padding-top';
     isSticky = true;
     closeAllPopups();
   }
@@ -557,6 +559,8 @@
     bookingEl.classList.remove('booking--sticky');
     bookingEl.style.top = '';
     isSticky = false;
+    lastPaddingTop = -1;
+    propertiesSection.style.willChange = '';
     propertiesSection.style.paddingTop = '';
     propertiesSection.style.zIndex = '';
     placeholder.style.height = '';
@@ -587,16 +591,23 @@
     var overlapThreshold = window.matchMedia('(max-width: 768px)').matches ? 10 : 30;
     if (overlap > overlapThreshold) {
       /* Форма перекрывает секцию — отодвигаем через paddingTop */
-      propertiesSection.style.paddingTop = Math.max(0, overlap) + 'px';
+      var newPad = Math.round(Math.max(0, overlap));
+      if (newPad !== lastPaddingTop) {
+        propertiesSection.style.paddingTop = newPad + 'px';
+        lastPaddingTop = newPad;
+      }
       propertiesSection.style.zIndex = '1';
       placeholder.style.height = '';
       fixedTop = 0;
     } else {
       /* Форма не перекрывает — сбрасываем paddingTop */
+      if (lastPaddingTop !== 0) {
+        propertiesSection.style.paddingTop = '';
+        propertiesSection.style.zIndex = '';
+        propertiesWrapper.style.height = '';
+        lastPaddingTop = 0;
+      }
       placeholder.style.height = '';
-      propertiesSection.style.paddingTop = '';
-      propertiesSection.style.zIndex = '';
-      propertiesWrapper.style.height = '';
       fixedTop = 0;
     }
   }
@@ -630,7 +641,13 @@
     window.visualViewport.addEventListener('scroll', handleViewportChange);
   }
   if (window.lenis) {
-      window.lenis.on('scroll', update);
+    var rafPending = false;
+    window.lenis.on('scroll', function () {
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(function () { rafPending = false; update(); });
+      }
+    });
   } else {
     var raf = null;
     window.addEventListener('scroll', function () {
