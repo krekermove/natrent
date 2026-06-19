@@ -496,8 +496,7 @@
   var propertiesWrapper = document.getElementById('properties-wrapper');
   var propertiesSection = document.getElementById('properties');
   var placeholder = document.getElementById('properties-placeholder');
-  var propertiesSectionHeight = propertiesSection.offsetHeight;
-  var wrapperFixedWidth = 0;
+  var stickyViewportTop = 0;
 
   if (!bookingEl || !propertiesWrapper || !propertiesSection) return;
 
@@ -509,24 +508,21 @@
   var isSticky = false;
   var frozenTop = NAV_H;
   var lastPaddingTop = -1;
-  /* Итоговая высота формы в компактном режиме — измеряется один раз без анимации,
-     используется в расчёте overlap вместо живого offsetHeight, который меняется
-     во время CSS-перехода padding и вызывает дёргание на мобильном. */
+  /* Высота формы в полном и компактном состоянии — измеряются один раз */
+  var fullFormH = 0;
   var compactFormH = 0;
-  /* Смещение visualViewport в момент фиксации формы — нужно для корректировки
-     позиции при появлении/скрытии адресной строки мобильного браузера. */
-  var stickyViewportTop = 0;
-  /* Снимок viewport-top propertiesSection в момент перехода в position:fixed */
-  var fixedTop = 0;
 
   function closeAllPopups() { document.dispatchEvent(new CustomEvent('booking:closePopups')); }
 
+  /* Измеряем высоту при --sq:1 (полностью компактная) без визуального скачка */
   function measureCompactHeight() {
     bookingEl.style.transition = 'none';
     bookingEl.classList.add('booking--sticky');
+    bookingEl.style.setProperty('--sq', '1');
     void bookingEl.offsetWidth;
     var h = bookingEl.offsetHeight;
     bookingEl.classList.remove('booking--sticky');
+    bookingEl.style.removeProperty('--sq');
     void bookingEl.offsetWidth;
     bookingEl.style.transition = '';
     return h;
@@ -535,17 +531,17 @@
   function makeSticky() {
     if (isSticky) return;
 
+    fullFormH = bookingEl.offsetHeight;
     if (!compactFormH) compactFormH = measureCompactHeight();
 
-    /* Запоминаем точную визуальную позицию — форма "заморозится" здесь без скачка */
     frozenTop = bookingEl.getBoundingClientRect().top;
     stickyViewportTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
 
-    ph.style.height = bookingEl.offsetHeight + 'px';
+
+    ph.style.height = fullFormH + 'px';
     ph.style.display = 'block';
 
-    /* inline top переопределяет CSS var(--nav-h) — форма остаётся ровно на месте */
-    bookingEl.style.top = frozenTop + 'px';
+    bookingEl.style.setProperty('--sq', '0');
     bookingEl.classList.add('booking--sticky');
     propertiesSection.style.willChange = 'padding-top';
     isSticky = true;
@@ -557,7 +553,7 @@
     closeAllPopups();
     ph.style.display = 'none';
     bookingEl.classList.remove('booking--sticky');
-    bookingEl.style.top = '';
+    bookingEl.style.removeProperty('--sq');
     isSticky = false;
     lastPaddingTop = -1;
     propertiesSection.style.willChange = '';
@@ -566,56 +562,53 @@
     placeholder.style.height = '';
   }
 
-  /* Единственное место, где записываются bookingEl.style.top и позиция
-     propertiesSection. Вызывается как из update() (скролл), так и из
-     обработчиков visualViewport (адресная строка мобильного браузера).
-
-     delta = суммарное смещение visualViewport с момента фиксации формы.
-     На обычном скролле delta не меняется (visualViewport.offsetTop стабилен) —
-     измениться он может только при появлении/скрытии адресной строки. */
+  /* Вычисляет --sq (0=полный, 1=компакт) по доступной высоте между навом и
+     верхом секции объектов, и корректирует paddingTop секции когда форма
+     вышла на минимум, а секция продолжает подниматься */
   function updateStickyPosition() {
     if (!isSticky) return;
+
+    var sectionTop = propertiesWrapper.getBoundingClientRect().top;
+    var availableH = sectionTop - NAV_H;
+    var formH = compactFormH;
+
+    var sq;
+    if (availableH >= fullFormH) {
+      sq = 0;
+    } else if (availableH <= compactFormH) {
+      sq = 1;
+    } else {
+      sq = (fullFormH - availableH) / (fullFormH - compactFormH);
+    }
 
     var viewportOffset = window.visualViewport ? window.visualViewport.offsetTop : 0;
     var delta = viewportOffset - stickyViewportTop;
 
-    var formH = compactFormH;
     var wrapperRect = propertiesWrapper.getBoundingClientRect();
 
     /* Форма уезжает вверх только когда секция properties начинает её "выталкивать" */
     var bookingTop = Math.min(wrapperRect.top, frozenTop + delta);
     bookingEl.style.top = bookingTop + 'px';
+    bookingEl.style.setProperty('--sq', sq.toFixed(4));
 
-    var overlap = bookingTop + formH - wrapperRect.top;
-
-    var overlapThreshold = window.matchMedia('(max-width: 768px)').matches ? 10 : 30;
-    if (overlap > overlapThreshold) {
-      /* Форма перекрывает секцию — отодвигаем через paddingTop */
-      var newPad = Math.round(Math.max(0, overlap));
-      if (newPad !== lastPaddingTop) {
-        propertiesSection.style.paddingTop = newPad + 'px';
-        lastPaddingTop = newPad;
-      }
-      propertiesSection.style.zIndex = '1';
-      placeholder.style.height = '';
-      fixedTop = 0;
-    } else {
-      /* Форма не перекрывает — сбрасываем paddingTop */
-      if (lastPaddingTop !== 0) {
+    /* Когда форма достигла минимума, а секция продолжает ехать — добавляем отступ */
+    // var overlapThreshold = window.matchMedia('(max-width: 768px)').matches ? 60 : 10;
+    var extraPad = sq >= 1 ? Math.max(0, bookingTop + formH - wrapperRect.top) : 0;
+    if (extraPad !== lastPaddingTop) {
+      if (extraPad > 0) {
+        propertiesSection.style.paddingTop = extraPad + 'px';
+        propertiesSection.style.zIndex = '1';
+      } else {
         propertiesSection.style.paddingTop = '';
         propertiesSection.style.zIndex = '';
-        propertiesWrapper.style.height = '';
-        lastPaddingTop = 0;
       }
-      placeholder.style.height = '';
-      fixedTop = 0;
+      lastPaddingTop = extraPad;
     }
   }
 
   function update() {
     var naturalEl = isSticky ? ph : bookingEl;
     var naturalRect = naturalEl.getBoundingClientRect();
-
     var shouldStick = isSticky ? naturalRect.top < NAV_H + 1 : naturalRect.top < NAV_H - 1;
 
     if (shouldStick) {
@@ -626,12 +619,6 @@
     }
   }
 
-   /* Полный resize (смена ориентации, ресайз окна): сброс состояния */
- // window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
-
-  /* visualViewport resize + scroll — адресная строка мобильного браузера.
-     На некоторых браузерах (Chrome Android) показ/скрытие строки вызывает
-     только scroll visualViewport, поэтому слушаем оба события. */
   if (window.visualViewport) {
     var handleViewportChange = function () {
       if (!isSticky) return;
@@ -640,6 +627,7 @@
     window.visualViewport.addEventListener('resize', handleViewportChange);
     window.visualViewport.addEventListener('scroll', handleViewportChange);
   }
+
   if (window.lenis) {
     var rafPending = false;
     window.lenis.on('scroll', function () {
