@@ -552,6 +552,13 @@
     bookingEl.style.top = '';
     isSticky = false;
     propertiesSection.style.paddingTop = '';
+    propertiesSection.style.zIndex = '';
+    propertiesSection.style.position = '';
+    propertiesSection.style.top = '';
+    propertiesSection.style.left = '';
+    propertiesSection.style.width = '';
+    propertiesSection.style.transform = '';
+    placeholder.style.height = '';
   }
 
   function update() {
@@ -574,6 +581,7 @@
         propertiesSection.style.top = '';
         propertiesSection.style.position = '';
         propertiesSection.style.transform = `translateY(${Math.max(0, overlap-30)}px)`;
+        propertiesSection.style.zIndex = '1';
         placeholder.style.height = '';
       }
       else if (frozenTop + formH - wrapperRect.top > 30) {
@@ -582,6 +590,7 @@
           placeholder.style.height = propertiesSection.offsetHeight + 'px';
           propertiesSection.style.transform = ``;
           propertiesSection.style.position = 'fixed';
+          propertiesSection.style.zIndex = '1';
           propertiesSection.style.top = ps.top + 'px';
           propertiesSection.style.left = ps.left + 'px';
           propertiesSection.style.width = ps.width + 'px';
@@ -592,6 +601,7 @@
         placeholder.style.height = '';
         propertiesSection.style.top = '';
         propertiesSection.style.position = '';
+        propertiesSection.style.zIndex = '';
         propertiesWrapper.style.height = '';
         propertiesSection.style.transform = ``;
       }
@@ -618,10 +628,20 @@
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', function () {
       if (isSticky) {
+        /* Если properties был зафиксирован, освобождаем — update() пересчитает позицию */
+        if (propertiesSection.style.position === 'fixed') {
+          propertiesSection.style.position = '';
+          propertiesSection.style.top = '';
+          propertiesSection.style.left = '';
+          propertiesSection.style.width = '';
+          propertiesSection.style.zIndex = '';
+          placeholder.style.height = '';
+        }
         var newW = propertiesWrapper.parentElement
           ? propertiesWrapper.parentElement.offsetWidth
           : wrapperFixedWidth;
         propertiesWrapper.style.width = newW + 'px';
+        update();
       }
     });
   }
