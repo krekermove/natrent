@@ -129,6 +129,10 @@ img{max-width:100%;display:block;}
   z-index:9999;
   padding:12px 24px;
   border-radius:0 0 22px 22px;
+  /* own stacking context — stays above transform stacking contexts (real mobile);
+     transform:translateZ(0) намеренно убран: оно делает fixed-потомков (попапы)
+     зависимыми от родителя и ломает их позиционирование на мобайле */
+  isolation:isolate;
 }
 /* Попапы открываются ВНИЗ когда форма зафиксирована (только десктоп) */
 @media(min-width:761px){

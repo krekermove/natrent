@@ -512,6 +512,11 @@
      используется в расчёте overlap вместо живого offsetHeight, который меняется
      во время CSS-перехода padding и вызывает дёргание на мобильном. */
   var compactFormH = 0;
+  /* Смещение visualViewport в момент фиксации формы — нужно для корректировки
+     позиции при появлении/скрытии адресной строки мобильного браузера. */
+  var stickyViewportTop = 0;
+  /* Снимок viewport-top propertiesSection в момент перехода в position:fixed */
+  var fixedTop = 0;
 
   function closeAllPopups() { document.dispatchEvent(new CustomEvent('booking:closePopups')); }
 
@@ -533,6 +538,7 @@
 
     /* Запоминаем точную визуальную позицию — форма "заморозится" здесь без скачка */
     frozenTop = bookingEl.getBoundingClientRect().top;
+    stickyViewportTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
 
     ph.style.height = bookingEl.offsetHeight + 'px';
     ph.style.display = 'block';
@@ -561,50 +567,73 @@
     placeholder.style.height = '';
   }
 
+  /* Единственное место, где записываются bookingEl.style.top и позиция
+     propertiesSection. Вызывается как из update() (скролл), так и из
+     обработчиков visualViewport (адресная строка мобильного браузера).
+
+     delta = суммарное смещение visualViewport с момента фиксации формы.
+     На обычном скролле delta не меняется (visualViewport.offsetTop стабилен) —
+     измениться он может только при появлении/скрытии адресной строки. */
+  function updateStickyPosition() {
+    if (!isSticky) return;
+
+    var viewportOffset = window.visualViewport ? window.visualViewport.offsetTop : 0;
+    var delta = viewportOffset - stickyViewportTop;
+
+    var formH = compactFormH;
+    var wrapperRect = propertiesWrapper.getBoundingClientRect();
+
+    /* Форма уезжает вверх только когда секция properties начинает её "выталкивать" */
+    var bookingTop = Math.min(wrapperRect.top, frozenTop + delta);
+    bookingEl.style.top = bookingTop + 'px';
+
+    var overlap = Math.max(30, Math.min(bookingTop + formH - wrapperRect.top, formH));
+    // console.log(bookingTop + formH - wrapperRect.top);
+    // console.log(formH);
+    if (bookingTop + formH - wrapperRect.top >= formH) {
+      propertiesSection.style.top = '';
+      propertiesSection.style.position = '';
+      propertiesSection.style.transform = 'translateY(' + Math.max(0, overlap - 30) + 'px)';
+      propertiesSection.style.zIndex = '1';
+      placeholder.style.height = '';
+      fixedTop = 0;
+    } else if (bookingTop + formH - wrapperRect.top > 30) {
+      if (propertiesSection.style.position !== 'fixed') {
+        /* Первый раз переходим в fixed — снимаем позицию ДО присвоения */
+        var ps = propertiesSection.getBoundingClientRect();
+        placeholder.style.height = propertiesSection.offsetHeight + 'px';
+        propertiesSection.style.transform = '';
+        propertiesSection.style.position = 'fixed';
+        propertiesSection.style.zIndex = '1';
+        fixedTop = ps.top;
+        propertiesSection.style.top = fixedTop + 'px';
+        propertiesSection.style.left = ps.left + 'px';
+        propertiesSection.style.width = ps.width + 'px';
+        wrapperFixedWidth = propertiesWrapper.offsetWidth;
+      } else {
+        /* Уже fixed — корректируем top при изменении адресной строки */
+        propertiesSection.style.top = (fixedTop + delta) + 'px';
+      }
+    } else {
+      placeholder.style.height = '';
+      propertiesSection.style.top = '';
+      propertiesSection.style.position = '';
+      propertiesSection.style.zIndex = '';
+      propertiesWrapper.style.height = '';
+      propertiesSection.style.transform = '';
+      fixedTop = 0;
+    }
+  }
+
   function update() {
     var naturalEl = isSticky ? ph : bookingEl;
     var naturalRect = naturalEl.getBoundingClientRect();
-    var wrapperRect = propertiesWrapper.getBoundingClientRect();
-    var ps = propertiesSection.getBoundingClientRect();
 
     var shouldStick = isSticky ? naturalRect.top < NAV_H + 1 : naturalRect.top < NAV_H - 1;
 
     if (shouldStick) {
       makeSticky();
-      /* Используем стабильную compactFormH, а не живой offsetHeight —
-         это предотвращает дёргание paddingTop во время CSS-анимации сжатия */
-      var formH = compactFormH;
-      /* Форма уезжает вверх только когда секция properties начинает её "выталкивать" */
-      bookingEl.style.top = Math.min(wrapperRect.top, frozenTop) + 'px';
-      var overlap = Math.max(30, Math.min(frozenTop + formH - wrapperRect.top, formH));
-      if (frozenTop + formH - wrapperRect.top > formH) {
-        propertiesSection.style.top = '';
-        propertiesSection.style.position = '';
-        propertiesSection.style.transform = `translateY(${Math.max(0, overlap-30)}px)`;
-        propertiesSection.style.zIndex = '1';
-        placeholder.style.height = '';
-      }
-      else if (frozenTop + formH - wrapperRect.top > 30) {
-        if (propertiesSection.style.position !== 'fixed') {
-
-          placeholder.style.height = propertiesSection.offsetHeight + 'px';
-          propertiesSection.style.transform = ``;
-          propertiesSection.style.position = 'fixed';
-          propertiesSection.style.zIndex = '1';
-          propertiesSection.style.top = ps.top + 'px';
-          propertiesSection.style.left = ps.left + 'px';
-          propertiesSection.style.width = ps.width + 'px';
-          wrapperFixedWidth = propertiesWrapper.offsetWidth;
-        }
-      }
-      else {
-        placeholder.style.height = '';
-        propertiesSection.style.top = '';
-        propertiesSection.style.position = '';
-        propertiesSection.style.zIndex = '';
-        propertiesWrapper.style.height = '';
-        propertiesSection.style.transform = ``;
-      }
+      updateStickyPosition();
     } else {
       makeNormal();
     }
@@ -622,22 +651,16 @@
    /* Полный resize (смена ориентации, ресайз окна): сброс состояния */
  window.addEventListener('resize', function () { compactFormH = 0; makeNormal(); setTimeout(update, 50); }, { passive: true });
 
-  // function updateStickyPosition() {
-  //
-  // }
-  /* visualViewport resize — адресная строка мобильного браузера:
-     только обновляем ширину wrapper, состояние НЕ сбрасываем */
+  /* visualViewport resize + scroll — адресная строка мобильного браузера.
+     На некоторых браузерах (Chrome Android) показ/скрытие строки вызывает
+     только scroll visualViewport, поэтому слушаем оба события. */
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', function () {
-      if (isSticky) {
-        /* Если properties был зафиксирован, освобождаем — update() пересчитает позицию */
-        var newW = propertiesWrapper.parentElement
-          ? propertiesWrapper.parentElement.offsetWidth
-          : wrapperFixedWidth;
-        propertiesWrapper.style.width = newW + 'px';
-        requestAnimationFrame(update);
-      }
-    });
+    var handleViewportChange = function () {
+      if (!isSticky) return;
+      requestAnimationFrame(updateStickyPosition);
+    };
+    window.visualViewport.addEventListener('resize', handleViewportChange);
+    window.visualViewport.addEventListener('scroll', handleViewportChange);
   }
 
   if (document.getElementById('search-applied-flag')) {
