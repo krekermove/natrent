@@ -129,7 +129,13 @@ img{max-width:100%;display:block;}
   margin-right:auto;
   z-index:9999;
   isolation:isolate;
-  transition: all .2s ease;
+  /* Позиция (top), сжатие (--sq) и отступ секции управляются покадрово из
+     scroll-цикла Lenis, поэтому CSS-transition здесь не нужен — он бы догонял
+     скролл с лагом и давал «дёрганый» эффект. Движение идёт 1:1 со сглаженным
+     скроллом. Важно: не используем transform/will-change на самой форме —
+     это сделало бы её containing block для position:fixed поповеров (моб.
+     шторки) и они вылезали бы на экран. */
+  transition:none;
   padding:calc(24px - 12px * var(--sq,0)) 24px;
   border-top-left-radius:calc(22px * (1 - var(--sq,0)));
   border-top-right-radius:calc(22px * (1 - var(--sq,0)));
@@ -146,7 +152,8 @@ img{max-width:100%;display:block;}
 .properties-wrapper .properties{
   padding:30px 28px 28px;
   background:#F7F8F9;
-  transition: padding-top 0.2s ease;
+  /* padding-top «выталкивается» формой покадрово из scroll-цикла Lenis —
+     transition здесь создавал бы рассинхрон с движением формы */
 }
 .properties-wrapper .h2{font-size:clamp(20px,2.4vw,30px);}
 .cards{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:22px;}

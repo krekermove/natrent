@@ -554,6 +554,7 @@
     ph.style.display = 'none';
     bookingEl.classList.remove('booking--sticky');
     bookingEl.style.removeProperty('--sq');
+    bookingEl.style.top = '';
     isSticky = false;
     lastPaddingTop = -1;
     propertiesSection.style.willChange = '';
@@ -568,8 +569,10 @@
   function updateStickyPosition() {
     if (!isSticky) return;
 
-    var sectionTop = propertiesWrapper.getBoundingClientRect().top;
-    var availableH = sectionTop - NAV_H;
+    /* Один замер геометрии на кадр — все чтения до записей стилей, чтобы не
+       провоцировать принудительный reflow в середине функции. */
+    var wrapperRect = propertiesWrapper.getBoundingClientRect();
+    var availableH = wrapperRect.top - NAV_H;
     var formH = compactFormH;
 
     var sq;
@@ -584,19 +587,20 @@
     var viewportOffset = window.visualViewport ? window.visualViewport.offsetTop : 0;
     var delta = viewportOffset - stickyViewportTop;
 
-    var wrapperRect = propertiesWrapper.getBoundingClientRect();
-
-    /* Форма уезжает вверх только когда секция properties начинает её "выталкивать" */
+    /* Форма уезжает вверх только когда секция properties начинает её "выталкивать".
+       Двигаем через top (не transform), чтобы форма не становилась containing
+       block для position:fixed поповеров. Плавность даёт отсутствие
+       CSS-transition: значение идёт 1:1 со сглаженным скроллом Lenis. */
     var bookingTop = Math.min(wrapperRect.top, frozenTop + delta);
     bookingEl.style.top = bookingTop + 'px';
     bookingEl.style.setProperty('--sq', sq.toFixed(4));
 
     /* Когда форма достигла минимума, а секция продолжает ехать — добавляем отступ */
-    // var overlapThreshold = window.matchMedia('(max-width: 768px)').matches ? 60 : 10;
+    var overlapThreshold = window.matchMedia('(max-width: 768px)').matches ? 30 : 30;
     var extraPad = sq >= 1 ? Math.max(0, bookingTop + formH - wrapperRect.top) : 0;
     if (extraPad !== lastPaddingTop) {
       if (extraPad > 0) {
-        propertiesSection.style.paddingTop = extraPad + 'px';
+        propertiesSection.style.paddingTop = extraPad + overlapThreshold + 'px';
         propertiesSection.style.zIndex = '1';
       } else {
         propertiesSection.style.paddingTop = '';
