@@ -481,6 +481,12 @@
     autoRaf: true,
     anchors: { offset: 72 },
     allowNestedScroll: true,
+    /* На телефоне нативный тач-скролл и покадровые правки формы живут в разных
+       таймлайнах — форма «дёргается» вслед за инерцией. syncTouch проводит
+       тач-скролл через тот же rAF-цикл Lenis, что и колесо на десктопе, поэтому
+       перемещение/сжатие формы идёт синхронно со скроллом. */
+    syncTouch: true,
+    syncTouchLerp: 0.1,
   });
 })();
 </script>
@@ -508,6 +514,11 @@
   var isSticky = false;
   var frozenTop = NAV_H;
   var lastPaddingTop = -1;
+  /* Кэш последних применённых значений — пишем в стиль только при реальном
+     изменении, чтобы не плодить лишние reflow на каждом кадре (важно для
+     слабых мобильных CPU). */
+  var lastTop = null;
+  var lastSq = null;
   /* Высота формы в полном и компактном состоянии — измеряются один раз */
   var fullFormH = 0;
   var compactFormH = 0;
@@ -544,6 +555,8 @@
     bookingEl.style.setProperty('--sq', '0');
     bookingEl.classList.add('booking--sticky');
     propertiesSection.style.willChange = 'padding-top';
+    lastTop = null;
+    lastSq = null;
     isSticky = true;
     closeAllPopups();
   }
@@ -557,6 +570,8 @@
     bookingEl.style.top = '';
     isSticky = false;
     lastPaddingTop = -1;
+    lastTop = null;
+    lastSq = null;
     propertiesSection.style.willChange = '';
     propertiesSection.style.paddingTop = '';
     propertiesSection.style.zIndex = '';
@@ -591,9 +606,16 @@
        Двигаем через top (не transform), чтобы форма не становилась containing
        block для position:fixed поповеров. Плавность даёт отсутствие
        CSS-transition: значение идёт 1:1 со сглаженным скроллом Lenis. */
-    var bookingTop = Math.min(wrapperRect.top, frozenTop + delta);
-    bookingEl.style.top = bookingTop + 'px';
-    bookingEl.style.setProperty('--sq', sq.toFixed(4));
+    var bookingTop = Math.round(Math.min(wrapperRect.top, frozenTop + delta));
+    if (bookingTop !== lastTop) {
+      bookingEl.style.top = bookingTop + 'px';
+      lastTop = bookingTop;
+    }
+    var sqStr = sq.toFixed(4);
+    if (sqStr !== lastSq) {
+      bookingEl.style.setProperty('--sq', sqStr);
+      lastSq = sqStr;
+    }
 
     /* Когда форма достигла минимума, а секция продолжает ехать — добавляем отступ */
     var overlapThreshold = window.matchMedia('(max-width: 768px)').matches ? 30 : 30;
