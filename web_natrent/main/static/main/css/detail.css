@@ -1,0 +1,222 @@
+/* ==========================================================================
+   NatRent — страница объекта «Детальная информация о доме»
+   Дополняет site.css и search.css (переменные, .nav, .footer, .wrap,
+   а также календарь/попап гостей берутся оттуда).
+   Подключается через {% static 'rental/css/detail.css' %} ПОСЛЕ search.css.
+   ========================================================================== */
+
+.detail-main{flex:1;max-width:1200px;width:100%;margin:0 auto;padding:104px 28px 88px;}
+
+/* ---------- Хлебные крошки ---------- */
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13.5px;color:#9AA3AC;margin-bottom:22px;flex-wrap:wrap;}
+.crumbs a{color:#6B7682;font-weight:500;transition:color .15s;}
+.crumbs a:hover{color:var(--accent);}
+.crumbs i,.crumbs svg{width:14px;height:14px;color:#C2C9D0;}
+.crumbs .current{color:#1C1F23;font-weight:600;}
+
+/* ---------- Шапка объекта ---------- */
+.detail-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:22px;}
+.detail-head__main{min-width:0;}
+.detail-badges{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;letter-spacing:.02em;padding:6px 12px;border-radius:100px;}
+.pill--accent{background:color-mix(in srgb, var(--accent) 13%, #fff);color:var(--accent);}
+.pill--soft{background:#EEF1F3;color:#41474E;}
+.pill i,.pill svg{width:13px;height:13px;}
+.detail-title{font-size:clamp(28px,3.8vw,44px);font-weight:800;letter-spacing:-.025em;line-height:1.08;margin:0;color:#15181C;text-wrap:balance;}
+.detail-loc{display:flex;align-items:center;gap:7px;margin-top:12px;color:#6B7682;font-size:15px;}
+.detail-loc i,.detail-loc svg{width:16px;height:16px;color:var(--accent);}
+
+.detail-head__aside{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.rating-box{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #E7EAED;border-radius:13px;padding:9px 14px;}
+.rating-box__score{display:flex;align-items:center;gap:5px;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#15181C;}
+.rating-box__score i,.rating-box__score svg{width:16px;height:16px;color:var(--accent);}
+.rating-box__meta{font-size:12px;line-height:1.3;color:#9AA3AC;}
+.rating-box__meta b{display:block;font-size:13px;color:#41474E;font-weight:700;}
+.icon-btn{width:44px;height:44px;border:1px solid #E7EAED;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;color:#41474E;cursor:pointer;transition:border-color .15s,color .15s,background .15s;}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+.icon-btn i,.icon-btn svg{width:18px;height:18px;}
+.icon-btn.is-active{background:color-mix(in srgb, var(--accent) 12%, #fff);border-color:transparent;color:var(--accent);}
+
+/* ---------- Галерея ---------- */
+.gallery{display:grid;grid-template-columns:1.62fr 1fr;grid-template-rows:1fr 1fr;gap:12px;height:clamp(380px,46vw,536px);margin-bottom:42px;}
+.gallery__cell{position:relative;border-radius:18px;overflow:hidden;background:#E7EBEE;cursor:pointer;}
+.gallery__cell img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.7,.2,1);}
+.gallery__cell:hover img{transform:scale(1.045);}
+.gallery__main{grid-row:1 / span 2;}
+.gallery__cell::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,16,22,0) 62%,rgba(10,16,22,.14));opacity:0;transition:opacity .25s;}
+.gallery__cell:hover::after{opacity:1;}
+.gallery__more{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:rgba(16,24,34,.5);color:#fff;font-weight:700;}
+.gallery__more b{font-size:24px;letter-spacing:-.02em;}
+.gallery__more span{font-size:13px;font-weight:600;opacity:.85;}
+.gallery__allbtn{position:absolute;left:16px;bottom:16px;z-index:2;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#1C1F23;border:none;border-radius:11px;padding:10px 16px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 16px rgba(8,14,22,.22);transition:transform .15s;}
+.gallery__allbtn:hover{transform:translateY(-1px);}
+.gallery__allbtn i,.gallery__allbtn svg{width:15px;height:15px;}
+
+/* ---------- Лайтбокс галереи ---------- */
+.lightbox{position:fixed;inset:0;z-index:1000;display:none;background:rgba(12,16,22,.94);align-items:center;justify-content:center;animation:lbFade .2s ease;}
+.lightbox.is-open{display:flex;}
+@keyframes lbFade{from{opacity:0;}to{opacity:1;}}
+.lightbox__bar{position:absolute;top:0;left:0;right:0;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:2;}
+.lightbox__counter{color:#fff;font-size:14px;font-weight:600;letter-spacing:.02em;}
+.lightbox__close{width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.lightbox__close:hover{background:rgba(255,255,255,.26);}
+.lightbox__close i,.lightbox__close svg{width:20px;height:20px;}
+.lightbox__stage{max-width:min(1100px,92vw);max-height:82vh;display:flex;align-items:center;justify-content:center;}
+.lightbox__img{max-width:100%;max-height:82vh;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.lightbox__nav{position:absolute;top:50%;transform:translateY(-50%);width:52px;height:52px;border:none;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;transition:background .15s;}
+.lightbox__nav:hover{background:rgba(255,255,255,.26);}
+.lightbox__nav i,.lightbox__nav svg{width:26px;height:26px;}
+.lightbox__nav--prev{left:20px;}
+.lightbox__nav--next{right:20px;}
+
+/* ---------- Сетка контент / бронирование ---------- */
+.detail-grid{display:grid;grid-template-columns:minmax(0,1fr) 388px;gap:40px;align-items:start;}
+.detail-content{min-width:0;}
+
+/* быстрые факты */
+.facts-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-bottom:32px;margin-bottom:32px;border-bottom:1px solid #ECEEF0;}
+.fact{display:flex;flex-direction:column;gap:9px;}
+.fact__ic{width:42px;height:42px;border-radius:12px;background:color-mix(in srgb, var(--accent) 10%, #fff);color:var(--accent);display:flex;align-items:center;justify-content:center;}
+.fact__ic i,.fact__ic svg{width:19px;height:19px;}
+.fact__val{font-size:18px;font-weight:800;letter-spacing:-.01em;color:#15181C;line-height:1;}
+.fact__lbl{font-size:13px;color:#9AA3AC;margin-top:-3px;}
+
+/* блоки */
+.block{padding-bottom:36px;margin-bottom:36px;border-bottom:1px solid #ECEEF0;}
+.block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.block__h{font-size:22px;font-weight:800;letter-spacing:-.02em;color:#15181C;margin:0 0 18px;}
+.prose{font-size:16px;line-height:1.7;color:#41474E;text-wrap:pretty;}
+.prose p{margin:0 0 14px;}
+.prose p:last-child{margin-bottom:0;}
+
+/* удобства */
+.amenities{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 28px;}
+.amenity{display:flex;align-items:center;gap:13px;font-size:15px;color:#2A3038;}
+.amenity__ic{flex-shrink:0;width:40px;height:40px;border-radius:11px;background:#F2F4F5;display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.amenity__ic i,.amenity__ic svg{width:18px;height:18px;}
+.amenity b{font-weight:600;}
+.amenity small{display:block;font-size:12.5px;color:#9AA3AC;font-weight:500;margin-top:1px;}
+
+/* «изюминки» — выделенные карточки */
+.highlights{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.highlight{border:1px solid #ECEEF0;border-radius:16px;padding:20px;background:#fff;transition:border-color .2s,box-shadow .2s,transform .2s;}
+.highlight:hover{border-color:#DDE1E4;box-shadow:0 14px 34px rgba(20,28,40,.08);transform:translateY(-3px);}
+.highlight__ic{width:44px;height:44px;border-radius:12px;background:var(--navy);color:#B7C9D6;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.highlight__ic i,.highlight__ic svg{width:20px;height:20px;}
+.highlight h4{font-size:15.5px;font-weight:700;margin:0 0 6px;color:#15181C;}
+.highlight p{font-size:13.5px;line-height:1.5;color:#6B7682;margin:0;}
+
+/* что включено — список галочек */
+.checklist{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 28px;}
+.check{display:flex;align-items:center;gap:10px;font-size:15px;color:#2A3038;}
+.check__tick{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:color-mix(in srgb, var(--accent) 14%, #fff);color:var(--accent);display:flex;align-items:center;justify-content:center;}
+.check__tick i,.check__tick svg{width:13px;height:13px;}
+
+/* карта / локация */
+.map-card{position:relative;border-radius:18px;overflow:hidden;border:1px solid #ECEEF0;height:300px;background:#EDF0F2;}
+.map-card__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.92);}
+.map-card__veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,24,34,0) 40%,rgba(16,24,34,.28));}
+.map-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.map-pin__dot{width:20px;height:20px;border-radius:50%;background:var(--accent);border:4px solid #fff;box-shadow:0 4px 14px rgba(8,14,22,.32);}
+.map-pin__pulse{position:absolute;top:50%;left:50%;width:54px;height:54px;border-radius:50%;background:color-mix(in srgb, var(--accent) 40%, transparent);transform:translate(-50%,-50%);animation:pinPulse 2.4s ease-out infinite;}
+@keyframes pinPulse{0%{transform:translate(-50%,-50%) scale(.5);opacity:.7;}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0;}}
+.map-card__chip{position:absolute;left:16px;bottom:16px;display:flex;align-items:center;gap:9px;background:#fff;border-radius:12px;padding:11px 15px;box-shadow:0 6px 20px rgba(8,14,22,.16);}
+.map-card__chip i,.map-card__chip svg{width:17px;height:17px;color:var(--accent);}
+.map-card__chip b{font-size:14px;font-weight:700;color:#15181C;display:block;}
+.map-card__chip small{font-size:12.5px;color:#9AA3AC;}
+.distances{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.dist{display:flex;align-items:center;gap:11px;font-size:14px;color:#41474E;}
+.dist i,.dist svg{width:16px;height:16px;color:#9AA3AC;flex-shrink:0;}
+.dist b{font-weight:700;color:#15181C;}
+
+/* хозяин */
+.host{display:flex;align-items:center;gap:18px;background:#fff;border:1px solid #ECEEF0;border-radius:18px;padding:22px;}
+.host__avatar{flex-shrink:0;width:62px;height:62px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;letter-spacing:-.02em;}
+.host__name{font-size:17px;font-weight:700;color:#15181C;display:flex;align-items:center;gap:7px;}
+.host__name i,.host__name svg{width:16px;height:16px;color:var(--accent);}
+.host__meta{font-size:13.5px;color:#6B7682;margin-top:3px;}
+.host__contact{margin-left:auto;flex-shrink:0;display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 20px;border:1px solid #E3E6E9;border-radius:12px;font-size:14px;font-weight:600;color:#1C1F23;background:#fff;transition:border-color .15s;}
+.host__contact:hover{border-color:var(--accent);}
+.host__contact i,.host__contact svg{width:16px;height:16px;}
+
+/* ---------- Карточка бронирования (sticky) ---------- */
+.book-aside{position:sticky;top:96px;}
+.book-card{background:#fff;border:1px solid #E7EAED;border-radius:20px;padding:24px;box-shadow:0 16px 44px rgba(20,28,40,.09);}
+.book-card__price{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+.book-card__price b{font-size:30px;font-weight:800;letter-spacing:-.025em;color:#15181C;}
+.book-card__price span{font-size:15px;color:#9AA3AC;font-weight:500;}
+.book-card__note{font-size:13.5px;color:#6B7682;margin:0 0 20px;display:flex;align-items:center;gap:6px;}
+.book-card__note i,.book-card__note svg{width:14px;height:14px;color:var(--accent);}
+
+.book-fields{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;}
+.book-aside .bf-label{margin-bottom:8px;}
+/* Виджет дат/гостей здесь — общий с index.html (booking.js + .cal-pop/.guest-pop из site.css).
+   На мобильных site.css сам раскрывает их нижней шторкой во всю ширину экрана.
+   Ниже — только десктопные правки под узкую карточку бронирования. */
+@media (min-width:761px){
+  /* в узкой колонке попапы открываются ВНИЗ от поля, а не вверх */
+  .book-card .cal-pop,
+  .book-card .guest-pop{top:calc(100% + 12px);bottom:auto;}
+  /* календарь прижимаем к правому краю, чтобы он не уходил за экран */
+  .book-card .cal-pop{left:auto;right:0;}
+}
+
+/* итог */
+.book-summary{border-top:1px solid #ECEEF0;margin-top:18px;padding-top:16px;display:flex;flex-direction:column;gap:11px;}
+.book-line{display:flex;align-items:center;justify-content:space-between;font-size:14.5px;color:#41474E;}
+.book-line span:first-child{color:#6B7682;}
+.book-line span:first-child u{text-decoration:underline;text-underline-offset:2px;text-decoration-color:#CBD0D5;cursor:help;}
+.book-total{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #ECEEF0;margin-top:5px;padding-top:15px;font-size:17px;font-weight:800;color:#15181C;letter-spacing:-.01em;}
+.book-cta{width:100%;height:54px;margin-top:20px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:9px;}
+.book-cta:hover{background:color-mix(in srgb, var(--accent) 84%, #000);}
+.book-cta i,.book-cta svg{width:18px;height:18px;}
+.book-reassure{margin:14px 0 0;font-size:12.5px;color:#9AA3AC;text-align:center;}
+
+/* мелкие плюшки под карточкой */
+.book-perks{margin-top:14px;display:flex;flex-direction:column;gap:9px;}
+.book-perk{display:flex;align-items:center;gap:9px;font-size:13px;color:#6B7682;}
+.book-perk i,.book-perk svg{width:15px;height:15px;color:var(--accent);flex-shrink:0;}
+
+/* ---------- Отзывы об объекте ---------- */
+.detail-reviews{margin-top:18px;}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:8px;}
+
+/* ---------- Похожие дома ---------- */
+.similar{margin-top:64px;}
+.similar__head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:26px;}
+.similar__head .h2{font-size:clamp(24px,3vw,34px);}
+.similar-link{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:var(--accent);white-space:nowrap;}
+.similar-link i,.similar-link svg{width:16px;height:16px;transition:transform .2s;}
+.similar-link:hover i,.similar-link:hover svg{transform:translateX(3px);}
+.similar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+
+/* ==========================================================================
+   Адаптив
+   ========================================================================== */
+@media (max-width:1000px){
+  .detail-grid{grid-template-columns:1fr;}
+  .book-aside{position:static;order:-1;}
+  .book-card{box-shadow:0 12px 32px rgba(20,28,40,.08);}
+  .similar-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:760px){
+  .detail-main{padding:92px 18px 64px;}
+  .gallery{grid-template-columns:1fr;grid-template-rows:auto;height:auto;}
+  .gallery__main{height:280px;}
+  .gallery__cell:not(.gallery__main){display:none;}
+  .gallery__main{display:block;}
+  .facts-row{grid-template-columns:repeat(2,1fr);gap:22px 14px;}
+  .amenities,.checklist{grid-template-columns:1fr;}
+  .highlights{grid-template-columns:1fr;}
+  .similar-grid{grid-template-columns:1fr;}
+  .host{flex-wrap:wrap;}
+  .host__contact{margin-left:0;width:100%;justify-content:center;}
+  .detail-head__aside{order:2;}
+
+  /* лайтбокс на мобильных — фото во весь экран, компактные кнопки */
+  .lightbox__stage{max-width:100vw;max-height:78vh;}
+  .lightbox__img{max-height:78vh;border-radius:0;box-shadow:none;}
+  .lightbox__nav{width:42px;height:42px;}
+  .lightbox__nav--prev{left:8px;}
+  .lightbox__nav--next{right:8px;}
+}

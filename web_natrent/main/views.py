@@ -2,6 +2,7 @@ import logging
 from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
@@ -318,8 +319,19 @@ class SearchView(View):
 class HouseDetailView(View):
     def get(self, request, house_id):
         house = get_object_or_404(RentObject, pk=house_id)
-        house.gallery_images = [image_field for image_field in [house.img1, house.img2, house.img3, house.img4] if image_field]
-        return render(request, 'main/house_detail.html', {'house': house})
+        slug = ''
+        if house_id == 2:
+            slug = 'detail_house_annolovo'
+        elif house_id == 1:
+            slug = 'detail_house_fedorov'
+        elif house_id == 3:
+            slug = 'detail_house_novoizm'
+        elif house_id == 4:
+            slug = 'detail_banya'
+        return render(request, f'main/{slug}.html', {
+            'house': house,
+            'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
+        })
 
 
 class PersonalDataConsentView(View):

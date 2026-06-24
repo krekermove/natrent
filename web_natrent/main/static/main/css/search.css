@@ -1,0 +1,199 @@
+/* ==========================================================================
+   NatRent — страница результатов поиска «Свободные дома»
+   Дополняет site.css (переменные, .nav, .footer, .wrap берутся оттуда).
+   Подключается через {% static 'rental/css/search.css' %} ПОСЛЕ site.css.
+   ========================================================================== */
+
+/* ---------- Контейнер страницы ---------- */
+.search-page{padding-top:72px;min-height:100vh;display:flex;flex-direction:column;}
+.search-main{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:112px 28px 80px;}
+
+/* ---------- Шапка результатов ---------- */
+.search-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px;}
+.search-head__title{font-size:clamp(28px,3.6vw,40px);font-weight:800;letter-spacing:-.02em;margin:0;color:#15181C;}
+.search-head__sub{margin:8px 0 0;font-size:15px;color:#6B7682;}
+.search-back{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--accent);padding:9px 14px;border:1px solid #E3E6E9;border-radius:10px;background:#fff;transition:border-color .15s,background .15s;white-space:nowrap;}
+.search-back:hover{border-color:var(--accent);background:#fff;}
+.search-back i,.search-back svg{width:15px;height:15px;}
+
+/* ---------- Сообщения Django ---------- */
+.msg-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.msg{border-radius:13px;border:1px solid;padding:14px 16px;font-size:14px;}
+.msg--success{background:color-mix(in srgb, var(--accent) 8%, #fff);border-color:color-mix(in srgb, var(--accent) 28%, #fff);color:#3A4A57;}
+.msg--error{background:#FCF2F2;border-color:#F0D5D5;color:#9A3B3B;}
+
+/* ---------- Панель бронирования ---------- */
+.search-booking{position:relative;background:#fff;border:1px solid #ECEEF0;border-radius:20px;padding:22px;box-shadow:0 12px 34px rgba(20,28,40,.06);margin-bottom:40px;}
+.booking-form{display:grid;grid-template-columns:1.7fr 1fr auto;gap:16px;align-items:end;}
+.bf-col{position:relative;}
+.bf-label{display:block;font-size:12px;font-weight:700;color:#6B7682;margin-bottom:9px;letter-spacing:.03em;text-transform:uppercase;}
+
+/* Поля-триггеры (id #dates, #guestsTrigger завязаны на JS) */
+.booking-control{height:56px;box-sizing:border-box;}
+.dates,.guests-picker-trigger{
+  position:relative;width:100%;border:1px solid #E3E6E9;border-radius:13px;background:#fff;
+  display:flex;align-items:center;padding:0 16px;font-size:15px;color:#1C1F23;cursor:pointer;
+  transition:border-color .15s;user-select:none;
+}
+.dates{justify-content:flex-start;padding-right:42px;}
+.guests-picker-trigger{justify-content:flex-start;}
+.dates:hover,.guests-picker-trigger:hover,
+.dates.active,.guests-picker-trigger.active{border-color:var(--accent);background:#fff;}
+.bf-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:#9AA3AC;pointer-events:none;}
+.search-submit{height:56px;padding:0 30px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.search-submit:hover{background:color-mix(in srgb, var(--accent) 84%, #000);}
+
+/* ---------- Бэкдропы (мобильные шторки) ---------- */
+.sheet-backdrop{display:none;}
+
+/* ---------- Календарь (попап) ---------- */
+.date-picker-calendar-popup{
+  position:absolute;top:calc(100% + 12px);left:0;background:#fff;border:1px solid #ECEEF1;border-radius:18px;
+  box-shadow:0 22px 60px rgba(20,28,40,.18);padding:22px;display:flex;gap:34px;z-index:80;align-items:flex-start;
+  opacity:0;visibility:hidden;transform:translateY(8px);
+  transition:opacity .2s ease, visibility .2s ease, transform .2s ease;
+}
+.date-picker-calendar-popup.show{opacity:1;visibility:visible;transform:translateY(0);}
+
+.calendar-module{display:flex;flex-direction:column;width:268px;}
+.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.calendar-header .month-year-display1,
+.calendar-header .month-year-display2{flex-grow:1;text-align:center;margin:0 8px;font-size:15px;font-weight:700;color:#1C1F23;}
+.calendar-header .nav-button{width:34px;height:34px;border:1px solid #E3E6E9;border-radius:9px;background:#fff;cursor:pointer;font-size:17px;line-height:1;color:#41474E;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.calendar-header .nav-button:hover{border-color:var(--accent);color:var(--accent);}
+
+.calendar-grid-1,.calendar-grid-2{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;}
+.calendar-grid-1 .weekday,.calendar-grid-2 .weekday{font-size:11px;color:#9AA3AC;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding-bottom:6px;}
+.calendar-grid-1 .day,.calendar-grid-2 .day{display:flex;align-items:center;justify-content:center;height:40px;font-size:14px;cursor:pointer;border-radius:10px;color:#1C1F23;transition:background-color .15s,color .15s;user-select:none;}
+.calendar-grid-1 .day.today,.calendar-grid-2 .day.today{box-shadow:inset 0 0 0 1px var(--accent);font-weight:700;}
+.calendar-grid-1 .day.other-month,.calendar-grid-2 .day.other-month{color:#CBD0D5;cursor:default;visibility:hidden;}
+.calendar-grid-1 .day:not(.other-month):hover,.calendar-grid-2 .day:not(.other-month):hover{background-color:#F0F2F3;}
+.calendar-grid-1 .day.middle,.calendar-grid-2 .day.middle{background-color:color-mix(in srgb, var(--accent) 13%, #fff);color:#1C1F23;border-radius:0;}
+.calendar-grid-1 .day.clicked,.calendar-grid-2 .day.clicked{background-color:var(--accent);color:#fff;font-weight:600;border-radius:10px;}
+
+.date-picker-actions{margin-top:14px;}
+.clear-button{background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);font-family:inherit;text-decoration:underline;text-underline-offset:3px;padding:0;}
+
+/* ---------- Гости (попап) ---------- */
+.guest-picker-popup{
+  position:absolute;top:calc(100% + 12px);left:0;right:0;min-width:320px;background:#fff;border:1px solid #ECEEF1;border-radius:18px;
+  box-shadow:0 22px 60px rgba(20,28,40,.18);padding:8px 18px 14px;z-index:80;
+  opacity:0;visibility:hidden;transform:translateY(8px);
+  transition:opacity .2s ease, visibility .2s ease, transform .2s ease;
+}
+.guest-picker-popup.show{opacity:1;visibility:visible;transform:translateY(0);}
+.guest-picker-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #F0F2F3;}
+.guest-picker-row:last-child{border-bottom:none;padding-bottom:4px;}
+.guest-picker-row-title{font-weight:700;font-size:15px;color:#1C1F23;}
+.guest-picker-row-subtitle{font-size:13px;color:#9AA3AC;margin-top:2px;}
+.guest-picker-stepper{display:flex;align-items:center;border:1px solid #E3E6E9;border-radius:11px;overflow:hidden;flex-shrink:0;}
+.guest-picker-stepper button{width:40px;height:40px;border:none;background:#fff;cursor:pointer;font-size:18px;line-height:1;color:#1C1F23;font-family:inherit;}
+.guest-picker-stepper button:hover:not([disabled]){background:#F0F2F3;}
+.guest-picker-stepper button[disabled]{opacity:.32;cursor:not-allowed;}
+.guest-picker-stepper-value{min-width:36px;text-align:center;font-weight:700;font-size:15px;}
+.guest-pet-toggle{position:relative;width:48px;height:28px;flex-shrink:0;}
+.guest-pet-toggle input{opacity:0;width:0;height:0;position:absolute;}
+.guest-pet-toggle-slider{position:absolute;inset:0;background:#E3E6E9;border-radius:28px;cursor:pointer;transition:background-color .2s;}
+.guest-pet-toggle-slider::before{content:"";position:absolute;height:22px;width:22px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.22);}
+.guest-pet-toggle input:checked + .guest-pet-toggle-slider{background:var(--accent);}
+.guest-pet-toggle input:checked + .guest-pet-toggle-slider::before{transform:translateX(20px);}
+
+/* Хром шторки — только мобайл */
+.bf-field{position:relative;}
+.cal-scroll{display:contents;}
+.sheet-handle,.sheet-head,.sheet-foot{display:none;}
+
+/* ---------- Карточки домов ---------- */
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:24px;}
+.house-card{background:#fff;border:1px solid #ECEEF0;border-radius:18px;overflow:hidden;transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;display:flex;flex-direction:column;}
+.house-card:hover{transform:translateY(-4px);box-shadow:0 22px 46px rgba(20,28,40,.12);border-color:#DDE1E4;}
+
+.house-slider{position:relative;overflow:hidden;background:#E7EBEE;}
+.house-slider-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-ms-overflow-style:none;scrollbar-width:none;}
+.house-slider-track::-webkit-scrollbar{display:none;}
+.house-slide{width:100%;flex:0 0 100%;scroll-snap-align:start;}
+.house-slide img{width:100%;height:248px;object-fit:cover;display:block;}
+.house-slider-btn{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border:1px solid rgba(255,255,255,.7);border-radius:9999px;background:rgba(17,24,39,.42);color:#fff;font-size:24px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4;opacity:0;transition:opacity .2s ease, background-color .2s ease, transform .2s ease;}
+.house-slider-btn:hover{background:rgba(17,24,39,.72);transform:translateY(-50%) scale(1.04);}
+.house-slider-btn.prev{left:14px;}
+.house-slider-btn.next{right:14px;}
+.house-slider-hit{position:absolute;top:0;bottom:0;width:18%;border:0;cursor:pointer;background:transparent;opacity:0;z-index:2;transition:opacity .2s ease;}
+.house-slider-hit.left{left:0;}
+.house-slider-hit.right{right:0;}
+.house-card:hover .house-slider-btn{opacity:1;}
+
+.house-body{padding:22px;display:flex;flex-direction:column;flex:1;}
+.house-title{font-size:19px;font-weight:700;letter-spacing:-.01em;margin:0 0 8px;color:#15181C;}
+.house-desc{margin:0 0 16px;font-size:14px;line-height:1.55;color:#6B7682;text-wrap:pretty;}
+.house-facts{display:flex;flex-direction:column;gap:7px;padding-top:16px;border-top:1px solid #F0F2F3;font-size:14px;color:#41474E;}
+.house-facts .label{color:#6B7682;}
+.house-facts .value{font-weight:700;color:#1C1F23;}
+.house-price{font-size:18px;}
+.house-actions{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.house-actions form{margin:0;}
+.btn-outline{display:flex;align-items:center;justify-content:center;text-align:center;border:1px solid #E3E6E9;border-radius:11px;padding:0 16px;height:46px;font-size:14px;font-weight:600;color:#1C1F23;background:#fff;transition:border-color .15s,background .15s;}
+.btn-outline:hover{border-color:var(--accent);}
+.btn-accent{width:100%;height:46px;background:var(--accent);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s;}
+.btn-accent:hover{background:color-mix(in srgb, var(--accent) 84%, #000);}
+
+/* ---------- Пустой результат ---------- */
+.empty-state{background:#fff;border:1px solid #ECEEF0;border-radius:18px;padding:48px 32px;text-align:center;}
+.empty-state__icon{width:56px;height:56px;border-radius:15px;background:color-mix(in srgb, var(--accent) 12%, #fff);color:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+.empty-state__icon i,.empty-state__icon svg{width:26px;height:26px;}
+.empty-state h2{font-size:20px;font-weight:700;margin:0 0 8px;color:#15181C;}
+.empty-state p{margin:0;font-size:15px;color:#6B7682;}
+
+/* ==========================================================================
+   Мобильная версия (<760px): календарь и гости — нижние шторки
+   ========================================================================== */
+@media (max-width:760px){
+  .search-main{padding:96px 18px 64px;}
+  .booking-form{grid-template-columns:1fr;gap:14px;}
+
+  /* затемнение фона при открытой шторке (через :has, без правок JS) */
+  .sheet-backdrop{display:block;position:fixed;inset:0;background:rgba(12,18,26,.45);z-index:200;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s;}
+  body:has(#calendar.show) .sheet-backdrop,
+  body:has(#guestPicker.show) .sheet-backdrop{opacity:1;visibility:visible;pointer-events:auto;}
+
+  /* общий каркас шторки */
+  .date-picker-calendar-popup,
+  .guest-picker-popup{
+    position:fixed;left:0;right:0;bottom:0;top:auto;width:auto;min-width:0;max-width:none;
+    border-radius:22px 22px 0 0;box-shadow:0 -12px 44px rgba(12,18,26,.2);z-index:201;
+    transform:translateY(101%);opacity:1;visibility:visible;
+    transition:transform .32s cubic-bezier(.32,.72,0,1);
+    display:flex;flex-direction:column;padding:0;gap:0;
+  }
+  .date-picker-calendar-popup{top:8vh;}
+  .guest-picker-popup{max-height:84vh;overflow-y:auto;padding:0 20px 22px;}
+  .date-picker-calendar-popup.show,
+  .guest-picker-popup.show{transform:translateY(0);}
+
+  /* ручка + шапка + футер шторки */
+  .sheet-handle{display:flex;justify-content:center;padding:10px 0 2px;flex-shrink:0;}
+  .sheet-handle span{width:38px;height:5px;border-radius:3px;background:#D9DDE1;}
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:6px 18px 14px;flex-shrink:0;border-bottom:1px solid #F0F2F3;}
+  .guest-picker-popup .sheet-head{padding:6px 0 12px;}
+  .sheet-head__title{font-size:17px;font-weight:700;color:#1C1F23;}
+  .sheet-x{width:36px;height:36px;border:none;background:none;cursor:pointer;font-size:22px;line-height:1;color:#1C1F23;font-family:inherit;display:flex;align-items:center;justify-content:center;margin-left:-8px;}
+  .sheet-x--spacer{width:36px;visibility:hidden;}
+
+  /* календарь внутри шторки: месяцы стопкой, вертикальный скролл */
+  .date-picker-calendar-popup .cal-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 18px 8px;display:flex;flex-direction:column;gap:26px;}
+  .calendar-module{width:100%;}
+  .calendar-grid-1 .day,.calendar-grid-2 .day{height:46px;font-size:16px;}
+  .date-picker-actions{display:none;}
+
+  .sheet-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;border-top:1px solid #F0F2F3;flex-shrink:0;}
+  .sheet-foot__note{font-size:13px;color:#9AA3AC;flex-shrink:0;}
+  .sheet-clear{background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;color:var(--accent);font-family:inherit;}
+  .sheet-apply{flex:1;max-width:180px;height:50px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .sheet-done{display:block;width:100%;height:52px;margin-top:18px;background:var(--accent);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+  /* кнопки слайдера всегда видимы на тач-экранах */
+  .house-slider-btn{opacity:1;background:rgba(17,24,39,.5);}
+  .results-grid{grid-template-columns:1fr;}
+}
+
+.sheet-done{display:none;}
+@media (max-width:760px){ .sheet-done{display:block;} }

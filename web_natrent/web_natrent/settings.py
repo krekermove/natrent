@@ -158,3 +158,6 @@ NATRENT_COMPANY_NAME = 'NatRent'
 NATRENT_ADDRESS = os.environ.get('NATRENT_ADDRESS', 'г. Санкт-Петербург')
 NATRENT_PHONE = os.environ.get('NATRENT_PHONE', '+7 (981) 824 21-75')
 NATRENT_CONTACT_EMAIL = os.environ.get('NATRENT_CONTACT_EMAIL', 'pavel.kobzov@gmail.com')
+
+# Yandex Maps static API key (used on house detail pages)
+YANDEX_MAPS_API_KEY = os.environ.get('YANDEX_MAPS_API_KEY', '')

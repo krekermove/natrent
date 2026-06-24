@@ -1,0 +1,687 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Аппартаменты на Московской | NatRent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'main/css/detail.css' %}">
+
+  <style>
+    /* Содержимое каждого факта — в строку */
+    .facts-row .fact{flex-direction:row;align-items:center;gap:10px;}
+    .facts-row .fact__lbl{margin-top:0;}
+  </style>
+</head>
+<body>
+
+  <!-- ===== НАВИГАЦИЯ ===== -->
+  <nav class="nav">
+    <div class="nav__inner">
+      <a href="{% url 'main:main_page' %}" class="nav__logo">
+        <span class="nav__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+        <span class="nav__brand">NatRent</span>
+      </a>
+      <div class="nav__right">
+        <div class="nav__links">
+          <a href="{% url 'main:main_page' %}#properties" class="nav__link">Объекты</a>
+          <a href="{% url 'main:main_page' %}#about" class="nav__link">О нас</a>
+          <a href="{% url 'main:main_page' %}#reviews" class="nav__link">Отзывы</a>
+          <a href="{% url 'main:main_page' %}#contact" class="nav__link">Контакты</a>
+        </div>
+        <a href="#book" class="nav__cta">Забронировать</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="detail-main">
+
+    <!-- ===== ХЛЕБНЫЕ КРОШКИ ===== -->
+    <div class="crumbs">
+      <a href="{% url 'main:main_page' %}">Главная</a>
+      <i data-feather="chevron-right"></i>
+      <span class="current">Аппартаменты на Московской</span>
+    </div>
+
+    <!-- ===== ШАПКА ОБЪЕКТА ===== -->
+    <div class="detail-head">
+      <div class="detail-head__main">
+<!--        <div class="detail-badges">-->
+<!--          <span class="pill pill&#45;&#45;accent"><i data-feather="award"></i>Хит сезона</span>-->
+<!--          <span class="pill pill&#45;&#45;soft"><i data-feather="check-circle"></i>Свободно на ваши даты</span>-->
+<!--        </div>-->
+        <h1 class="detail-title">Аппартаменты на Московской</h1>
+        <a href="https://yandex.ru/maps/2/saint-petersburg/house/novoizmaylovskiy_prospekt_44k5/Z0kYdQZgSEQHQFtjfXR0dXRrbA==/?ll=30.309769%2C59.853481&z=16.93">
+          <div class="detail-loc">
+            <i data-feather="map-pin"></i>
+            г. Санкт-Петербург · Новоизмаловский пр-т · м. Московская
+          </div>
+        </a>
+      </div>
+      <div class="detail-head__aside">
+        <div class="rating-box">
+          <span class="rating-box__score"><i data-feather="star"></i>4.9</span>
+          <span class="rating-box__meta"><b>Отлично</b>18 отзывов</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ГАЛЕРЕЯ ===== -->
+    <div class="gallery" id="gallery">
+      <div class="gallery__cell gallery__main" data-index="0">
+        <img src="{% static 'main/img/novoizmayl/1.jpg' %}" alt="Спальня">
+        <button type="button" class="gallery__allbtn"><i data-feather="image"></i>Все фото · 12</button>
+      </div>
+      <div class="gallery__cell" data-index="1">
+        <img src="{% static 'main/img/novoizmayl/2.jpg' %}" alt="Интерьер гостиной">
+      </div>
+      <div class="gallery__cell" data-index="2">
+        <img src="{% static 'main/img/novoizmayl/3.jpg' %}" alt="Кухня">
+        <div class="gallery__more"><b>+10</b><span>фото</span></div>
+      </div>
+    </div>
+
+    <!-- ===== СЕТКА КОНТЕНТ / БРОНИРОВАНИЕ ===== -->
+    <div class="detail-grid">
+
+      <!-- ЛЕВАЯ КОЛОНКА -->
+      <div class="detail-content">
+
+        <!-- быстрые факты -->
+        <div class="facts-row">
+          <div class="fact">
+            <span class="fact__ic"><i data-feather="users"></i></span>
+            <span class="fact__val">4</span>
+            <span class="fact__lbl">гостя</span>
+          </div>
+          <div class="fact">
+            <span class="fact__ic"><i data-feather="home"></i></span>
+            <span class="fact__val">1</span>
+            <span class="fact__lbl">спальня</span>
+          </div>
+          <div class="fact">
+            <span class="fact__ic"><i data-feather="droplet"></i></span>
+            <span class="fact__val">1</span>
+            <span class="fact__lbl">санузел</span>
+          </div>
+          <div class="fact">
+            <span class="fact__ic"><i data-feather="maximize"></i></span>
+            <span class="fact__val">40 м²</span>
+            <span class="fact__lbl">площадь</span>
+          </div>
+        </div>
+
+        <!-- описание -->
+        <div class="block">
+          <h2 class="block__h">Об этом доме</h2>
+          <div class="prose">
+            <p>Уютнaя бoльшая однoкoмнaтная Квартирa от cобcтвeнникa. 40м2. В шaгoвой доcтупнocти oт мeтро. До аэропoртa и цeнтра 15 минут.</p>
+          </div>
+        </div>
+
+        <!-- изюминки -->
+        <div class="block">
+          <h2 class="block__h">Почему здесь хорошо</h2>
+          <div class="highlights">
+            <div class="highlight">
+              <span class="highlight__ic"><i data-feather="droplet"></i></span>
+              <h4>Бесконтактное заселение</h4>
+              <p>Парная премиум-класса и банный чан под открытым небом. Протопим к вашему приезду по запросу.</p>
+            </div>
+            <div class="highlight">
+              <span class="highlight__ic"><i data-feather="key"></i></span>
+              <h4>Заселение без посредников</h4>
+              <p>Сдаём свои аппартаменты напрямую — честная цена, быстрые ответы и помощь с заездом в любое время.</p>
+            </div>
+            <div class="highlight">
+              <span class="highlight__ic"><i data-feather="sun"></i></span>
+              <h4>Клиника "Скандинавия"</h4>
+              <p>Буквально в 50-ти метрах от дома располагается клиника "Скандинавия"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- удобства -->
+        <div class="block">
+          <h2 class="block__h">Удобства</h2>
+          <div class="amenities">
+            <div class="amenity"><span class="amenity__ic"><i data-feather="droplet"></i></span><span><b>Премиальная баня</b><small>Парная от уральских мастеров</small></span></div>
+            <div class="amenity"><span class="amenity__ic"><i data-feather="thermometer"></i></span><span><b>Банный чан</b><small>На дровах, под открытым небом</small></span></div>
+            <div class="amenity"><span class="amenity__ic"><i data-feather="wind"></i></span><span><b>Мангальная зона</b><small>Беседка с грилем и дровами</small></span></div>
+            <div class="amenity"><span class="amenity__ic"><i data-feather="wifi"></i></span><span><b>Wi-Fi 100 Мбит/с</b><small>Стабильный интернет</small></span></div>
+            <div class="amenity"><span class="amenity__ic"><i data-feather="truck"></i></span><span><b>Парковка во дворе</b><small>2 машиноместа</small></span></div>
+            <div class="amenity"><span class="amenity__ic"><i data-feather="coffee"></i></span><span><b>Оборудованная кухня</b><small>Плита, холодильник, посуда</small></span></div>
+            <div class="amenity"><span class="amenity__ic"><i data-feather="tv"></i></span><span><b>Smart TV</b><small>Кинотеатр и приставка</small></span></div>
+            <div class="amenity"><span class="amenity__ic"><i data-feather="sun"></i></span><span><b>Тёплые полы</b><small>Во всём доме</small></span></div>
+          </div>
+        </div>
+
+        <!-- что включено -->
+        <div class="block">
+          <h2 class="block__h">Что включено в стоимость</h2>
+          <div class="checklist">
+            <div class="check"><span class="check__tick"><i data-feather="check"></i></span>Постельное бельё и полотенца</div>
+            <div class="check"><span class="check__tick"><i data-feather="check"></i></span>Дрова для бани и мангала</div>
+            <div class="check"><span class="check__tick"><i data-feather="check"></i></span>Кухонная техника и посуда</div>
+            <div class="check"><span class="check__tick"><i data-feather="check"></i></span>Парковка на участке</div>
+            <div class="check"><span class="check__tick"><i data-feather="check"></i></span>Уборка после выезда</div>
+            <div class="check"><span class="check__tick"><i data-feather="check"></i></span>Детский стульчик по запросу</div>
+          </div>
+        </div>
+
+        <!-- локация -->
+        <div class="block">
+          <h2 class="block__h">Расположение</h2>
+          <div class="map-card">
+            <a href="https://yandex.ru/maps/2/saint-petersburg/house/novoizmaylovskiy_prospekt_44k5/Z0kYdQZgSEQHQFtjfXR0dXRrbA==/?ll=30.308731%2C59.854335&z=16.93">
+              <img class="map-card__img" src="https://static-maps.yandex.ru/v1?ll=30.308731,59.854335&lang=ru_RU&size=450,450&z=13&pt=30.308731,59.854335,home~30.308731,59.854335,home1&apikey={{ yandex_maps_api_key }}" alt="Расположение аппартаментов">
+              <div class="map-card__veil"></div>
+              <div class="map-pin"><span class="map-pin__pulse"></span></span></div>
+              <div class="map-card__chip">
+                <i data-feather="map-pin"></i>
+                <span><b>м. Московская (15 мин)</b><small>Новоизмайловский пр-т</small></span>
+              </div>
+            </a>
+          </div>
+          <div class="distances">
+            <div class="dist"><i data-feather="droplet"></i><span><b>700 м</b> до озера</span></div>
+            <div class="dist"><i data-feather="shopping-bag"></i><span><b>3 км</b> до магазина</span></div>
+            <div class="dist"><i data-feather="map-pin"></i><span><b>30 км</b> до Санкт-Петербурга</span></div>
+          </div>
+        </div>
+
+        <!-- хозяин -->
+<!--        <div class="block">-->
+<!--          <div class="host">-->
+<!--            <span class="host__avatar">Н</span>-->
+<!--            <div>-->
+<!--              <div class="host__name">Наталья <i data-feather="check-circle"></i></div>-->
+<!--              <div class="host__meta">Хозяйка · принимает гостей с 2021 года · отвечает за ~15 минут</div>-->
+<!--            </div>-->
+<!--            <a href="_preview.html#contact" class="host__contact"><i data-feather="message-circle"></i>Написать хозяйке</a>-->
+<!--          </div>-->
+<!--        </div>-->
+
+        <!-- отзывы -->
+        <div class="block detail-reviews">
+          <h2 class="block__h">Отзывы гостей · 5.0 из 5.0</h2>
+          <div class="reviews-grid">
+            <div class="review">
+              <div class="review__stars">★★★★★</div>
+              <p class="review__text">Снимали дом на выходные — топили баню и сразу в чан под звёздами. Дом тёплый, всё чисто и продумано до мелочей. Обязательно вернёмся зимой!</p>
+              <div class="review__author">
+                <span class="review__avatar">АК</span>
+                <div>
+                  <div class="review__name">Анна К.</div>
+                  <div class="review__when">Январь 2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="review">
+              <div class="review__stars">★★★★★</div>
+              <p class="review__text">Тихое место у леса, до озера правда близко. Чан — отдельный кайф. Хозяйка на связи, помогла с заездом поздно вечером. Рекомендую.</p>
+              <div class="review__author">
+                <span class="review__avatar">МР</span>
+                <div>
+                  <div class="review__name">Михаил Р.</div>
+                  <div class="review__when">Октябрь 2025</div>
+                </div>
+              </div>
+            </div>
+            <div class="review">
+              <div class="review__stars">★★★★★</div>
+              <p class="review__text">Брали с детьми. Дом просторный, кухня со всем необходимым, мангал и дрова уже ждали. Баня шикарная. Спасибо, было здорово!</p>
+              <div class="review__author">
+                <span class="review__avatar">ОВ</span>
+                <div>
+                  <div class="review__name">Ольга В.</div>
+                  <div class="review__when">Август 2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ПРАВАЯ КОЛОНКА — БРОНИРОВАНИЕ -->
+      <aside class="book-aside" id="book">
+        <div class="book-card">
+          <div class="book-card__price"><b>18 000 ₽</b><span>/ ночь</span></div>
+          <p class="book-card__note"><i data-feather="calendar"></i>Минимум 2 ночи · отмена за 5 дней</p>
+
+          <!-- Виджет бронирования портирован со страницы index.html (booking.js + site.css):
+               на мобильных календарь и гости раскрываются нижней шторкой во всю ширину экрана. -->
+          <div id="booking">
+            <form id="bookingForm" class="book-fields" action="#" method="post">
+              <input type="hidden" name="guest_count" value="2">
+              <input type="hidden" name="children_under_3" value="0">
+              <input type="hidden" name="has_pet" value="false">
+
+              <!-- Даты -->
+              <div class="pop" data-pop="cal">
+                <label class="field-label">Даты проживания</label>
+                <div class="field" data-trigger="cal" role="button" tabindex="0">
+                  <input type="hidden" name="firstInputDate" value="">
+                  <input type="hidden" name="secondInputDate" value="">
+                  <span data-label="dates">Выберите даты</span>
+                  <i data-feather="calendar"></i>
+                </div>
+                <div class="backdrop" data-backdrop="cal"></div>
+
+                <div class="cal-pop" data-pop-el="cal">
+                  <!-- Шапка шторки (только мобайл) -->
+                  <div class="sheet-handle"><span></span></div>
+                  <div class="sheet-head">
+                    <button type="button" class="sheet-x" data-action="close-cal">✕</button>
+                    <span class="sheet-head__title">Даты</span>
+                    <button type="button" class="sheet-reset" data-action="clear-dates">Сбросить</button>
+                  </div>
+                  <div class="sheet-weekdays">
+                    <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+                  </div>
+
+                  <!-- Мобайл: вертикальный список месяцев -->
+                  <div class="cal-mobile" data-cal-mobile>
+                    <div class="cal-scroll" data-cal-scroll></div>
+                    <div class="sheet-foot">
+                      <span class="sheet-foot__note">Минимум 2 ночи</span>
+                      <button type="button" class="sheet-apply" data-action="close-cal">Применить</button>
+                    </div>
+                  </div>
+
+                  <!-- Десктоп: два месяца рядом -->
+                  <div class="cal-desktop" data-cal-desktop>
+                    <div class="cal-month">
+                      <div class="cal-month__head">
+                        <button type="button" class="cal-nav" data-cal="prev">‹</button>
+                        <span class="cal-month__title" data-cal="leftTitle"></span>
+                        <span class="cal-nav--spacer"></span>
+                      </div>
+                      <div class="cal-grid">
+                        <span class="cal-wd">Пн</span><span class="cal-wd">Вт</span><span class="cal-wd">Ср</span><span class="cal-wd">Чт</span><span class="cal-wd">Пт</span><span class="cal-wd">Сб</span><span class="cal-wd">Вс</span>
+                      </div>
+                      <div class="cal-grid" data-cal="leftGrid"></div>
+                    </div>
+                    <div class="cal-month">
+                      <div class="cal-month__head">
+                        <span class="cal-nav--spacer"></span>
+                        <span class="cal-month__title" data-cal="rightTitle"></span>
+                        <button type="button" class="cal-nav" data-cal="next">›</button>
+                      </div>
+                      <div class="cal-grid">
+                        <span class="cal-wd">Пн</span><span class="cal-wd">Вт</span><span class="cal-wd">Ср</span><span class="cal-wd">Чт</span><span class="cal-wd">Пт</span><span class="cal-wd">Сб</span><span class="cal-wd">Вс</span>
+                      </div>
+                      <div class="cal-grid" data-cal="rightGrid"></div>
+                    </div>
+                  </div>
+
+                  <div class="cal-foot">
+                    <span class="cal-foot__note">Минимум 2 ночи</span>
+                    <button type="button" class="link-btn" data-action="clear-dates">Очистить даты</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Гости -->
+              <div class="pop" data-pop="guests">
+                <label class="field-label">Гости</label>
+                <div class="field" data-trigger="guests" role="button" tabindex="0">
+                  <span data-label="guests">2 гостя</span>
+                  <i data-feather="users"></i>
+                </div>
+                <div class="backdrop" data-backdrop="guests"></div>
+
+                <div class="guest-pop" data-pop-el="guests">
+                  <div class="sheet-handle"><span></span></div>
+                  <div class="sheet-head">
+                    <button type="button" class="sheet-x" data-action="close-guests">✕</button>
+                    <span class="sheet-head__title">Гости</span>
+                    <span class="sheet-x--spacer"></span>
+                  </div>
+
+                  <div class="guest-row">
+                    <div>
+                      <div class="guest-row__title">Взрослые</div>
+                      <div class="guest-row__sub">От 13 лет</div>
+                    </div>
+                    <div class="stepper">
+                      <button type="button" data-step="adults-dec">−</button>
+                      <span class="stepper__val" data-val="adults">2</span>
+                      <button type="button" data-step="adults-inc">+</button>
+                    </div>
+                  </div>
+                  <div class="guest-row">
+                    <div>
+                      <div class="guest-row__title">Дети</div>
+                      <div class="guest-row__sub">До 3 лет — бесплатно</div>
+                    </div>
+                    <div class="stepper">
+                      <button type="button" data-step="children-dec">−</button>
+                      <span class="stepper__val" data-val="children">0</span>
+                      <button type="button" data-step="children-inc">+</button>
+                    </div>
+                  </div>
+                  <div class="guest-row">
+                    <div>
+                      <div class="guest-row__title">С питомцем</div>
+                      <div class="guest-row__sub">Размещение с животными</div>
+                    </div>
+                    <button type="button" class="switch" data-switch="pet"><span class="switch__knob"></span></button>
+                  </div>
+
+                  <button type="button" class="sheet-done" data-action="close-guests">Готово</button>
+                </div>
+              </div>
+
+              <!-- Итог -->
+              <div class="book-summary">
+                <div class="book-line"><span>18 000 ₽ × <span id="sumNights">— ночей</span></span><span id="sumSubtotal">—</span></div>
+                <div class="book-line"><span>Уборка и бельё</span><span>1 500 ₽</span></div>
+                <div class="book-total"><span>Итого</span><span id="sumTotal">—</span></div>
+              </div>
+
+              <button type="submit" class="book-cta"><i data-feather="calendar"></i>Забронировать</button>
+              <p class="book-reassure">Бронь не списывает деньги автоматически — мы свяжемся для подтверждения</p>
+            </form>
+          </div>
+
+          <div class="book-perks">
+            <div class="book-perk"><i data-feather="check-circle"></i>Бесплатная отмена за 5 дней до заезда</div>
+            <div class="book-perk"><i data-feather="droplet"></i>Баня и чан протопим к вашему приезду</div>
+            <div class="book-perk"><i data-feather="message-circle"></i>Хозяйка на связи ежедневно 9:00–21:00</div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- ===== ПОХОЖИЕ ДОМА ===== -->
+    <section class="similar">
+      <div class="similar__head">
+        <h2 class="h2">Похожие дома</h2>
+        <a href="_preview_search.html" class="similar-link">Смотреть все<i data-feather="arrow-right"></i></a>
+      </div>
+      <div class="similar-grid">
+
+        <a class="card" href="#">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80&auto=format&fit=crop');">
+            <span class="card__price">от 24 000 ₽<span> / ночь</span></span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Дом с бассейном и баней</h3>
+            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · Выборгское напр.</span></div>
+            <div class="card__meta">
+              <div class="card__facts">
+                <span><i data-feather="users"></i>8 гостей</span>
+                <span><i data-feather="home"></i>3 спальни</span>
+              </div>
+              <span class="card__rating"><i data-feather="star"></i>4.8</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="card" href="#">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80&auto=format&fit=crop');">
+            <span class="card__price">от 15 000 ₽<span> / ночь</span></span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Дом у леса с панорамной баней</h3>
+            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · у Лосевских порогов</span></div>
+            <div class="card__meta">
+              <div class="card__facts">
+                <span><i data-feather="users"></i>4 гостя</span>
+                <span><i data-feather="home"></i>2 спальни</span>
+              </div>
+              <span class="card__rating"><i data-feather="star"></i>4.9</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="card" href="#">
+          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop');">
+            <span class="card__price">от 6 500 ₽<span> / ночь</span></span>
+          </div>
+          <div class="card__body">
+            <h3 class="card__title">Апартаменты на Ленинском пр.</h3>
+            <div class="card__loc"><i data-feather="map-pin"></i><span>Санкт-Петербург · у клиники «Скандинавия»</span></div>
+            <div class="card__meta">
+              <div class="card__facts">
+                <span><i data-feather="users"></i>4 гостя</span>
+                <span><i data-feather="home"></i>1 спальня</span>
+              </div>
+              <span class="card__rating"><i data-feather="star"></i>4.7</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== ЛАЙТБОКС ГАЛЕРЕИ ===== -->
+    <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Фотографии объекта">
+      <div class="lightbox__bar">
+        <span class="lightbox__counter"><span id="lbIndex">1</span> / <span id="lbTotal">10</span></span>
+        <button type="button" class="lightbox__close" data-lb-close aria-label="Закрыть"><i data-feather="x"></i></button>
+      </div>
+      <button type="button" class="lightbox__nav lightbox__nav--prev" data-lb-prev aria-label="Предыдущее фото"><i data-feather="chevron-left"></i></button>
+      <div class="lightbox__stage" id="lbStage">
+        <img class="lightbox__img" id="lbImg" src="" alt="Фотография объекта">
+      </div>
+      <button type="button" class="lightbox__nav lightbox__nav--next" data-lb-next aria-label="Следующее фото"><i data-feather="chevron-right"></i></button>
+    </div>
+
+    <script type="application/json" id="galleryData">
+    [
+      "{% static 'main/img/annolovo/1.jpg' %}",
+      "{% static 'main/img/annolovo/2.jpg' %}",
+      "{% static 'main/img/annolovo/3.jpg' %}",
+      "{% static 'main/img/annolovo/4.jpg' %}",
+      "{% static 'main/img/annolovo/5.jpg' %}",
+      "{% static 'main/img/annolovo/6.jpg' %}",
+      "{% static 'main/img/annolovo/7.jpg' %}",
+      "{% static 'main/img/annolovo/8.jpg' %}",
+      "{% static 'main/img/annolovo/9.jpg' %}",
+      "{% static 'main/img/annolovo/10.jpg' %}"
+    ]
+    </script>
+
+  </main>
+
+  <!-- ===== ФУТЕР ===== -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__cols">
+        <div class="footer__brand">
+          <div class="footer__brandrow">
+            <span class="footer__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+            <span class="footer__brandname">NatRent</span>
+          </div>
+          <p class="footer__about">Дома с баней, чаном и бассейном в Ленинградской области и квартира в центре Петербурга.</p>
+        </div>
+        <div>
+          <div class="footer__h">Объекты</div>
+          <div class="footer__list">
+            <a href="_preview.html#properties">Дома с баней</a>
+            <a href="_preview.html#properties">Дом с бассейном</a>
+            <a href="_preview.html#properties">Квартира в СПб</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Компания</div>
+          <div class="footer__list">
+            <a href="_preview.html#about">О нас</a>
+            <a href="_preview.html#reviews">Отзывы</a>
+            <a href="_preview.html#contact">Контакты</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Мы на связи</div>
+          <div class="footer__list">
+            <span>+7 (921) 000-00-00</span>
+            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2048454c4c4f604e415452454e540e5255">[email&#160;protected]</a></span>
+            <a href="#">Telegram · @natrent</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© 2026 NatRent. Все права защищены.</span>
+        <div class="footer__legal">
+          <a href="#">Политика конфиденциальности</a>
+          <a href="#">Условия аренды</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Иконки -->
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://unpkg.com/feather-icons"></script>
+  <script>if (window.feather) feather.replace();</script>
+
+  <!-- ===== ЛОГИКА ===== -->
+  <script>
+    /* ---------- Галерея: клик по фото открывает лайтбокс ---------- */
+    (function(){
+      const gallery = document.getElementById("gallery");
+      const lightbox = document.getElementById("lightbox");
+      const dataEl = document.getElementById("galleryData");
+      if (!gallery || !lightbox || !dataEl) return;
+
+      let images = [];
+      try { images = JSON.parse(dataEl.textContent); } catch (e) { images = []; }
+      if (!images.length) return;
+
+      const lbImg = document.getElementById("lbImg");
+      const lbIndex = document.getElementById("lbIndex");
+      const lbTotal = document.getElementById("lbTotal");
+      const stage = document.getElementById("lbStage");
+      let current = 0;
+
+      lbTotal.textContent = images.length;
+
+      function render(){
+        lbImg.setAttribute("src", images[current]);
+        lbIndex.textContent = current + 1;
+      }
+      function openAt(i){
+        current = ((i % images.length) + images.length) % images.length;
+        render();
+        lightbox.classList.add("is-open");
+        lightbox.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+      function closeLightbox(){
+        lightbox.classList.remove("is-open");
+        lightbox.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+      function go(step){ openAt(current + step); }
+
+      gallery.querySelectorAll("[data-index]").forEach((cell) => {
+        cell.addEventListener("click", () => openAt(Number(cell.dataset.index) || 0));
+      });
+
+      lightbox.querySelectorAll("[data-lb-close]").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); closeLightbox(); }));
+      lightbox.querySelector("[data-lb-prev]").addEventListener("click", (e) => { e.stopPropagation(); go(-1); });
+      lightbox.querySelector("[data-lb-next]").addEventListener("click", (e) => { e.stopPropagation(); go(1); });
+      lightbox.addEventListener("click", (e) => { if (e.target === lightbox || e.target === stage) closeLightbox(); });
+
+      document.addEventListener("keydown", (e) => {
+        if (!lightbox.classList.contains("is-open")) return;
+        if (e.key === "Escape") closeLightbox();
+        else if (e.key === "ArrowLeft") go(-1);
+        else if (e.key === "ArrowRight") go(1);
+      });
+
+      /* свайп на тач-устройствах */
+      let touchX = null;
+      stage.addEventListener("touchstart", (e) => { touchX = e.changedTouches[0].clientX; }, { passive: true });
+      stage.addEventListener("touchend", (e) => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+        touchX = null;
+      }, { passive: true });
+    })();
+
+    /* ---------- Поделиться / избранное ---------- */
+    (function(){
+      const like = document.getElementById("likeBtn");
+      if (like) like.addEventListener("click", () => like.classList.toggle("is-active"));
+      const share = document.getElementById("shareBtn");
+      if (share) share.addEventListener("click", () => {
+        if (navigator.share) { navigator.share({ title: document.title, url: location.href }).catch(()=>{}); }
+        else if (navigator.clipboard) { navigator.clipboard.writeText(location.href).catch(()=>{}); }
+      });
+    })();
+
+  </script>
+
+  <!-- Логика бронирования (календарь + гости) — общий скрипт со страницы index.html -->
+  <script src="{% static 'main/js/booking.js' %}"></script>
+
+  <!-- Пересчёт стоимости по выбранным датам -->
+  <script>
+    (function(){
+      const PRICE_PER_NIGHT = 18000;
+      const CLEANING_FEE = 1500;
+      const booking = document.getElementById("booking");
+      if (!booking) return;
+
+      const firstInputDate = booking.querySelector('[name="firstInputDate"]');
+      const secondInputDate = booking.querySelector('[name="secondInputDate"]');
+      const sumNightsEl = document.getElementById("sumNights");
+      const sumSubtotalEl = document.getElementById("sumSubtotal");
+      const sumTotalEl = document.getElementById("sumTotal");
+
+      function nf(n){ return n.toLocaleString("ru-RU").replace(/,/g, " "); }
+      function pluralNights(n){
+        const a = Math.abs(n) % 100, b = a % 10;
+        if (a > 10 && a < 20) return n + " ночей";
+        if (b > 1 && b < 5) return n + " ночи";
+        if (b === 1) return n + " ночь";
+        return n + " ночей";
+      }
+      function toDate(displayDate){
+        if (!displayDate || displayDate.indexOf(".") === -1) return null;
+        const p = displayDate.split("."); if (p.length !== 3) return null;
+        const d = new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      function updateSummary(){
+        const sd = toDate(firstInputDate.value);
+        const ed = toDate(secondInputDate.value);
+        let nights = 0;
+        if (sd && ed) nights = Math.round((ed - sd) / 86400000);
+        if (nights <= 0) {
+          sumNightsEl.textContent = "— ночей";
+          sumSubtotalEl.textContent = "—";
+          sumTotalEl.textContent = nf(PRICE_PER_NIGHT + CLEANING_FEE) + " ₽";
+          return;
+        }
+        const sub = PRICE_PER_NIGHT * nights;
+        sumNightsEl.textContent = pluralNights(nights);
+        sumSubtotalEl.textContent = nf(sub) + " ₽";
+        sumTotalEl.textContent = nf(sub + CLEANING_FEE) + " ₽";
+      }
+
+      /* booking.js пишет даты в скрытые поля синхронно по клику — пересчитываем
+         после его обработчиков (setTimeout 0), затем при любом действии в виджете */
+      booking.addEventListener("click", () => setTimeout(updateSummary, 0));
+      const bookingForm = document.getElementById("bookingForm");
+      if (bookingForm) bookingForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        alert("Заявка отправлена! Мы свяжемся с вами для подтверждения брони.");
+      });
+
+      updateSummary();
+    })();
+  </script>
+</body>
+</html>
