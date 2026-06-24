@@ -1,3 +1,4 @@
+import json
 import logging
 from urllib.parse import urlencode
 from datetime import datetime, timedelta
@@ -202,9 +203,14 @@ class MainView(View):
             status=True,
         ).values_list('house_id', flat=True)
 
-        free_houses = list(RentObject.objects.filter(
+        free_houses_qs = RentObject.objects.filter(
             max_guests__gte=guest_count
-        ).exclude(id__in=busy_ids))
+        ).exclude(id__in=busy_ids)
+
+        if has_pet_bool:
+            free_houses_qs = free_houses_qs.filter(pets_allowed=True)
+
+        free_houses = list(free_houses_qs)
 
         start_date = datetime.strptime(first_date, '%Y-%m-%d').date()
         end_date = datetime.strptime(second_date, '%Y-%m-%d').date()
@@ -279,6 +285,9 @@ class SearchView(View):
             id__in=busy_houses_ids
         )
 
+        if has_pet_bool:
+            free_houses = free_houses.filter(pets_allowed=True)
+
         start_date = datetime.strptime(first_date, "%Y-%m-%d").date()
         end_date = datetime.strptime(second_date, "%Y-%m-%d").date()
         free_houses = list(free_houses)
@@ -328,9 +337,17 @@ class HouseDetailView(View):
             slug = 'detail_house_novoizm'
         elif house_id == 4:
             slug = 'detail_banya'
+
+        date_costs = {
+            date_cost.date.strftime('%Y-%m-%d'): date_cost.cost
+            for date_cost in DateObjectCost.objects.filter(house=house)
+            if date_cost.cost is not None
+        }
+
         return render(request, f'main/{slug}.html', {
             'house': house,
             'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
+            'date_costs_json': json.dumps(date_costs),
         })
 
 

@@ -164,6 +164,9 @@
 /* итог */
 .book-summary{border-top:1px solid #ECEEF0;margin-top:18px;padding-top:16px;display:flex;flex-direction:column;gap:11px;}
 .book-line{display:flex;align-items:center;justify-content:space-between;font-size:14.5px;color:#41474E;}
+/* строки итога с атрибутом hidden (доп. гости, питомец, опции) скрываем —
+   иначе display:flex выше перекрывает стандартное [hidden]{display:none} */
+.book-line[hidden]{display:none;}
 .book-line span:first-child{color:#6B7682;}
 .book-line span:first-child u{text-decoration:underline;text-underline-offset:2px;text-decoration-color:#CBD0D5;cursor:help;}
 .book-total{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #ECEEF0;margin-top:5px;padding-top:15px;font-size:17px;font-weight:800;color:#15181C;letter-spacing:-.01em;}

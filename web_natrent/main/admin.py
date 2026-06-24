@@ -118,7 +118,7 @@ class TimeTableAdmin(admin.ModelAdmin):
 
 @admin.register(RentObject)
 class RentObjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'max_guests', 'price')
+    list_display = ('name', 'address', 'max_guests', 'price', 'pets_allowed')
 
 
 @admin.register(DateObjectCost)

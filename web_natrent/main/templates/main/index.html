@@ -231,6 +231,9 @@
               </div>
               <div class="card__body">
                 <h3 class="card__title">{{ house.name }}</h3>
+                {% if house.address %}
+                  <p class="card__address"><i data-feather="map-pin"></i>{{ house.address }}</p>
+                {% endif %}
                 <p class="card__desc">{{ house.description|truncatechars:90 }}</p>
                 <div class="card__meta">
                   <div class="card__facts">

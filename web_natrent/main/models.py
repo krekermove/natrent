@@ -44,6 +44,7 @@ class TimeTable(models.Model):
 
 class RentObject(models.Model):
     name = models.CharField(max_length=50, verbose_name="Название объекта")
+    address = models.CharField(max_length=255, blank=True, verbose_name="Адрес")
     img1 = models.ImageField(upload_to='houses',
                               blank=True)
     img2 = models.ImageField(upload_to='houses',
@@ -65,6 +66,10 @@ class RentObject(models.Model):
         default=0,
         verbose_name="Дополнительная плата за питомца",
         help_text="Добавляется к стоимости брони за каждого питомца",
+    )
+    pets_allowed = models.BooleanField(
+        default=False,
+        verbose_name="Разрешено с питомцами",
     )
 
     class Meta:

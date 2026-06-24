@@ -20,8 +20,16 @@
 
     /* ===== Дополнительные опции бронирования: баня и чан ===== */
     .addons{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
-    .addons__head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+    .addons__head{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:none;border:none;padding:0;cursor:pointer;text-align:left;font:inherit;}
+    .addons__head .field-label{cursor:pointer;}
+    .addons__head-r{display:flex;align-items:center;gap:8px;}
     .addons__hint{font-size:11.5px;font-weight:700;color:var(--accent);white-space:nowrap;}
+    .addons__chevron{display:flex;align-items:center;color:#9AA3AC;transition:transform .2s;}
+    .addons__chevron i,.addons__chevron svg{width:18px;height:18px;}
+    .addons.is-collapsed .addons__chevron{transform:rotate(-90deg);}
+    /* Тело раскрывается/скрывается плавно по высоте */
+    .addons__body{display:flex;flex-direction:column;gap:10px;overflow:hidden;transition:max-height .25s ease,opacity .2s ease;}
+    .addons.is-collapsed .addons__body{max-height:0 !important;opacity:0;pointer-events:none;}
     .addon{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid #E7EAED;border-radius:13px;cursor:pointer;transition:border-color .15s,background .15s;}
     .addon:hover{border-color:#CBD0D5;}
     .addon:has(.addon__cb:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,#fff);}
@@ -279,12 +287,12 @@
       <!-- ПРАВАЯ КОЛОНКА — БРОНИРОВАНИЕ -->
       <aside class="book-aside" id="book">
         <div class="book-card">
-          <div class="book-card__price"><b>18 000 ₽</b><span>/ ночь</span></div>
-          <p class="book-card__note"><i data-feather="calendar"></i>Минимум 2 ночи · отмена за 5 дней</p>
+          <div class="book-card__price"><b>от {{ house.price }} ₽</b><span>/ ночь</span></div>
+          <p class="book-card__note"><i data-feather="calendar"></i>Отмена за 5 дней</p>
 
           <!-- Виджет бронирования портирован со страницы index.html (booking.js + site.css):
                на мобильных календарь и гости раскрываются нижней шторкой во всю ширину экрана. -->
-          <div id="booking">
+          <div id="booking" data-max-guests="{{ house.max_guests }}">
             <form id="bookingForm" class="book-fields" action="#" method="post">
               <input type="hidden" name="guest_count" value="2">
               <input type="hidden" name="children_under_3" value="0">
@@ -394,6 +402,7 @@
                       <button type="button" data-step="children-inc">+</button>
                     </div>
                   </div>
+                  {% if house.pets_allowed %}
                   <div class="guest-row">
                     <div>
                       <div class="guest-row__title">С питомцем</div>
@@ -401,6 +410,7 @@
                     </div>
                     <button type="button" class="switch" data-switch="pet"><span class="switch__knob"></span></button>
                   </div>
+                  {% endif %}
 
                   <button type="button" class="sheet-done" data-action="close-guests">Готово</button>
                 </div>
@@ -408,44 +418,50 @@
 
               <!-- Дополнительно: баня и чан -->
               <div class="addons" id="addons">
-                <div class="addons__head">
-                  <label class="field-label" style="margin:0;">Дополнительно</label>
-                  <span class="addons__hint">Вместе — выгоднее</span>
-                </div>
-
-                <label class="addon">
-                  <input type="checkbox" class="addon__cb" name="addon_banya" data-addon-price="6000">
-                  <span class="addon__ic"><i data-feather="droplet"></i></span>
-                  <span class="addon__txt">
-                    <b>Баня</b>
-                    <small>Парная премиум · 2 часа</small>
+                <button type="button" class="addons__head" data-addons-toggle aria-expanded="true" aria-controls="addonsBody">
+                  <span class="field-label" style="margin:0;">Дополнительно</span>
+                  <span class="addons__head-r">
+                    <span class="addons__hint">Скрыть</span>
+                    <span class="addons__chevron"><i data-feather="chevron-down"></i></span>
                   </span>
-                  <span class="addon__price">6 000 ₽</span>
-                  <span class="addon__check"><i data-feather="check"></i></span>
-                </label>
+                </button>
 
-                <label class="addon">
-                  <input type="checkbox" class="addon__cb" name="addon_chan" data-addon-price="6000">
-                  <span class="addon__ic"><i data-feather="thermometer"></i></span>
-                  <span class="addon__txt">
-                    <b>Сибирский чан</b>
-                    <small>На дровах, под открытым небом</small>
-                  </span>
-                  <span class="addon__price">6 000 ₽</span>
-                  <span class="addon__check"><i data-feather="check"></i></span>
-                </label>
+                <div class="addons__body" id="addonsBody">
+                  <label class="addon">
+                    <input type="checkbox" class="addon__cb" name="addon_banya" data-addon-price="6000">
+                    <span class="addon__ic"><i data-feather="droplet"></i></span>
+                    <span class="addon__txt">
+                      <b>Баня</b>
+                      <small>Парная премиум · 2 часа</small>
+                    </span>
+                    <span class="addon__price">6 000 ₽</span>
+                    <span class="addon__check"><i data-feather="check"></i></span>
+                  </label>
 
-                <div class="addon-combo" id="addonCombo">
-                  <i data-feather="gift"></i>
-                  <span>Баня + чан вместе на 3 часа — <b>11 000 ₽</b> <s>12 000 ₽</s></span>
+                  <label class="addon">
+                    <input type="checkbox" class="addon__cb" name="addon_chan" data-addon-price="6000">
+                    <span class="addon__ic"><i data-feather="thermometer"></i></span>
+                    <span class="addon__txt">
+                      <b>Сибирский чан</b>
+                      <small>На дровах, под открытым небом</small>
+                    </span>
+                    <span class="addon__price">6 000 ₽</span>
+                    <span class="addon__check"><i data-feather="check"></i></span>
+                  </label>
+
+                  <div class="addon-combo" id="addonCombo">
+                    <i data-feather="gift"></i>
+                    <span>Баня + чан вместе на 3 часа — <b>11 000 ₽</b> <s>12 000 ₽</s></span>
+                  </div>
                 </div>
               </div>
 
               <!-- Итог -->
               <div class="book-summary">
-                <div class="book-line"><span>18 000 ₽ × <span id="sumNights">— ночей</span></span><span id="sumSubtotal">—</span></div>
+                <div class="book-line">Проживание на выбранные даты<span id="sumSubtotal">—</span></div>
+                <div class="book-line" id="sumGuestLine" hidden><span id="sumGuestLabel">Дополнительные гости</span><span id="sumGuest">—</span></div>
+                <div class="book-line" id="sumPetLine" hidden><span>Размещение с питомцем</span><span id="sumPet">—</span></div>
                 <div class="book-line" id="sumAddonLine" hidden><span id="sumAddonLabel">Баня и чан</span><span id="sumAddon">—</span></div>
-                <div class="book-line"><span>Уборка и бельё</span><span>1 500 ₽</span></div>
                 <div class="book-total"><span>Итого</span><span id="sumTotal">—</span></div>
               </div>
 
@@ -672,6 +688,43 @@
       }, { passive: true });
     })();
 
+    /* ---------- Дополнительные опции: сворачивание блока ---------- */
+    (function(){
+      const addons = document.getElementById("addons");
+      const toggle = addons && addons.querySelector("[data-addons-toggle]");
+      const body = document.getElementById("addonsBody");
+      if (!addons || !toggle || !body) return;
+
+      /* Раскрытое состояние держим через явный max-height (scrollHeight),
+         чтобы работала плавная анимация; при свёрнутом — CSS обнуляет его. */
+      function setOpenHeight(){
+        if (!addons.classList.contains("is-collapsed")) {
+          body.style.maxHeight = body.scrollHeight + "px";
+        }
+      }
+
+      function setCollapsed(collapsed){
+        if (collapsed) {
+          /* фиксируем текущую высоту перед сворачиванием для анимации */
+          body.style.maxHeight = body.scrollHeight + "px";
+          requestAnimationFrame(() => addons.classList.add("is-collapsed"));
+        } else {
+          addons.classList.remove("is-collapsed");
+          setOpenHeight();
+        }
+        toggle.setAttribute("aria-expanded", String(!collapsed));
+      }
+
+      setOpenHeight();
+      toggle.addEventListener("click", () => {
+        setCollapsed(!addons.classList.contains("is-collapsed"));
+      });
+
+      /* высота тела меняется при выборе опций (подсветка комбо) и ресайзе */
+      addons.addEventListener("change", setOpenHeight);
+      window.addEventListener("resize", setOpenHeight);
+    })();
+
     /* ---------- Поделиться / избранное ---------- */
     (function(){
       const like = document.getElementById("likeBtn");
@@ -688,22 +741,44 @@
   <!-- Логика бронирования (календарь + гости) — общий скрипт со страницы index.html -->
   <script src="{% static 'main/js/booking.js' %}"></script>
 
+  <!-- Стоимость проживания по датам (DateObjectCost) -->
+  <script type="application/json" id="dateCostsData">{{ date_costs_json|safe }}</script>
+
   <!-- Пересчёт стоимости по выбранным датам -->
   <script>
     (function(){
-      const PRICE_PER_NIGHT = 18000;
-      const CLEANING_FEE = 1500;
+      const PRICE_PER_NIGHT = {{ house.price }};
+      const EXTRA_GUEST_FEE = {{ house.extra_guest_fee }};
+      const EXTRA_PET_FEE = {{ house.extra_pet_fee }};
+      const CLEANING_FEE = 0;
       const BANYA_PRICE = 6000;
       const CHAN_PRICE = 6000;
       const COMBO_PRICE = 11000; /* баня + чан вместе на 3 часа */
       const booking = document.getElementById("booking");
       if (!booking) return;
 
+      /* Стоимость проживания на конкретные даты из DateObjectCost.
+         Ключ — "YYYY-MM-DD", значение — стоимость ночи. Для дат без записи
+         используется базовая цена дома (house.price). */
+      let DATE_COSTS = {};
+      const dateCostsEl = document.getElementById("dateCostsData");
+      if (dateCostsEl) {
+        try { DATE_COSTS = JSON.parse(dateCostsEl.textContent) || {}; }
+        catch (e) { DATE_COSTS = {}; }
+      }
+
       const firstInputDate = booking.querySelector('[name="firstInputDate"]');
       const secondInputDate = booking.querySelector('[name="secondInputDate"]');
-      const sumNightsEl = document.getElementById("sumNights");
+      const guestCountInput = booking.querySelector('[name="guest_count"]');
+      const childrenInput = booking.querySelector('[name="children_under_3"]');
+      const petInput = booking.querySelector('[name="has_pet"]');
       const sumSubtotalEl = document.getElementById("sumSubtotal");
       const sumTotalEl = document.getElementById("sumTotal");
+      const sumGuestLine = document.getElementById("sumGuestLine");
+      const sumGuestLabel = document.getElementById("sumGuestLabel");
+      const sumGuestEl = document.getElementById("sumGuest");
+      const sumPetLine = document.getElementById("sumPetLine");
+      const sumPetEl = document.getElementById("sumPet");
 
       const banyaCb = booking.querySelector('[name="addon_banya"]');
       const chanCb = booking.querySelector('[name="addon_chan"]');
@@ -713,18 +788,50 @@
       const sumAddonEl = document.getElementById("sumAddon");
 
       function nf(n){ return n.toLocaleString("ru-RU").replace(/,/g, " "); }
-      function pluralNights(n){
-        const a = Math.abs(n) % 100, b = a % 10;
-        if (a > 10 && a < 20) return n + " ночей";
-        if (b > 1 && b < 5) return n + " ночи";
-        if (b === 1) return n + " ночь";
-        return n + " ночей";
-      }
+      function pad2(n){ return n < 10 ? "0" + n : String(n); }
+      function dateKey(d){ return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
       function toDate(displayDate){
         if (!displayDate || displayDate.indexOf(".") === -1) return null;
         const p = displayDate.split("."); if (p.length !== 3) return null;
         const d = new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
         return Number.isNaN(d.getTime()) ? null : d;
+      }
+      /* Сумма за проживание = сумма стоимостей каждой ночи (заезд включительно,
+         выезд исключительно), как и в расчёте на стороне сервера. */
+      function staySubtotal(sd, ed){
+        let nights = 0, subtotal = 0;
+        const cur = new Date(sd.getFullYear(), sd.getMonth(), sd.getDate());
+        while (cur < ed) {
+          const c = DATE_COSTS[dateKey(cur)];
+          subtotal += (typeof c === "number") ? c : PRICE_PER_NIGHT;
+          nights++;
+          cur.setDate(cur.getDate() + 1);
+        }
+        return { nights: nights, subtotal: subtotal };
+      }
+      function pluralGuests(n){
+        const a = Math.abs(n) % 100, b = a % 10;
+        if (a > 10 && a < 20) return n + " гостей";
+        if (b > 1 && b < 5) return n + " гостя";
+        if (b === 1) return n + " гость";
+        return n + " гостей";
+      }
+      /* Доп. плата за гостей и питомца — повторяет расчёт сервера
+         (calculate_booking_cost): доп. гость = гость сверх 2, кроме детей до 3 лет;
+         применяется только при выбранных датах (nights > 0). */
+      function extraFees(nights){
+        let extraGuests = 0, extraGuestsCost = 0, petCost = 0;
+        if (nights > 0) {
+          const guestCount = parseInt(guestCountInput && guestCountInput.value, 10) || 0;
+          const childrenUnder3 = parseInt(childrenInput && childrenInput.value, 10) || 0;
+          const hasPet = petInput && petInput.value === "true";
+          if (guestCount > 2) {
+            extraGuests = Math.max(0, guestCount - childrenUnder3 - 2);
+            extraGuestsCost = extraGuests * EXTRA_GUEST_FEE;
+          }
+          if (hasPet) petCost = EXTRA_PET_FEE;
+        }
+        return { extraGuests: extraGuests, extraGuestsCost: extraGuestsCost, petCost: petCost };
       }
       /* Стоимость доп. опций: баня + чан вместе дешевле, чем по отдельности */
       function addonsCost(){
@@ -738,8 +845,31 @@
       function updateSummary(){
         const sd = toDate(firstInputDate.value);
         const ed = toDate(secondInputDate.value);
-        let nights = 0;
-        if (sd && ed) nights = Math.round((ed - sd) / 86400000);
+        let nights = 0, sub = 0;
+        if (sd && ed && ed > sd) {
+          const stay = staySubtotal(sd, ed);
+          nights = stay.nights;
+          sub = stay.subtotal;
+        }
+
+        const fees = extraFees(nights);
+        /* строка с доплатой за дополнительных гостей */
+        if (fees.extraGuestsCost > 0) {
+          sumGuestLabel.textContent = "Доп. гости · " + pluralGuests(fees.extraGuests);
+          sumGuestEl.textContent = nf(fees.extraGuestsCost) + " ₽";
+          sumGuestLine.hidden = false;
+        } else {
+          sumGuestLine.hidden = true;
+          sumGuestEl.textContent = "";
+        }
+        /* строка с доплатой за питомца */
+        if (fees.petCost > 0) {
+          sumPetEl.textContent = nf(fees.petCost) + " ₽";
+          sumPetLine.hidden = false;
+        } else {
+          sumPetLine.hidden = true;
+          sumPetEl.textContent = "";
+        }
 
         const addons = addonsCost();
         /* подсветим выгодное комбо, когда выбраны обе опции */
@@ -749,24 +879,28 @@
           sumAddonEl.textContent = nf(addons.cost) + " ₽";
           sumAddonLine.hidden = false;
         } else {
+          /* опции сняты — прячем строку и очищаем устаревшую подпись/сумму */
           sumAddonLine.hidden = true;
+          sumAddonLabel.textContent = "";
+          sumAddonEl.textContent = "";
         }
 
+        const fixedExtras = CLEANING_FEE + addons.cost + fees.extraGuestsCost + fees.petCost;
         if (nights <= 0) {
-          sumNightsEl.textContent = "— ночей";
           sumSubtotalEl.textContent = "—";
-          sumTotalEl.textContent = nf(PRICE_PER_NIGHT + CLEANING_FEE + addons.cost) + " ₽";
+          sumTotalEl.textContent = nf(fixedExtras) + " ₽";
           return;
         }
-        const sub = PRICE_PER_NIGHT * nights;
-        sumNightsEl.textContent = pluralNights(nights);
         sumSubtotalEl.textContent = nf(sub) + " ₽";
-        sumTotalEl.textContent = nf(sub + CLEANING_FEE + addons.cost) + " ₽";
+        sumTotalEl.textContent = nf(sub + fixedExtras) + " ₽";
       }
 
-      /* booking.js пишет даты в скрытые поля синхронно по клику — пересчитываем
-         после его обработчиков (setTimeout 0), затем при любом действии в виджете */
-      booking.addEventListener("click", () => setTimeout(updateSummary, 0));
+      /* booking.js пишет даты в скрытые поля синхронно по клику и вызывает
+         stopPropagation() в своих обработчиках (выбор дня, степперы), поэтому
+         клики не всплывают до #booking. Слушаем на фазе перехвата (capture),
+         она срабатывает до stopPropagation, а setTimeout(0) откладывает пересчёт
+         до завершения обработчиков booking.js — к этому моменту поля уже обновлены. */
+      booking.addEventListener("click", () => setTimeout(updateSummary, 0), true);
       if (banyaCb) banyaCb.addEventListener("change", updateSummary);
       if (chanCb) chanCb.addEventListener("change", updateSummary);
       const bookingForm = document.getElementById("bookingForm");

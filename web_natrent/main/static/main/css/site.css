@@ -160,6 +160,8 @@ img{max-width:100%;display:block;}
 .properties-wrapper .cards{padding-bottom:28px;}
 
 /* Card description + actions */
+.card__address{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:13px;line-height:1.4;color:#6B7682;}
+.card__address svg{width:14px;height:14px;flex-shrink:0;color:var(--accent);}
 .card__desc{margin:10px 0 0;font-size:14px;line-height:1.5;color:#6B7682;}
 .card__actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid #F0F2F3;}
 .card__actions form{display:contents;}

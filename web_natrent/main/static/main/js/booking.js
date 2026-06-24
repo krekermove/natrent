@@ -15,6 +15,11 @@
     var root = document.getElementById('booking');
     if (!root) return;
 
+    // Лимит гостей берём из data-max-guests объекта (RentObject.max_guests),
+    // если он задан; иначе — общий лимит по умолчанию.
+    var maxGuestsAttr = parseInt(root.getAttribute('data-max-guests'), 10);
+    var guestLimit = (maxGuestsAttr > 0) ? maxGuestsAttr : GUEST_LIMIT;
+
     var now = new Date();
     var state = {
       calOpen: false,
@@ -186,10 +191,11 @@
       root.querySelector('[data-val="adults"]').textContent = state.adults;
       root.querySelector('[data-val="children"]').textContent = state.children;
       root.querySelector('[data-step="adults-dec"]').disabled = state.adults <= 1;
-      root.querySelector('[data-step="adults-inc"]').disabled = total >= GUEST_LIMIT;
+      root.querySelector('[data-step="adults-inc"]').disabled = total >= guestLimit;
       root.querySelector('[data-step="children-dec"]').disabled = state.children <= 0;
-      root.querySelector('[data-step="children-inc"]').disabled = total >= GUEST_LIMIT;
-      root.querySelector('[data-switch="pet"]').classList.toggle('on', state.pet);
+      root.querySelector('[data-step="children-inc"]').disabled = total >= guestLimit;
+      var petSwitch = root.querySelector('[data-switch="pet"]');
+      if (petSwitch) petSwitch.classList.toggle('on', state.pet);
       renderLabels();
     }
 
@@ -254,11 +260,12 @@
       var b = root.querySelector(sel);
       if (b) b.addEventListener('click', function (e) { e.stopPropagation(); fn(); renderGuests(); });
     }
-    bindStep('[data-step="adults-inc"]',   function () { if (state.adults + state.children < GUEST_LIMIT) state.adults++; });
+    bindStep('[data-step="adults-inc"]',   function () { if (state.adults + state.children < guestLimit) state.adults++; });
     bindStep('[data-step="adults-dec"]',   function () { if (state.adults > 1) state.adults--; });
-    bindStep('[data-step="children-inc"]', function () { if (state.adults + state.children < GUEST_LIMIT) state.children++; });
+    bindStep('[data-step="children-inc"]', function () { if (state.adults + state.children < guestLimit) state.children++; });
     bindStep('[data-step="children-dec"]', function () { if (state.children > 0) state.children--; });
-    root.querySelector('[data-switch="pet"]').addEventListener('click', function (e) { e.stopPropagation(); state.pet = !state.pet; renderGuests(); });
+    var petSwitchBtn = root.querySelector('[data-switch="pet"]');
+    if (petSwitchBtn) petSwitchBtn.addEventListener('click', function (e) { e.stopPropagation(); state.pet = !state.pet; renderGuests(); });
 
     // клик вне поповеров (десктоп)
     document.addEventListener('mousedown', function (e) {
