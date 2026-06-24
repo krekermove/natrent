@@ -293,7 +293,8 @@
           <!-- Виджет бронирования портирован со страницы index.html (booking.js + site.css):
                на мобильных календарь и гости раскрываются нижней шторкой во всю ширину экрана. -->
           <div id="booking" data-max-guests="{{ house.max_guests }}">
-            <form id="bookingForm" class="book-fields" action="#" method="post">
+            <form id="bookingForm" class="book-fields" action="{% url 'main:house_detail' house.id %}" method="post">
+              {% csrf_token %}
               <input type="hidden" name="guest_count" value="2">
               <input type="hidden" name="children_under_3" value="0">
               <input type="hidden" name="has_pet" value="false">
@@ -903,13 +904,21 @@
       booking.addEventListener("click", () => setTimeout(updateSummary, 0), true);
       if (banyaCb) banyaCb.addEventListener("change", updateSummary);
       if (chanCb) chanCb.addEventListener("change", updateSummary);
+      /* Перед отправкой формы (POST на страницу объекта) убеждаемся, что даты
+         выбраны — иначе сервер вернёт обратно с ошибкой. */
       const bookingForm = document.getElementById("bookingForm");
       if (bookingForm) bookingForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        alert("Заявка отправлена! Мы свяжемся с вами для подтверждения брони.");
+        if (!firstInputDate.value || !secondInputDate.value) {
+          e.preventDefault();
+          alert("Пожалуйста, выберите даты проживания.");
+        }
       });
 
       updateSummary();
+      /* booking.js восстанавливает перенесённый с главной выбор на
+         DOMContentLoaded (после первого updateSummary). Пересчитываем итог
+         на window.load, когда скрытые поля уже заполнены. */
+      window.addEventListener('load', function () { setTimeout(updateSummary, 0); });
     })();
   </script>
 </body>

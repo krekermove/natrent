@@ -1,0 +1,290 @@
+{% load static %}
+{% load russian_plural %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Бронирование — {{ house.name }} | NatRent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'main/css/book.css' %}">
+</head>
+<body class="book-page">
+
+  <!-- ===== НАВИГАЦИЯ ===== -->
+  <nav class="nav">
+    <div class="nav__inner">
+      <a href="{% url 'main:main_page' %}" class="nav__logo">
+        <span class="nav__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+        <span class="nav__brand">NatRent</span>
+      </a>
+      <div class="nav__right">
+        <div class="nav__links">
+          <a href="{% url 'main:main_page' %}#properties" class="nav__link">Объекты</a>
+          <a href="{% url 'main:main_page' %}#about" class="nav__link">О нас</a>
+          <a href="{% url 'main:main_page' %}#reviews" class="nav__link">Отзывы</a>
+          <a href="{% url 'main:main_page' %}#contact" class="nav__link">Контакты</a>
+        </div>
+        <a href="{% url 'main:search_houses' %}" class="nav__cta">Свободные дома</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="book-main">
+
+    <!-- ===== ШАПКА ===== -->
+    <div class="book-head">
+      <div>
+        <h1 class="book-head__title">Бронирование</h1>
+        <p class="book-head__sub">Проверьте детали и оставьте контакты — мы свяжемся для подтверждения.</p>
+      </div>
+      <form action="{% url 'main:search_houses' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="first_date" value="{{ first_date }}">
+        <input type="hidden" name="second_date" value="{{ second_date }}">
+        <input type="hidden" name="guest_count" value="{{ guest_count }}">
+        <input type="hidden" name="children_under_3" value="{{ children_under_3 }}">
+        <input type="hidden" name="has_pet" value="{{ has_pet }}">
+        <button type="submit" class="book-back"><i data-feather="arrow-left"></i>Назад к поиску</button>
+      </form>
+    </div>
+
+    <!-- ===== СООБЩЕНИЯ ===== -->
+    {% if messages %}
+    <div class="msg-list">
+      {% for message in messages %}
+      <div class="msg {% if message.tags == 'success' %}msg--success{% else %}msg--error{% endif %}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ===== СЕТКА: ФОРМА / СВОДКА ===== -->
+    <div class="book-layout">
+
+      <!-- ЛЕВАЯ КОЛОНКА — ДАННЫЕ ГОСТЯ -->
+      <section class="guest-card">
+        {% if booking_success %}
+        <div class="booking-done">
+          <span class="booking-done__ic"><i data-feather="check-circle"></i></span>
+          <h2 class="booking-done__title">Заявка отправлена!</h2>
+          <p class="booking-done__text">Спасибо за бронирование. Мы свяжемся с вами для подтверждения брони. Детали отправлены на вашу почту.</p>
+          <a href="{% url 'main:main_page' %}" class="book-submit"><i data-feather="home"></i>На главную</a>
+        </div>
+        {% else %}
+        <h2 class="guest-card__h">Введите свои данные</h2>
+        <p class="guest-card__sub">Эти контакты нужны, чтобы подтвердить бронь и помочь с заселением.</p>
+
+        <form id="bookingForm" class="guest-form" action="{% url 'main:book_house' house.id %}" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="form_action" value="submit">
+          <input type="hidden" name="first_date" value="{{ first_date }}">
+          <input type="hidden" name="second_date" value="{{ second_date }}">
+          <input type="hidden" name="guest_count" value="{{ guest_count }}">
+          <input type="hidden" name="children_under_3" value="{{ children_under_3 }}">
+          <input type="hidden" name="has_pet" value="{{ has_pet }}">
+          {% if addon_banya %}<input type="hidden" name="addon_banya" value="on">{% endif %}
+          {% if addon_chan %}<input type="hidden" name="addon_chan" value="on">{% endif %}
+
+          <div class="fld">
+            <label for="bookingName" class="fld__label">Имя</label>
+            <input id="bookingName" name="name" type="text" required class="fld__input" placeholder="Как к вам обращаться" value="{{ form_data.name|default:'' }}">
+          </div>
+
+          <div class="fld">
+            <label for="bookingPhone" class="fld__label">Номер телефона</label>
+            <input id="bookingPhone" name="phone" type="text" required class="fld__input" placeholder="+7 (___) ___-__-__" value="{{ form_data.phone|default:'' }}">
+          </div>
+
+          <div class="fld">
+            <label for="bookingEmail" class="fld__label">Электронная почта</label>
+            <input id="bookingEmail" name="email" type="email" required class="fld__input" placeholder="example@mail.ru" value="{{ form_data.email|default:'' }}">
+          </div>
+
+          <div class="fld">
+            <label for="bookingComment" class="fld__label">Комментарий</label>
+            <textarea id="bookingComment" name="comment" rows="3" class="fld__area" placeholder="Дополнительные пожелания">{{ form_data.comment|default:'' }}</textarea>
+          </div>
+
+          <div>
+            <label class="consent" for="personalDataConsent">
+              <input id="personalDataConsent" name="personal_data_consent" type="checkbox" required{% if form_data.personal_data_consent %} checked{% endif %}>
+              <span class="consent__box"><i data-feather="check"></i></span>
+              <span class="consent__text">
+                Я даю
+                <a href="{% url 'main:personal_data_consent' %}" target="_blank" rel="noopener noreferrer">согласие на обработку персональных данных</a>
+                и подтверждаю ознакомление с
+                <a href="{% url 'main:user_agreement' %}" target="_blank" rel="noopener noreferrer">пользовательским соглашением</a>
+                и
+                <a href="{% url 'main:privacy_policy' %}" target="_blank" rel="noopener noreferrer">политикой конфиденциальности</a>
+              </span>
+            </label>
+            <p id="consentError" class="consent-error">Необходимо дать согласие на обработку персональных данных.</p>
+          </div>
+
+          <button type="submit" class="book-submit"><i data-feather="check-circle"></i>Отправить заявку</button>
+        </form>
+        {% endif %}
+      </section>
+
+      <!-- ПРАВАЯ КОЛОНКА — СВОДКА БРОНИ -->
+      <aside class="summary-aside">
+        <div class="summary">
+          <div class="summary__head">
+            <h2>Ваше бронирование</h2>
+          </div>
+
+          <div class="summary__nights">
+            <i data-feather="moon"></i>
+            {{ cost_data.stay_nights }} ноч{{ cost_data.stay_nights|ru_plural:"ь,и,ей" }}
+          </div>
+
+          <div class="summary__sec">
+            <p class="summary__dates">{{ date_range_display }}</p>
+            <p class="summary__time"><i data-feather="log-in"></i><span>{{ check_in_weekday }} с 14:00</span></p>
+            <p class="summary__time"><i data-feather="log-out"></i><span>{{ check_out_weekday }} до 12:00</span></p>
+          </div>
+
+          <div class="summary__sec">
+            <div class="summary__house">
+              {% if house.gallery_images %}
+              <img src="{{ house.gallery_images.0.url }}" alt="{{ house.name }}" class="summary__thumb">
+              {% endif %}
+              <div>
+                <b>{{ house.name }}</b>
+                {% if house.address %}<small><i data-feather="map-pin"></i>{{ house.address }}</small>{% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="summary__sec">
+            <div class="summary__params">
+              <div class="param"><span>Гостей</span><b>{{ guest_count }}</b></div>
+              {% if children_under_3 %}<div class="param"><span>Детей до 3 лет</span><b>{{ children_under_3 }}</b></div>{% endif %}
+              <div class="param"><span>Питомец</span><b>{% if has_pet_bool %}Да{% else %}Нет{% endif %}</b></div>
+              {% if cost_data.addon_label %}<div class="param"><span>Доп. услуги</span><b>{{ cost_data.addon_label }}</b></div>{% endif %}
+            </div>
+          </div>
+
+          <div class="summary__cost">
+            <div class="cost-line">
+              <span>Проживание ({{ cost_data.stay_nights }} ноч{{ cost_data.stay_nights|ru_plural:"ь,и,ей" }})</span>
+              <b>{{ cost_data.base_cost }} ₽</b>
+            </div>
+            {% if cost_data.extra_guests_cost %}
+            <div class="cost-line">
+              <span>Доплата за доп. гостей ({{ cost_data.extra_guests }})</span>
+              <b>{{ cost_data.extra_guests_cost }} ₽</b>
+            </div>
+            {% endif %}
+            {% if cost_data.pet_cost %}
+            <div class="cost-line">
+              <span>Доплата за питомца</span>
+              <b>{{ cost_data.pet_cost }} ₽</b>
+            </div>
+            {% endif %}
+            {% if cost_data.addon_cost %}
+            <div class="cost-line">
+              <span>{{ cost_data.addon_label }}</span>
+              <b>{{ cost_data.addon_cost }} ₽</b>
+            </div>
+            {% endif %}
+            <div class="cost-total">
+              <span>Итого</span>
+              <b>{{ cost_data.total_cost }} ₽</b>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ===== ФУТЕР ===== -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__cols">
+        <div class="footer__brand">
+          <div class="footer__brandrow">
+            <span class="footer__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+            <span class="footer__brandname">NatRent</span>
+          </div>
+          <p class="footer__about">Дома с баней, чаном и бассейном в Ленинградской области и квартира в центре Петербурга.</p>
+        </div>
+        <div>
+          <div class="footer__h">Объекты</div>
+          <div class="footer__list">
+            <a href="{% url 'main:main_page' %}#properties">Дома с баней</a>
+            <a href="{% url 'main:main_page' %}#properties">Дом с бассейном</a>
+            <a href="{% url 'main:main_page' %}#properties">Квартира в СПб</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Компания</div>
+          <div class="footer__list">
+            <a href="{% url 'main:main_page' %}#about">О нас</a>
+            <a href="{% url 'main:main_page' %}#reviews">Отзывы</a>
+            <a href="{% url 'main:main_page' %}#contact">Контакты</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Мы на связи</div>
+          <div class="footer__list">
+            <span>+7 (921) 000-00-00</span>
+            <a href="#">Telegram · @natrent</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© 2026 NatRent. Все права защищены.</span>
+        <div class="footer__legal">
+          <a href="{% url 'main:privacy_policy' %}">Политика конфиденциальности</a>
+          <a href="{% url 'main:user_agreement' %}">Условия аренды</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/feather-icons"></script>
+  <script>if (window.feather) feather.replace();</script>
+
+  <script>
+    const bookingForm = document.getElementById("bookingForm");
+    const consentCheckbox = document.getElementById("personalDataConsent");
+    const consentError = document.getElementById("consentError");
+    const phoneInput = document.getElementById("bookingPhone");
+
+    if (bookingForm && consentCheckbox) {
+      bookingForm.addEventListener("submit", (event) => {
+        if (!consentCheckbox.checked) {
+          event.preventDefault();
+          if (consentError) consentError.classList.add("show");
+          consentCheckbox.focus();
+        }
+      });
+      consentCheckbox.addEventListener("change", () => {
+        if (consentCheckbox.checked && consentError) consentError.classList.remove("show");
+      });
+    }
+
+    if (phoneInput) {
+      phoneInput.addEventListener("input", function (event) {
+        let value = event.target.value.replace(/\D/g, "");
+        let formattedValue = "";
+        if (value.length > 0) formattedValue = "+7";
+        if (value.length > 1) formattedValue += " (" + value.substring(1, 4);
+        if (value.length > 4) formattedValue += ") " + value.substring(4, 7);
+        if (value.length > 7) formattedValue += "-" + value.substring(7, 9);
+        if (value.length > 9) formattedValue += "-" + value.substring(9, 11);
+        event.target.value = formattedValue;
+      });
+      phoneInput.addEventListener("focus", function () { if (!this.value) this.value = "+7"; });
+      phoneInput.addEventListener("blur", function () { if (this.value === "+7") this.value = ""; });
+    }
+  </script>
+</body>
+</html>

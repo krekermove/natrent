@@ -30,6 +30,8 @@ def normalize_search_data(data):
         'guest_count': data.get('guest_count'),
         'children_under_3': data.get('children_under_3', '0'),
         'has_pet': data.get('has_pet', 'false'),
+        'addon_banya': data.get('addon_banya'),
+        'addon_chan': data.get('addon_chan'),
     }
 
 
@@ -43,6 +45,24 @@ WEEKDAYS_RU = (
     'понедельник', 'вторник', 'среда', 'четверг',
     'пятница', 'суббота', 'воскресенье',
 )
+
+# Стоимость дополнительных услуг (баня и сибирский чан).
+# Должна совпадать с ценами в шаблоне страницы объекта.
+BANYA_PRICE = 6000
+CHAN_PRICE = 6000
+BANYA_CHAN_COMBO_PRICE = 11000  # баня + чан вместе на 3 часа — выгоднее
+
+
+def addons_cost(addon_banya, addon_chan):
+    """Стоимость и подпись выбранных доп. услуг (баня/чан).
+    Вместе они дешевле, чем по отдельности."""
+    if addon_banya and addon_chan:
+        return BANYA_CHAN_COMBO_PRICE, 'Баня + чан · 3 часа'
+    if addon_banya:
+        return BANYA_PRICE, 'Баня · 2 часа'
+    if addon_chan:
+        return CHAN_PRICE, 'Сибирский чан'
+    return 0, ''
 
 
 def format_date_ru(date_value):
@@ -72,6 +92,9 @@ def parse_booking_params(data):
 
     has_pet_bool = str(has_pet).lower() in ('true', '1', 'on', 'yes')
 
+    addon_banya = bool(data.get('addon_banya'))
+    addon_chan = bool(data.get('addon_chan'))
+
     start_date = None
     end_date = None
     if first_date and second_date:
@@ -91,6 +114,8 @@ def parse_booking_params(data):
         'children_under_3': children_under_3,
         'has_pet': has_pet,
         'has_pet_bool': has_pet_bool,
+        'addon_banya': addon_banya,
+        'addon_chan': addon_chan,
     }
 
 
@@ -101,6 +126,8 @@ def calculate_booking_cost(
     guest_count=1,
     children_under_3=0,
     has_pet=False,
+    addon_banya=False,
+    addon_chan=False,
 ):
     stay_nights = (end_date - start_date).days
     stay_dates = [start_date + timedelta(days=day) for day in range(stay_nights)]
@@ -123,6 +150,8 @@ def calculate_booking_cost(
     extra_guests = 0
     extra_guests_cost = 0
     pet_cost = 0
+    addon_cost = 0
+    addon_label = ''
 
     if has_all_dates_cost:
         if guest_count > 2:
@@ -130,14 +159,19 @@ def calculate_booking_cost(
             extra_guests_cost = extra_guests * house.extra_guest_fee
         if has_pet:
             pet_cost = house.extra_pet_fee
+        addon_cost, addon_label = addons_cost(addon_banya, addon_chan)
 
-    total_cost = base_cost + extra_guests_cost + pet_cost
+    total_cost = base_cost + extra_guests_cost + pet_cost + addon_cost
 
     return {
         'base_cost': base_cost,
         'extra_guests': extra_guests,
         'extra_guests_cost': extra_guests_cost,
         'pet_cost': pet_cost,
+        'addon_banya': addon_banya,
+        'addon_chan': addon_chan,
+        'addon_cost': addon_cost,
+        'addon_label': addon_label,
         'total_cost': total_cost,
         'has_all_dates_cost': has_all_dates_cost,
         'stay_nights': stay_nights,
@@ -152,6 +186,97 @@ def build_booking_query_string(params):
         'children_under_3': params['children_under_3'],
         'has_pet': params['has_pet'],
     })
+
+
+def build_booking_context(house, params):
+    """Контекст для страницы оформления брони (book_object.html)."""
+    start_date = params['start_date']
+    end_date = params['end_date']
+    guest_count = params['guest_count']
+    children_under_3 = params['children_under_3']
+    has_pet_bool = params['has_pet_bool']
+    addon_banya = params['addon_banya']
+    addon_chan = params['addon_chan']
+
+    cost_data = calculate_booking_cost(
+        house,
+        start_date,
+        end_date,
+        guest_count=guest_count,
+        children_under_3=children_under_3,
+        has_pet=has_pet_bool,
+        addon_banya=addon_banya,
+        addon_chan=addon_chan,
+    )
+
+    house.gallery_images = [
+        image_field for image_field in [house.img1, house.img2, house.img3, house.img4] if image_field
+    ]
+
+    return {
+        'house': house,
+        'first_date': params['first_date'],
+        'second_date': params['second_date'],
+        'start_date': start_date,
+        'end_date': end_date,
+        'guest_count': guest_count,
+        'children_under_3': children_under_3,
+        'has_pet': params['has_pet'],
+        'has_pet_bool': has_pet_bool,
+        'addon_banya': addon_banya,
+        'addon_chan': addon_chan,
+        'cost_data': cost_data,
+        'check_in_date_display': format_date_ru(start_date),
+        'check_out_date_display': format_date_ru(end_date),
+        'check_in_weekday': format_weekday_ru(start_date),
+        'check_out_weekday': format_weekday_ru(end_date),
+        'date_range_display': f'{format_date_ru(start_date)} — {format_date_ru(end_date)}',
+    }
+
+
+def validate_booking_params(house, params):
+    """Проверяет выбранные пользователем параметры брони.
+    Возвращает текст ошибки или None, если всё корректно."""
+    start_date = params['start_date']
+    end_date = params['end_date']
+    guest_count = params['guest_count']
+
+    if not params['first_date'] or not params['second_date']:
+        return 'Вы не полностью выбрали даты проживания.'
+
+    if start_date is None or end_date is None:
+        return 'Некорректный формат дат.'
+
+    if end_date <= start_date:
+        return 'Дата выезда должна быть позже даты заезда.'
+
+    if guest_count is None or guest_count < 1:
+        return 'Укажите количество гостей.'
+
+    if guest_count > house.max_guests:
+        return 'Количество гостей превышает максимальное для этого дома.'
+
+    is_busy = TimeTable.objects.filter(
+        Q(startdate__lt=end_date),
+        Q(enddate__gt=start_date),
+        status=True,
+        house=house,
+    ).exists()
+    if is_busy:
+        return 'На выбранные даты этот дом уже забронирован.'
+
+    cost_data = calculate_booking_cost(
+        house,
+        start_date,
+        end_date,
+        guest_count=guest_count,
+        children_under_3=params['children_under_3'],
+        has_pet=params['has_pet_bool'],
+    )
+    if not cost_data['has_all_dates_cost']:
+        return 'Не удалось рассчитать стоимость проживания на выбранные даты.'
+
+    return None
 
 
 # Create your views here.
@@ -255,7 +380,7 @@ class SearchView(View):
         context = {}
         if not first_date or not second_date:
             context['date_input_error'] = 'Вы не полностью выбрали даты проживания'
-            return render(request, 'main/index2.html', context=context)
+            return render(request, 'main/index.html', context=context)
 
         try:
             guest_count = int(guest_count)
@@ -271,7 +396,7 @@ class SearchView(View):
 
         if second_date <= first_date:
             context['date_input_error'] = 'Дата выезда должна быть позже даты заезда'
-            return render(request, 'main/index2.html', context=context)
+            return render(request, 'main/index.html', context=context)
 
         busy_houses_ids = TimeTable.objects.filter(
             Q(startdate__lt=second_date),
@@ -350,6 +475,20 @@ class HouseDetailView(View):
             'date_costs_json': json.dumps(date_costs),
         })
 
+    def post(self, request, house_id):
+        """Отправка формы бронирования со страницы объекта.
+        Переносит выбранные пользователем данные на страницу оформления брони."""
+        house = get_object_or_404(RentObject, pk=house_id)
+        params = parse_booking_params(normalize_search_data(request.POST))
+
+        error = validate_booking_params(house, params)
+        if error:
+            messages.error(request, error)
+            return redirect(reverse('main:house_detail', args=[house_id]))
+
+        context = build_booking_context(house, params)
+        return render(request, 'main/book_object.html', context)
+
 
 class PersonalDataConsentView(View):
     def get(self, request):
@@ -367,91 +506,11 @@ class PrivacyPolicyView(View):
 
 
 class BookHouseView(View):
-    def get_booking_context(self, house, params):
-        start_date = params['start_date']
-        end_date = params['end_date']
-        guest_count = params['guest_count']
-        children_under_3 = params['children_under_3']
-        has_pet_bool = params['has_pet_bool']
-
-        cost_data = calculate_booking_cost(
-            house,
-            start_date,
-            end_date,
-            guest_count=guest_count,
-            children_under_3=children_under_3,
-            has_pet=has_pet_bool,
-        )
-
-        house.gallery_images = [
-            image_field for image_field in [house.img1, house.img2, house.img3, house.img4] if image_field
-        ]
-
-        return {
-            'house': house,
-            'first_date': params['first_date'],
-            'second_date': params['second_date'],
-            'start_date': start_date,
-            'end_date': end_date,
-            'guest_count': guest_count,
-            'children_under_3': children_under_3,
-            'has_pet': params['has_pet'],
-            'has_pet_bool': has_pet_bool,
-            'cost_data': cost_data,
-            'check_in_date_display': format_date_ru(start_date),
-            'check_out_date_display': format_date_ru(end_date),
-            'check_in_weekday': format_weekday_ru(start_date),
-            'check_out_weekday': format_weekday_ru(end_date),
-            'date_range_display': f'{format_date_ru(start_date)} — {format_date_ru(end_date)}',
-        }
-
-    def validate_booking_params(self, house, params):
-        start_date = params['start_date']
-        end_date = params['end_date']
-        guest_count = params['guest_count']
-
-        if not params['first_date'] or not params['second_date']:
-            return 'Вы не полностью выбрали даты проживания.'
-
-        if start_date is None or end_date is None:
-            return 'Некорректный формат дат.'
-
-        if end_date <= start_date:
-            return 'Дата выезда должна быть позже даты заезда.'
-
-        if guest_count is None or guest_count < 1:
-            return 'Укажите количество гостей.'
-
-        if guest_count > house.max_guests:
-            return 'Количество гостей превышает максимальное для этого дома.'
-
-        is_busy = TimeTable.objects.filter(
-            Q(startdate__lt=end_date),
-            Q(enddate__gt=start_date),
-            status=True,
-            house=house,
-        ).exists()
-        if is_busy:
-            return 'На выбранные даты этот дом уже забронирован.'
-
-        cost_data = calculate_booking_cost(
-            house,
-            start_date,
-            end_date,
-            guest_count=guest_count,
-            children_under_3=params['children_under_3'],
-            has_pet=params['has_pet_bool'],
-        )
-        if not cost_data['has_all_dates_cost']:
-            return 'Не удалось рассчитать стоимость проживания на выбранные даты.'
-
-        return None
-
     def render_booking_page(self, request, house, params, form_data=None):
-        context = self.get_booking_context(house, params)
+        context = build_booking_context(house, params)
         if form_data:
             context['form_data'] = form_data
-        return render(request, 'main/book_house.html', context)
+        return render(request, 'main/book_object.html', context)
 
     def redirect_to_search(self, params):
         search_url = reverse('main:search_houses')
@@ -469,7 +528,7 @@ class BookHouseView(View):
         form_action = request.POST.get('form_action', 'show')
 
         if form_action == 'show':
-            error = self.validate_booking_params(house, params)
+            error = validate_booking_params(house, params)
             if error:
                 messages.error(request, error)
                 return self.redirect_to_search(params)
@@ -491,7 +550,7 @@ class BookHouseView(View):
             messages.error(request, 'Необходимо дать согласие на обработку персональных данных.')
             return self.render_booking_page(request, house, params, form_data)
 
-        error = self.validate_booking_params(house, params)
+        error = validate_booking_params(house, params)
         if error:
             messages.error(request, error)
             return self.render_booking_page(request, house, params, form_data)
@@ -507,6 +566,8 @@ class BookHouseView(View):
             guest_count=params['guest_count'],
             children_under_3=params['children_under_3'],
             has_pet=params['has_pet_bool'],
+            addon_banya=params['addon_banya'],
+            addon_chan=params['addon_chan'],
         )
 
         try:
@@ -520,6 +581,8 @@ class BookHouseView(View):
                 guests_amount=params['guest_count'],
                 children_under_3=params['children_under_3'],
                 has_pet=params['has_pet_bool'],
+                addon_banya=params['addon_banya'],
+                addon_chan=params['addon_chan'],
                 comment=comment,
                 order_cost=cost_data['total_cost'],
             )
@@ -536,5 +599,12 @@ class BookHouseView(View):
                 booking.pk,
             )
 
-        messages.success(request, f'Заявка на бронирование "{house.name}" отправлена.')
-        return self.redirect_to_search(params)
+        messages.success(
+            request,
+            f'Заявка на бронирование «{house.name}» отправлена. '
+            f'Мы свяжемся с вами для подтверждения брони.',
+        )
+        # Не перенаправляем — показываем подтверждение на этой же странице.
+        context = build_booking_context(house, params)
+        context['booking_success'] = True
+        return render(request, 'main/book_object.html', context)

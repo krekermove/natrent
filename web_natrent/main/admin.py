@@ -10,7 +10,7 @@ from .models import TimeTable, RentObject, DateObjectCost
 
 @admin.register(TimeTable)
 class TimeTableAdmin(admin.ModelAdmin):
-    list_display = ('phone', 'house', 'startdate', 'enddate', 'status', 'guests_amount', 'has_pet')
+    list_display = ('phone', 'house', 'startdate', 'enddate', 'status', 'guests_amount', 'has_pet', 'addon_banya', 'addon_chan')
 
     change_list_template = 'admin/timetable_changelist.html'
 

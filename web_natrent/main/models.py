@@ -14,6 +14,8 @@ class TimeTable(models.Model):
         verbose_name="Количество детей до 3 лет",
     )
     has_pet = models.BooleanField(default=False, verbose_name="Наличие питомца")
+    addon_banya = models.BooleanField(default=False, verbose_name="Доп. услуга: баня")
+    addon_chan = models.BooleanField(default=False, verbose_name="Доп. услуга: сибирский чан")
     comment = models.TextField(max_length=200, null=True, blank=True, default=None, verbose_name="Комментарий")
     order_cost = models.PositiveIntegerField(verbose_name="Стоимость заказа")
     status = models.BooleanField(default=True, blank=True, verbose_name="Статус аренды")

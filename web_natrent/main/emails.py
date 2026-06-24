@@ -50,8 +50,15 @@ def build_booking_email_context(booking, request=None):
 
     nights = (booking.enddate - booking.startdate).days
 
+    addons = []
+    if booking.addon_banya:
+        addons.append('Баня')
+    if booking.addon_chan:
+        addons.append('Сибирский чан')
+
     return {
         'booking': booking,
+        'addons_display': ', '.join(addons),
         'booking_number': build_booking_number(booking),
         'booking_datetime': format_booking_datetime(booking.created),
         'check_in_date': format_stay_date(booking.startdate),

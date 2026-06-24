@@ -682,6 +682,43 @@
   }
 })();
 
+/* ---- Перенос выбранных дат и гостей на страницу объекта ----
+   При переходе по ссылке «Подробнее» / «Выбрать даты» сохраняем текущий
+   выбор формы бронирования в sessionStorage в том же формате, который
+   booking.js восстанавливает при загрузке (ключ bk_restore). */
+(function () {
+  'use strict';
+  var booking = document.getElementById('booking');
+  if (!booking) return;
+
+  function parseDotDate(value) {
+    if (!value) return null;
+    var p = value.split('.');
+    if (p.length !== 3) return null;
+    var d = new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+    return isNaN(d.getTime()) ? null : d.getTime();
+  }
+
+  function fieldValue(name) {
+    var el = booking.querySelector('[name="' + name + '"]');
+    return el ? el.value : '';
+  }
+
+  document.querySelectorAll('.card__actions a[href]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      var total = parseInt(fieldValue('guest_count'), 10) || 1;
+      var children = parseInt(fieldValue('children_under_3'), 10) || 0;
+      sessionStorage.setItem('bk_restore', JSON.stringify({
+        start: parseDotDate(fieldValue('firstInputDate')),
+        end: parseDotDate(fieldValue('secondInputDate')),
+        adults: Math.max(1, total - children),
+        children: children,
+        pet: fieldValue('has_pet') === 'true'
+      }));
+    });
+  });
+})();
+
 /* ---- Card image sliders ---- */
 (function () {
   'use strict';

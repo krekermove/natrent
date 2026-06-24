@@ -14,7 +14,9 @@ Email: {{ company_email }}
 Выезд: {{ check_out_date }} (до 12:00)
 Ночей: {{ nights }}
 Гостей: {{ booking.guests_amount }}
+Детей до 3 лет: {{ booking.children_under_3 }}
 Номеров: 1
+{% if addons_display %}Дополнительные услуги: {{ addons_display }}{% endif %}
 
 ДАННЫЕ ЗАКАЗЧИКА
 ФИО: {{ booking.name }}
