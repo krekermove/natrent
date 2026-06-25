@@ -51,6 +51,13 @@
     .addon-combo i,.addon-combo svg{width:15px;height:15px;color:var(--accent);flex-shrink:0;}
     .addon-combo b{color:#15181C;}
     .addon-combo s{color:#9AA3AC;}
+
+    /* ===== Сообщения бронирования (например, дом занят на выбранные даты) ===== */
+    .book-msgs{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+    .book-msg{display:flex;align-items:flex-start;gap:10px;border-radius:12px;padding:12px 14px;font-size:13.5px;font-weight:500;line-height:1.4;border:1px solid;}
+    .book-msg i,.book-msg svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
+    .book-msg--error{background:#FCF2F2;border-color:#F0D5D5;color:#9A3B3B;}
+    .book-msg--success{background:color-mix(in srgb,var(--accent) 8%,#fff);border-color:color-mix(in srgb,var(--accent) 28%,#fff);color:#3A4A57;}
   </style>
 </head>
 <body>
@@ -306,6 +313,17 @@
           <div class="book-card__price"><b>от {{ house.price }} ₽</b><span>/ ночь</span></div>
           <p class="book-card__note"><i data-feather="calendar"></i>Отмена за 5 дней</p>
 
+          {% if messages %}
+          <div class="book-msgs">
+            {% for message in messages %}
+            <div class="book-msg {% if message.tags == 'success' %}book-msg--success{% else %}book-msg--error{% endif %}">
+              <i data-feather="{% if message.tags == 'success' %}check-circle{% else %}alert-circle{% endif %}"></i>
+              <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
           <!-- Виджет бронирования портирован со страницы index.html (booking.js + site.css):
                на мобильных календарь и гости раскрываются нижней шторкой во всю ширину экрана. -->
           <div id="booking" data-max-guests="{{ house.max_guests }}">
@@ -538,6 +556,17 @@
   <!-- Иконки -->
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://unpkg.com/feather-icons"></script>
   <script>if (window.feather) feather.replace();</script>
+
+  {% if messages %}
+  <!-- При наличии сообщения (например, дом занят на выбранные даты) прокручиваем
+       к карточке бронирования, чтобы пользователь его увидел. -->
+  <script>
+    (function(){
+      const card = document.getElementById("book");
+      if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+    })();
+  </script>
+  {% endif %}
 
   <!-- ===== ЛОГИКА ===== -->
   <script>
