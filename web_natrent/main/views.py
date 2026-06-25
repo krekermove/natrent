@@ -46,6 +46,12 @@ WEEKDAYS_RU = (
     'пятница', 'суббота', 'воскресенье',
 )
 
+# Апартаменты (единственный объект такого типа в базе) бронируются минимум
+# от двух ночей. Объекты пока не разделены на категории, поэтому ориентируемся
+# на конкретный id объекта с апартаментами.
+APARTMENTS_HOUSE_ID = 3
+APARTMENTS_MIN_NIGHTS = 2
+
 # Стоимость дополнительных услуг (баня и сибирский чан).
 # Должна совпадать с ценами в шаблоне страницы объекта.
 BANYA_PRICE = 6000
@@ -250,6 +256,12 @@ def validate_booking_params(house, params):
     if end_date <= start_date:
         return 'Дата выезда должна быть позже даты заезда.'
 
+    if (
+        house.id == APARTMENTS_HOUSE_ID
+        and (end_date - start_date).days < APARTMENTS_MIN_NIGHTS
+    ):
+        return 'Апартаменты можно забронировать минимум от 2 ночей.'
+
     if guest_count is None or guest_count < 1:
         return 'Укажите количество гостей.'
 
@@ -322,6 +334,10 @@ class MainView(View):
         has_pet = search_data.get('has_pet', 'false')
         has_pet_bool = str(has_pet).lower() in ('true', '1', 'on', 'yes')
 
+        start_date = datetime.strptime(first_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(second_date, '%Y-%m-%d').date()
+        nights = (end_date - start_date).days
+
         busy_ids = TimeTable.objects.filter(
             Q(startdate__lt=second_date),
             Q(enddate__gt=first_date),
@@ -335,10 +351,12 @@ class MainView(View):
         if has_pet_bool:
             free_houses_qs = free_houses_qs.filter(pets_allowed=True)
 
-        free_houses = list(free_houses_qs)
+        # Апартаменты бронируются минимум от двух ночей — при коротком
+        # выборе не показываем их в результатах поиска.
+        if nights < APARTMENTS_MIN_NIGHTS:
+            free_houses_qs = free_houses_qs.exclude(id=APARTMENTS_HOUSE_ID)
 
-        start_date = datetime.strptime(first_date, '%Y-%m-%d').date()
-        end_date = datetime.strptime(second_date, '%Y-%m-%d').date()
+        free_houses = list(free_houses_qs)
 
         for house in free_houses:
             cost_data = calculate_booking_cost(
