@@ -11,7 +11,7 @@ from django.views import View
 from django.db.models import Q
 from django.urls import reverse
 
-from .models import RentObject, TimeTable, DateObjectCost
+from .models import RentObject, TimeTable, DateObjectCost, Feedback
 from .emails import send_booking_confirmation_email
 
 logger = logging.getLogger(__name__)
@@ -503,6 +503,26 @@ class HouseDetailView(View):
         response = HttpResponseRedirect(reverse('main:book_house', args=[house_id]))
         response.status_code = 307
         return response
+
+
+class FeedbackView(View):
+    """Приём сообщений из формы обратной связи (.form-col) на главной странице."""
+
+    def get(self, request):
+        return redirect(f"{reverse('main:main_page')}#contact")
+
+    def post(self, request):
+        name = request.POST.get('name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        message = request.POST.get('message', '').strip()
+
+        if not name or not phone:
+            messages.error(request, 'Укажите имя и телефон, чтобы мы могли с вами связаться.')
+        else:
+            Feedback.objects.create(name=name, phone=phone, message=message)
+            messages.success(request, 'Спасибо! Мы получили ваше сообщение и скоро свяжемся с вами.')
+
+        return redirect(f"{reverse('main:main_page')}#contact")
 
 
 class PersonalDataConsentView(View):

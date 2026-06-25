@@ -356,7 +356,7 @@
             <span class="contact-item__icon"><i data-feather="phone"></i></span>
             <div>
               <div class="contact-item__label">Телефон</div>
-              <div class="contact-item__value">+7 (921) 000-00-00</div>
+              <div class="contact-item__value">+7 (911) 811-08-42</div>
             </div>
           </div>
           <div class="contact-item">
@@ -385,16 +385,23 @@
 
       <div class="contact-card">
         <h3>Написать нам</h3>
-        {# Подключите CSRF и обработку POST на стороне Django: добавьте {% csrf_token %} и method="post" #}
-        <form class="form-col" action="" method="post">
+        {% if messages %}
+          <div class="form-messages">
+            {% for message in messages %}
+              <div class="form-message form-message--{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <form class="form-col" action="{% url 'main:feedback' %}" method="post">
+          {% csrf_token %}
           <div class="form-row">
             <div class="form-field">
               <label>Ваше имя</label>
-              <input type="text" name="name" placeholder="Имя">
+              <input type="text" name="name" placeholder="Имя" required>
             </div>
             <div class="form-field">
               <label>Телефон</label>
-              <input type="tel" name="phone" placeholder="+7 (___) ___-__-__">
+              <input id="feedbackPhone" type="tel" name="phone" placeholder="+7 (___) ___-__-__" required>
             </div>
           </div>
           <div class="form-field">
@@ -742,6 +749,26 @@
 
     goTo(0);
   });
+})();
+
+/* ---- Маска ввода телефона в форме обратной связи ---- */
+(function () {
+  'use strict';
+  var phoneInput = document.getElementById('feedbackPhone');
+  if (!phoneInput) return;
+
+  phoneInput.addEventListener('input', function (event) {
+    var value = event.target.value.replace(/\D/g, '');
+    var formattedValue = '';
+    if (value.length > 0) formattedValue = '+7';
+    if (value.length > 1) formattedValue += ' (' + value.substring(1, 4);
+    if (value.length > 4) formattedValue += ') ' + value.substring(4, 7);
+    if (value.length > 7) formattedValue += '-' + value.substring(7, 9);
+    if (value.length > 9) formattedValue += '-' + value.substring(9, 11);
+    event.target.value = formattedValue;
+  });
+  phoneInput.addEventListener('focus', function () { if (!this.value) this.value = '+7'; });
+  phoneInput.addEventListener('blur', function () { if (this.value === '+7') this.value = ''; });
 })();
 </script>
 </body>

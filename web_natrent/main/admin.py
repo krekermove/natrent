@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import path
 
 from .forms import BookingForm, CostForm
-from .models import TimeTable, RentObject, DateObjectCost
+from .models import TimeTable, RentObject, DateObjectCost, Feedback
 
 
 @admin.register(TimeTable)
@@ -124,3 +124,13 @@ class RentObjectAdmin(admin.ModelAdmin):
 @admin.register(DateObjectCost)
 class DateObjectCostAdmin(admin.ModelAdmin):
     list_display = ('date', 'house', 'cost')
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'created', 'is_processed')
+    list_filter = ('is_processed', 'created')
+    list_editable = ('is_processed',)
+    search_fields = ('name', 'phone', 'message')
+    readonly_fields = ('name', 'phone', 'message', 'created')
+    date_hierarchy = 'created'

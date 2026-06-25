@@ -82,6 +82,22 @@ class RentObject(models.Model):
         return self.name
 
 
+class Feedback(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Имя")
+    phone = models.CharField(max_length=30, verbose_name="Телефон")
+    message = models.TextField(max_length=2000, blank=True, verbose_name="Сообщение")
+    is_processed = models.BooleanField(default=False, verbose_name="Обработано")
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Дата отправки")
+
+    class Meta:
+        verbose_name = "Обращение из формы обратной связи"
+        verbose_name_plural = "Обращения из формы обратной связи"
+        ordering = ('-created',)
+
+    def __str__(self):
+        return f"{self.name} ({self.phone}) — {self.created:%d.%m.%Y %H:%M}"
+
+
 class DateObjectCost(models.Model):
     date = models.DateField(verbose_name="Дата")
     house = models.ForeignKey(RentObject, on_delete=models.CASCADE, related_name="datecost", verbose_name="Объект")
