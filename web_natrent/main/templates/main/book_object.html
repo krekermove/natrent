@@ -43,7 +43,7 @@
         <h1 class="book-head__title">Бронирование</h1>
         <p class="book-head__sub">Проверьте детали и оставьте контакты — мы свяжемся для подтверждения.</p>
       </div>
-      <form action="{% url 'main:house_detail' house.id%}" method="post">
+      <form action="{% url 'main:house_detail' house.id%}" method="get">
         {% csrf_token %}
         <input type="hidden" name="first_date" value="{{ first_date }}">
         <input type="hidden" name="second_date" value="{{ second_date }}">
@@ -112,7 +112,7 @@
 
           <div>
             <label class="consent" for="personalDataConsent">
-              <input id="personalDataConsent" name="personal_data_consent" type="checkbox" required{% if form_data.personal_data_consent %} checked{% endif %}>
+              <input id="personalDataConsent" name="personal_data_consent" type="checkbox"{% if form_data.personal_data_consent %} checked{% endif %}>
               <span class="consent__box"><i data-feather="check"></i></span>
               <span class="consent__text">
                 Я даю
