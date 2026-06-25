@@ -1,10 +1,11 @@
 {% load static %}
+{% load russian_plural %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Дом с баней и сибирским чаном | NatRent</title>
+  <title>Дом с баней в Федоровском | NatRent</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,6 +18,39 @@
     /* Содержимое каждого факта — в строку */
     .facts-row .fact{flex-direction:row;align-items:center;gap:10px;}
     .facts-row .fact__lbl{margin-top:0;}
+
+    /* ===== Дополнительные опции бронирования: баня и чан ===== */
+    .addons{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+    .addons__head{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;background:none;border:none;padding:0;cursor:pointer;text-align:left;font:inherit;}
+    .addons__head .field-label{cursor:pointer;}
+    .addons__head-r{display:flex;align-items:center;gap:8px;}
+    .addons__hint{font-size:11.5px;font-weight:700;color:var(--accent);white-space:nowrap;}
+    .addons__chevron{display:flex;align-items:center;color:#9AA3AC;transition:transform .2s;}
+    .addons__chevron i,.addons__chevron svg{width:18px;height:18px;}
+    .addons.is-collapsed .addons__chevron{transform:rotate(-90deg);}
+    /* Тело раскрывается/скрывается плавно по высоте */
+    .addons__body{display:flex;flex-direction:column;gap:10px;overflow:hidden;transition:max-height .25s ease,opacity .2s ease;}
+    .addons.is-collapsed .addons__body{max-height:0 !important;opacity:0;pointer-events:none;}
+    .addon{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid #E7EAED;border-radius:13px;cursor:pointer;transition:border-color .15s,background .15s;}
+    .addon:hover{border-color:#CBD0D5;}
+    .addon:has(.addon__cb:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,#fff);}
+    .addon__cb{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+    .addon__ic{flex-shrink:0;width:40px;height:40px;border-radius:11px;background:#F2F4F5;color:var(--accent);display:flex;align-items:center;justify-content:center;}
+    .addon:has(.addon__cb:checked) .addon__ic{background:color-mix(in srgb,var(--accent) 14%,#fff);}
+    .addon__ic i,.addon__ic svg{width:18px;height:18px;}
+    .addon__txt{flex:1;min-width:0;}
+    .addon__txt b{display:block;font-size:14.5px;font-weight:700;color:#15181C;}
+    .addon__txt small{display:block;font-size:12px;color:#9AA3AC;margin-top:1px;}
+    .addon__price{font-size:14px;font-weight:700;color:#15181C;white-space:nowrap;}
+    .addon__check{flex-shrink:0;width:22px;height:22px;border-radius:7px;border:1.5px solid #D7DBDF;display:flex;align-items:center;justify-content:center;color:#fff;transition:background .15s,border-color .15s;}
+    .addon__check i,.addon__check svg{width:13px;height:13px;opacity:0;transition:opacity .15s;}
+    .addon:has(.addon__cb:checked) .addon__check{background:var(--accent);border-color:var(--accent);}
+    .addon:has(.addon__cb:checked) .addon__check i,.addon:has(.addon__cb:checked) .addon__check svg{opacity:1;}
+    .addon-combo{display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:1.4;color:#41474E;background:color-mix(in srgb,var(--accent) 8%,#fff);border-radius:10px;padding:10px 12px;transition:background .15s;}
+    .addon-combo.is-active{background:color-mix(in srgb,var(--accent) 15%,#fff);}
+    .addon-combo i,.addon-combo svg{width:15px;height:15px;color:var(--accent);flex-shrink:0;}
+    .addon-combo b{color:#15181C;}
+    .addon-combo s{color:#9AA3AC;}
   </style>
 </head>
 <body>
@@ -46,7 +80,7 @@
     <div class="crumbs">
       <a href="{% url 'main:main_page' %}">Главная</a>
       <i data-feather="chevron-right"></i>
-      <span class="current">Дом с баней и сибирским чаном</span>
+      <span class="current">Дом с баней в Федоровском</span>
     </div>
 
     <!-- ===== ШАПКА ОБЪЕКТА ===== -->
@@ -56,18 +90,18 @@
 <!--          <span class="pill pill&#45;&#45;accent"><i data-feather="award"></i>Хит сезона</span>-->
 <!--          <span class="pill pill&#45;&#45;soft"><i data-feather="check-circle"></i>Свободно на ваши даты</span>-->
 <!--        </div>-->
-        <h1 class="detail-title">Дом с баней и сибирским чаном</h1>
-        <a href="https://yandex.ru/maps/?ll=30.592055%2C59.635722&mode=search&sll=30.592022%2C59.635739&text=59.635739%2C30.592022&z=16.81">
+        <h1 class="detail-title">Дом с баней в Федоровском</h1>
+        <a href="https://yandex.ru/maps/2/saint-petersburg/?ll=30.572509%2C59.647552&mode=whatshere&whatshere%5Bpoint%5D=30.570751%2C59.647458&whatshere%5Bzoom%5D=17.79&z=15.8">
           <div class="detail-loc">
             <i data-feather="map-pin"></i>
-            Ленинградская обл. · Деревня Аннолово · 30 км от СПб
+            Ленинградская обл. · Поселок Федоровское · 20 км от СПб
           </div>
         </a>
       </div>
       <div class="detail-head__aside">
         <div class="rating-box">
-          <span class="rating-box__score"><i data-feather="star"></i>5.0</span>
-          <span class="rating-box__meta"><b>Отлично</b>23 отзывов</span>
+          <span class="rating-box__score"><i data-feather="star"></i>4.9</span>
+          <span class="rating-box__meta"><b>Отлично</b>35 отзывов</span>
         </div>
       </div>
     </div>
@@ -75,15 +109,15 @@
     <!-- ===== ГАЛЕРЕЯ ===== -->
     <div class="gallery" id="gallery">
       <div class="gallery__cell gallery__main" data-index="0">
-        <img src="{% static 'main/img/annolovo/1.jpg' %}" alt="Дом с баней и сибирским чаном — общий вид">
-        <button type="button" class="gallery__allbtn"><i data-feather="image"></i>Все фото · 10</button>
+        <img src="{% static 'main/img/fedorovskoe/1.jpg' %}" alt="Дом с баней — общий вид">
+        <button type="button" class="gallery__allbtn"><i data-feather="image"></i>Все фото · 17</button>
       </div>
       <div class="gallery__cell" data-index="1">
-        <img src="{% static 'main/img/annolovo/2.jpg' %}" alt="Интерьер гостиной">
+        <img src="{% static 'main/img/fedorovskoe/2.jpg' %}" alt="Баня и зона отдыха">
       </div>
       <div class="gallery__cell" data-index="2">
-        <img src="{% static 'main/img/annolovo/3.jpg' %}" alt="Баня и зона отдыха">
-        <div class="gallery__more"><b>+14</b><span>фото</span></div>
+        <img src="{% static 'main/img/fedorovskoe/3.jpg' %}" alt="Интерьер гостиной">
+        <div class="gallery__more"><b>+15</b><span>фото</span></div>
       </div>
     </div>
 
@@ -97,7 +131,7 @@
         <div class="facts-row">
           <div class="fact">
             <span class="fact__ic"><i data-feather="users"></i></span>
-            <span class="fact__val">4</span>
+            <span class="fact__val">7</span>
             <span class="fact__lbl">гостя</span>
           </div>
           <div class="fact">
@@ -112,7 +146,7 @@
           </div>
           <div class="fact">
             <span class="fact__ic"><i data-feather="maximize"></i></span>
-            <span class="fact__val">60 м²</span>
+            <span class="fact__val">110 м²</span>
             <span class="fact__lbl">площадь</span>
           </div>
         </div>
@@ -121,8 +155,8 @@
         <div class="block">
           <h2 class="block__h">Об этом доме</h2>
           <div class="prose">
-            <p>Уютный тёплый дом из клеёного бруса на тихом участке у соснового леса в Приозерском направлении. Идеально для семьи или компании до шести человек: две спальни, светлая гостиная с панорамными окнами и большая крытая терраса с видом на лес.</p>
-            <p>Главная гордость — премиальная баня от уральских мастеров с настоящей каменкой, а во дворе ждёт сибирский банный чан под открытым небом: топится на дровах, парит круглый год даже в мороз. Рядом мангальная зона с беседкой и дровами. Всё готово к вашему приезду — заезжайте и отдыхайте.</p>
+            <p>Если вы xотитe oтдохнуть от городскoй cуеты, добрo пoжалoвать в нaш загoрoдный дом. Дoм дepевянный, двуxэтaжный рядoм c Павловcкoм, с бoльшим oгopоженным учacткoм 22 сoтки от cобственникa. В домe 7 спальных мест! Спальня с двуспальной кроватью, спальня с тремя односпальными кроватями и раскладной диван на первом этаже.</p>
+            <p>Дом отапливаемый - камин🔥, конвектора. Можно ловить рыбу, купаться. мангал-зона со всеми принадлежностями ( решётки, шампура). Детская площадка. Парковка на 3 автомобиля. WiFi. Спутниковое ТВ.</p>
           </div>
         </div>
 
@@ -132,8 +166,8 @@
           <div class="highlights">
             <div class="highlight">
               <span class="highlight__ic"><i data-feather="droplet"></i></span>
-              <h4>Баня и чан в стоимости</h4>
-              <p>Парная премиум-класса и банный чан под открытым небом. Протопим к вашему приезду по запросу.</p>
+              <h4>Баня и сибирский чан</h4>
+              <p>Парная премиум-класса и банный чан под открытым небом — добавьте при бронировании. Вместе на 3 часа выгоднее.</p>
             </div>
             <div class="highlight">
               <span class="highlight__ic"><i data-feather="key"></i></span>
@@ -180,13 +214,13 @@
         <div class="block">
           <h2 class="block__h">Расположение</h2>
           <div class="map-card">
-            <a href="https://yandex.ru/maps/?ll=30.592055%2C59.635722&mode=search&sll=30.592022%2C59.635739&text=59.635739%2C30.592022&z=16.81">
-              <img class="map-card__img" src="https://static-maps.yandex.ru/v1?ll=30.592022,59.635739&lang=ru_RU&size=450,450&z=13&pt=30.592022,59.635739,home~30.592022,59.635739,home1&apikey={{ yandex_maps_api_key }}" alt="Лес и природа вокруг дома">
+            <a href="https://yandex.ru/maps/2/saint-petersburg/?ll=30.572509%2C59.647552&mode=whatshere&whatshere%5Bpoint%5D=30.570751%2C59.647458&whatshere%5Bzoom%5D=17.79&z=15.8">
+              <img class="map-card__img" src="https://static-maps.yandex.ru/v1?ll=30.57075,59.647458&lang=ru_RU&size=450,450&z=13&pt=30.57075,59.647458,home~30.57075,59.647458,home1&apikey={{ yandex_maps_api_key }}" alt="Лес и природа вокруг дома">
               <div class="map-card__veil"></div>
               <div class="map-pin"><span class="map-pin__pulse"></span></span></div>
               <div class="map-card__chip">
                 <i data-feather="map-pin"></i>
-                <span><b>Деревня Аннолово</b><small>Ленинградская область</small></span>
+                <span><b>Поселок Федоровское</b><small>Ленинградская область</small></span>
               </div>
             </a>
           </div>
@@ -211,38 +245,59 @@
 
         <!-- отзывы -->
         <div class="block detail-reviews">
-          <h2 class="block__h">Отзывы гостей · 5.0 из 5.0</h2>
+          <h2 class="block__h">Отзывы гостей · 4.9 из 5.0</h2>
           <div class="reviews-grid">
             <div class="review">
               <div class="review__stars">★★★★★</div>
-              <p class="review__text">Снимали дом на выходные — топили баню и сразу в чан под звёздами. Дом тёплый, всё чисто и продумано до мелочей. Обязательно вернёмся зимой!</p>
+              <p class="review__text">Отдыхали в июне большой компанией. И это идеальное место для загородного отдыха! В доме идеальный порядок, тепло и комфортно. Шикарная русская баня и бассейн. Огромное спасибо за отличный прием и организацию! Хозяева чудесные и отзывчивые люди!</p>
               <div class="review__author">
-                <span class="review__avatar">АК</span>
+                <span class="review__avatar">О</span>
                 <div>
-                  <div class="review__name">Анна К.</div>
-                  <div class="review__when">Январь 2026</div>
+                  <div class="review__name">Олеся</div>
+                  <div class="review__when">Июнь 2026</div>
                 </div>
               </div>
             </div>
             <div class="review">
               <div class="review__stars">★★★★★</div>
-              <p class="review__text">Тихое место у леса, до озера правда близко. Чан — отдельный кайф. Хозяйка на связи, помогла с заездом поздно вечером. Рекомендую.</p>
+              <p class="review__text">Данный дом снимали 3 года назад и сейчас сняли тоже его. Всё понравилось. Отличный дом для проведения праздника. Хозяева отзывчивые, всегда рады гостям!
+                Бесконтактная оплата, очень удобно!
+                Количество спальных мест, хватает на большую компанию. Будем советовать друзьям и знакомым)</p>
               <div class="review__author">
-                <span class="review__avatar">МР</span>
+                <span class="review__avatar">И</span>
                 <div>
-                  <div class="review__name">Михаил Р.</div>
+                  <div class="review__name">Иван</div>
                   <div class="review__when">Октябрь 2025</div>
                 </div>
               </div>
             </div>
             <div class="review">
               <div class="review__stars">★★★★★</div>
-              <p class="review__text">Брали с детьми. Дом просторный, кухня со всем необходимым, мангал и дрова уже ждали. Баня шикарная. Спасибо, было здорово!</p>
+              <p class="review__text">Уютный дом прямо на берегу реки
+                Всё чудесно, всё есть, Наталья всегда на связи и готова помочь
+                До Пушкина 30 минут на автомобиле, до Павловска и того меньше, есть доставка еды и продуктов
+                Нас пустили с собаками - это вообще космос
+                Спасибо!</p>
               <div class="review__author">
-                <span class="review__avatar">ОВ</span>
+                <span class="review__avatar">А</span>
                 <div>
-                  <div class="review__name">Ольга В.</div>
-                  <div class="review__when">Август 2025</div>
+                  <div class="review__name">Антон</div>
+                  <div class="review__when">Июнь 2025</div>
+                </div>
+              </div>
+            </div>
+            <div class="review">
+              <div class="review__stars">★★★★★</div>
+              <p class="review__text">Прекрасное место, в первую очередь подкупает видом на реку.
+                Только ради этого и бронировал его. Камин дает свой антураж и крутые романтические ощущения.
+                Остальное по проживанию плюс-минус среднее .
+                Заселение бесконтактное, все прошло супер.
+                Спасибо!</p>
+              <div class="review__author">
+                <span class="review__avatar">Е</span>
+                <div>
+                  <div class="review__name">Егор</div>
+                  <div class="review__when">Апрель 2025</div>
                 </div>
               </div>
             </div>
@@ -254,13 +309,14 @@
       <!-- ПРАВАЯ КОЛОНКА — БРОНИРОВАНИЕ -->
       <aside class="book-aside" id="book">
         <div class="book-card">
-          <div class="book-card__price"><b>18 000 ₽</b><span>/ ночь</span></div>
-          <p class="book-card__note"><i data-feather="calendar"></i>Минимум 2 ночи · отмена за 5 дней</p>
+          <div class="book-card__price"><b>от {{ house.price }} ₽</b><span>/ ночь</span></div>
+          <p class="book-card__note"><i data-feather="calendar"></i>Отмена за 5 дней</p>
 
           <!-- Виджет бронирования портирован со страницы index.html (booking.js + site.css):
                на мобильных календарь и гости раскрываются нижней шторкой во всю ширину экрана. -->
-          <div id="booking">
-            <form id="bookingForm" class="book-fields" action="#" method="post">
+          <div id="booking" data-max-guests="{{ house.max_guests }}">
+            <form id="bookingForm" class="book-fields" action="{% url 'main:house_detail' house.id %}" method="post">
+              {% csrf_token %}
               <input type="hidden" name="guest_count" value="2">
               <input type="hidden" name="children_under_3" value="0">
               <input type="hidden" name="has_pet" value="false">
@@ -369,6 +425,7 @@
                       <button type="button" data-step="children-inc">+</button>
                     </div>
                   </div>
+                  {% if house.pets_allowed %}
                   <div class="guest-row">
                     <div>
                       <div class="guest-row__title">С питомцем</div>
@@ -376,15 +433,42 @@
                     </div>
                     <button type="button" class="switch" data-switch="pet"><span class="switch__knob"></span></button>
                   </div>
+                  {% endif %}
 
                   <button type="button" class="sheet-done" data-action="close-guests">Готово</button>
                 </div>
               </div>
 
+              <!-- Дополнительно: баня и чан -->
+              <div class="addons" id="addons">
+                <button type="button" class="addons__head" data-addons-toggle aria-expanded="true" aria-controls="addonsBody">
+                  <span class="field-label" style="margin:0;">Дополнительно</span>
+                  <span class="addons__head-r">
+                    <span class="addons__hint">Скрыть</span>
+                    <span class="addons__chevron"><i data-feather="chevron-down"></i></span>
+                  </span>
+                </button>
+
+                <div class="addons__body" id="addonsBody">
+                  <label class="addon">
+                    <input type="checkbox" class="addon__cb" name="addon_banya" data-addon-price="5000">
+                    <span class="addon__ic"><i data-feather="droplet"></i></span>
+                    <span class="addon__txt">
+                      <b>Баня</b>
+                      <small>На весь период проживания</small>
+                    </span>
+                    <span class="addon__price">5 000 ₽</span>
+                    <span class="addon__check"><i data-feather="check"></i></span>
+                  </label>
+                </div>
+              </div>
+
               <!-- Итог -->
               <div class="book-summary">
-                <div class="book-line"><span>18 000 ₽ × <span id="sumNights">— ночей</span></span><span id="sumSubtotal">—</span></div>
-                <div class="book-line"><span>Уборка и бельё</span><span>1 500 ₽</span></div>
+                <div class="book-line">Проживание на выбранные даты<span id="sumSubtotal">—</span></div>
+                <div class="book-line" id="sumGuestLine" hidden><span id="sumGuestLabel">Дополнительные гости</span><span id="sumGuest">—</span></div>
+                <div class="book-line" id="sumPetLine" hidden><span>Размещение с питомцем</span><span id="sumPet">—</span></div>
+                <div class="book-line" id="sumAddonLine" hidden><span id="sumAddonLabel">Баня</span><span id="sumAddon">—</span></div>
                 <div class="book-total"><span>Итого</span><span id="sumTotal">—</span></div>
               </div>
 
@@ -395,75 +479,11 @@
 
           <div class="book-perks">
             <div class="book-perk"><i data-feather="check-circle"></i>Бесплатная отмена за 5 дней до заезда</div>
-            <div class="book-perk"><i data-feather="droplet"></i>Баня и чан протопим к вашему приезду</div>
             <div class="book-perk"><i data-feather="message-circle"></i>Хозяйка на связи ежедневно 9:00–21:00</div>
           </div>
         </div>
       </aside>
-
     </div>
-
-    <!-- ===== ПОХОЖИЕ ДОМА ===== -->
-    <section class="similar">
-      <div class="similar__head">
-        <h2 class="h2">Похожие дома</h2>
-        <a href="_preview_search.html" class="similar-link">Смотреть все<i data-feather="arrow-right"></i></a>
-      </div>
-      <div class="similar-grid">
-
-        <a class="card" href="#">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 24 000 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Дом с бассейном и баней</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · Выборгское напр.</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>8 гостей</span>
-                <span><i data-feather="home"></i>3 спальни</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.8</span>
-            </div>
-          </div>
-        </a>
-
-        <a class="card" href="#">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 15 000 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Дом у леса с панорамной баней</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · у Лосевских порогов</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>4 гостя</span>
-                <span><i data-feather="home"></i>2 спальни</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.9</span>
-            </div>
-          </div>
-        </a>
-
-        <a class="card" href="#">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 6 500 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Апартаменты на Ленинском пр.</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Санкт-Петербург · у клиники «Скандинавия»</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>4 гостя</span>
-                <span><i data-feather="home"></i>1 спальня</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.7</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
-    </section>
 
     <!-- ===== ЛАЙТБОКС ГАЛЕРЕИ ===== -->
     <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Фотографии объекта">
@@ -480,16 +500,25 @@
 
     <script type="application/json" id="galleryData">
     [
-      "{% static 'main/img/annolovo/1.jpg' %}",
-      "{% static 'main/img/annolovo/2.jpg' %}",
-      "{% static 'main/img/annolovo/3.jpg' %}",
-      "{% static 'main/img/annolovo/4.jpg' %}",
-      "{% static 'main/img/annolovo/5.jpg' %}",
-      "{% static 'main/img/annolovo/6.jpg' %}",
-      "{% static 'main/img/annolovo/7.jpg' %}",
-      "{% static 'main/img/annolovo/8.jpg' %}",
-      "{% static 'main/img/annolovo/9.jpg' %}",
-      "{% static 'main/img/annolovo/10.jpg' %}"
+      "{% static 'main/img/fedorovskoe/1.jpg' %}",
+      "{% static 'main/img/fedorovskoe/2.jpg' %}",
+      "{% static 'main/img/fedorovskoe/3.jpg' %}",
+      "{% static 'main/img/fedorovskoe/4.jpg' %}",
+      "{% static 'main/img/fedorovskoe/5.jpg' %}",
+      "{% static 'main/img/fedorovskoe/6.jpg' %}",
+      "{% static 'main/img/fedorovskoe/7.jpg' %}",
+      "{% static 'main/img/fedorovskoe/8.jpg' %}",
+      "{% static 'main/img/fedorovskoe/9.jpg' %}",
+      "{% static 'main/img/fedorovskoe/10.jpg' %}",
+      "{% static 'main/img/fedorovskoe/11.jpg' %}",
+      "{% static 'main/img/fedorovskoe/12.jpg' %}",
+      "{% static 'main/img/fedorovskoe/13.jpg' %}",
+      "{% static 'main/img/fedorovskoe/14.jpg' %}",
+      "{% static 'main/img/fedorovskoe/15.jpg' %}",
+      "{% static 'main/img/fedorovskoe/16.jpg' %}",
+      "{% static 'main/img/fedorovskoe/17.jpg' %}",
+      "{% static 'main/img/fedorovskoe/18.jpg' %}",
+      "{% static 'main/img/fedorovskoe/19.jpg' %}"
     ]
     </script>
 
@@ -509,24 +538,24 @@
         <div>
           <div class="footer__h">Объекты</div>
           <div class="footer__list">
-            <a href="_preview.html#properties">Дома с баней</a>
-            <a href="_preview.html#properties">Дом с бассейном</a>
-            <a href="_preview.html#properties">Квартира в СПб</a>
+            <a href="{% url 'main:house_detail' 2 %}">Дом в Аннолово</a>
+            <a href="{% url 'main:house_detail' 1 %}">Дом в Федоровском</a>
+            <a href="{% url 'main:house_detail' 3 %}">Аппартаменты на московской</a>
           </div>
         </div>
         <div>
           <div class="footer__h">Компания</div>
           <div class="footer__list">
-            <a href="_preview.html#about">О нас</a>
-            <a href="_preview.html#reviews">Отзывы</a>
-            <a href="_preview.html#contact">Контакты</a>
+            <a href="{% url 'main:main_page' %}#about">О нас</a>
+            <a href="{% url 'main:main_page' %}#reviews">Отзывы</a>
+            <a href="{% url 'main:main_page' %}#contact">Контакты</a>
           </div>
         </div>
         <div>
           <div class="footer__h">Мы на связи</div>
           <div class="footer__list">
-            <span>+7 (921) 000-00-00</span>
-            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2048454c4c4f604e415452454e540e5255">[email&#160;protected]</a></span>
+            <span>+7 (911) 811-08-42</span>
+            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2048454c4c4f604e415452454e540e5255">natalkob@gmail.com</a></span>
             <a href="#">Telegram · @natrent</a>
           </div>
         </div>
@@ -534,8 +563,9 @@
       <div class="footer__bottom">
         <span>© 2026 NatRent. Все права защищены.</span>
         <div class="footer__legal">
-          <a href="#">Политика конфиденциальности</a>
-          <a href="#">Условия аренды</a>
+          <a href="{% url 'main:personal_data_consent' %}" target="_blank" rel="noopener noreferrer">Согласие на обработку персональных данных</a>
+          <a href="{% url 'main:user_agreement' %}" target="_blank" rel="noopener noreferrer">Пользовательским соглашением</a>
+          <a href="{% url 'main:privacy_policy' %}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>
         </div>
       </div>
     </div>
@@ -611,6 +641,43 @@
       }, { passive: true });
     })();
 
+    /* ---------- Дополнительные опции: сворачивание блока ---------- */
+    (function(){
+      const addons = document.getElementById("addons");
+      const toggle = addons && addons.querySelector("[data-addons-toggle]");
+      const body = document.getElementById("addonsBody");
+      if (!addons || !toggle || !body) return;
+
+      /* Раскрытое состояние держим через явный max-height (scrollHeight),
+         чтобы работала плавная анимация; при свёрнутом — CSS обнуляет его. */
+      function setOpenHeight(){
+        if (!addons.classList.contains("is-collapsed")) {
+          body.style.maxHeight = body.scrollHeight + "px";
+        }
+      }
+
+      function setCollapsed(collapsed){
+        if (collapsed) {
+          /* фиксируем текущую высоту перед сворачиванием для анимации */
+          body.style.maxHeight = body.scrollHeight + "px";
+          requestAnimationFrame(() => addons.classList.add("is-collapsed"));
+        } else {
+          addons.classList.remove("is-collapsed");
+          setOpenHeight();
+        }
+        toggle.setAttribute("aria-expanded", String(!collapsed));
+      }
+
+      setOpenHeight();
+      toggle.addEventListener("click", () => {
+        setCollapsed(!addons.classList.contains("is-collapsed"));
+      });
+
+      /* высота тела меняется при выборе опций (подсветка комбо) и ресайзе */
+      addons.addEventListener("change", setOpenHeight);
+      window.addEventListener("resize", setOpenHeight);
+    })();
+
     /* ---------- Поделиться / избранное ---------- */
     (function(){
       const like = document.getElementById("likeBtn");
@@ -627,61 +694,183 @@
   <!-- Логика бронирования (календарь + гости) — общий скрипт со страницы index.html -->
   <script src="{% static 'main/js/booking.js' %}"></script>
 
+  <!-- Стоимость проживания по датам (DateObjectCost) -->
+  <script type="application/json" id="dateCostsData">{{ date_costs_json|safe }}</script>
+
   <!-- Пересчёт стоимости по выбранным датам -->
   <script>
     (function(){
-      const PRICE_PER_NIGHT = 18000;
-      const CLEANING_FEE = 1500;
+      const PRICE_PER_NIGHT = {{ house.price }};
+      const EXTRA_GUEST_FEE = {{ house.extra_guest_fee }};
+      const EXTRA_PET_FEE = {{ house.extra_pet_fee }};
+      const CLEANING_FEE = 0;
+      const BANYA_PRICE = 5000;
+      const CHAN_PRICE = 0;
+      const COMBO_PRICE = 0; /* баня + чан вместе на 3 часа */
       const booking = document.getElementById("booking");
       if (!booking) return;
 
+      /* Стоимость проживания на конкретные даты из DateObjectCost.
+         Ключ — "YYYY-MM-DD", значение — стоимость ночи. Для дат без записи
+         используется базовая цена дома (house.price). */
+      let DATE_COSTS = {};
+      const dateCostsEl = document.getElementById("dateCostsData");
+      if (dateCostsEl) {
+        try { DATE_COSTS = JSON.parse(dateCostsEl.textContent) || {}; }
+        catch (e) { DATE_COSTS = {}; }
+      }
+
       const firstInputDate = booking.querySelector('[name="firstInputDate"]');
       const secondInputDate = booking.querySelector('[name="secondInputDate"]');
-      const sumNightsEl = document.getElementById("sumNights");
+      const guestCountInput = booking.querySelector('[name="guest_count"]');
+      const childrenInput = booking.querySelector('[name="children_under_3"]');
+      const petInput = booking.querySelector('[name="has_pet"]');
       const sumSubtotalEl = document.getElementById("sumSubtotal");
       const sumTotalEl = document.getElementById("sumTotal");
+      const sumGuestLine = document.getElementById("sumGuestLine");
+      const sumGuestLabel = document.getElementById("sumGuestLabel");
+      const sumGuestEl = document.getElementById("sumGuest");
+      const sumPetLine = document.getElementById("sumPetLine");
+      const sumPetEl = document.getElementById("sumPet");
+
+      const banyaCb = booking.querySelector('[name="addon_banya"]');
+      const chanCb = booking.querySelector('[name="addon_chan"]');
+      const addonCombo = document.getElementById("addonCombo");
+      const sumAddonLine = document.getElementById("sumAddonLine");
+      const sumAddonLabel = document.getElementById("sumAddonLabel");
+      const sumAddonEl = document.getElementById("sumAddon");
 
       function nf(n){ return n.toLocaleString("ru-RU").replace(/,/g, " "); }
-      function pluralNights(n){
-        const a = Math.abs(n) % 100, b = a % 10;
-        if (a > 10 && a < 20) return n + " ночей";
-        if (b > 1 && b < 5) return n + " ночи";
-        if (b === 1) return n + " ночь";
-        return n + " ночей";
-      }
+      function pad2(n){ return n < 10 ? "0" + n : String(n); }
+      function dateKey(d){ return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
       function toDate(displayDate){
         if (!displayDate || displayDate.indexOf(".") === -1) return null;
         const p = displayDate.split("."); if (p.length !== 3) return null;
         const d = new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
         return Number.isNaN(d.getTime()) ? null : d;
       }
+      /* Сумма за проживание = сумма стоимостей каждой ночи (заезд включительно,
+         выезд исключительно), как и в расчёте на стороне сервера. */
+      function staySubtotal(sd, ed){
+        let nights = 0, subtotal = 0;
+        const cur = new Date(sd.getFullYear(), sd.getMonth(), sd.getDate());
+        while (cur < ed) {
+          const c = DATE_COSTS[dateKey(cur)];
+          subtotal += (typeof c === "number") ? c : PRICE_PER_NIGHT;
+          nights++;
+          cur.setDate(cur.getDate() + 1);
+        }
+        return { nights: nights, subtotal: subtotal };
+      }
+      function pluralGuests(n){
+        const a = Math.abs(n) % 100, b = a % 10;
+        if (a > 10 && a < 20) return n + " гостей";
+        if (b > 1 && b < 5) return n + " гостя";
+        if (b === 1) return n + " гость";
+        return n + " гостей";
+      }
+      /* Доп. плата за гостей и питомца — повторяет расчёт сервера
+         (calculate_booking_cost): доп. гость = гость сверх 2, кроме детей до 3 лет;
+         применяется только при выбранных датах (nights > 0). */
+      function extraFees(nights){
+        let extraGuests = 0, extraGuestsCost = 0, petCost = 0;
+        if (nights > 0) {
+          const guestCount = parseInt(guestCountInput && guestCountInput.value, 10) || 0;
+          const childrenUnder3 = parseInt(childrenInput && childrenInput.value, 10) || 0;
+          const hasPet = petInput && petInput.value === "true";
+          if (guestCount > 2) {
+            extraGuests = Math.max(0, guestCount - childrenUnder3 - 2);
+            extraGuestsCost = extraGuests * EXTRA_GUEST_FEE;
+          }
+          if (hasPet) petCost = EXTRA_PET_FEE;
+        }
+        return { extraGuests: extraGuests, extraGuestsCost: extraGuestsCost, petCost: petCost };
+      }
+      /* Стоимость доп. опций: баня + чан вместе дешевле, чем по отдельности */
+      function addonsCost(){
+        const banya = banyaCb && banyaCb.checked;
+        const chan = chanCb && chanCb.checked;
+        if (banya && chan) return { cost: COMBO_PRICE, label: "Баня + чан · 3 часа" };
+        if (banya) return { cost: BANYA_PRICE, label: "Баня" };
+        if (chan) return { cost: CHAN_PRICE, label: "Сибирский чан" };
+        return { cost: 0, label: "" };
+      }
       function updateSummary(){
         const sd = toDate(firstInputDate.value);
         const ed = toDate(secondInputDate.value);
-        let nights = 0;
-        if (sd && ed) nights = Math.round((ed - sd) / 86400000);
+        let nights = 0, sub = 0;
+        if (sd && ed && ed > sd) {
+          const stay = staySubtotal(sd, ed);
+          nights = stay.nights;
+          sub = stay.subtotal;
+        }
+
+        const fees = extraFees(nights);
+        /* строка с доплатой за дополнительных гостей */
+        if (fees.extraGuestsCost > 0) {
+          sumGuestLabel.textContent = "Доп. гости · " + pluralGuests(fees.extraGuests);
+          sumGuestEl.textContent = nf(fees.extraGuestsCost) + " ₽";
+          sumGuestLine.hidden = false;
+        } else {
+          sumGuestLine.hidden = true;
+          sumGuestEl.textContent = "";
+        }
+        /* строка с доплатой за питомца */
+        if (fees.petCost > 0) {
+          sumPetEl.textContent = nf(fees.petCost) + " ₽";
+          sumPetLine.hidden = false;
+        } else {
+          sumPetLine.hidden = true;
+          sumPetEl.textContent = "";
+        }
+
+        const addons = addonsCost();
+        /* подсветим выгодное комбо, когда выбраны обе опции */
+        if (addonCombo) addonCombo.classList.toggle("is-active", !!(banyaCb && banyaCb.checked && chanCb && chanCb.checked));
+        if (addons.cost > 0) {
+          sumAddonLabel.textContent = addons.label;
+          sumAddonEl.textContent = nf(addons.cost) + " ₽";
+          sumAddonLine.hidden = false;
+        } else {
+          /* опции сняты — прячем строку и очищаем устаревшую подпись/сумму */
+          sumAddonLine.hidden = true;
+          sumAddonLabel.textContent = "";
+          sumAddonEl.textContent = "";
+        }
+
+        const fixedExtras = CLEANING_FEE + addons.cost + fees.extraGuestsCost + fees.petCost;
         if (nights <= 0) {
-          sumNightsEl.textContent = "— ночей";
           sumSubtotalEl.textContent = "—";
-          sumTotalEl.textContent = nf(PRICE_PER_NIGHT + CLEANING_FEE) + " ₽";
+          sumTotalEl.textContent = nf(fixedExtras) + " ₽";
           return;
         }
-        const sub = PRICE_PER_NIGHT * nights;
-        sumNightsEl.textContent = pluralNights(nights);
         sumSubtotalEl.textContent = nf(sub) + " ₽";
-        sumTotalEl.textContent = nf(sub + CLEANING_FEE) + " ₽";
+        sumTotalEl.textContent = nf(sub + fixedExtras) + " ₽";
       }
 
-      /* booking.js пишет даты в скрытые поля синхронно по клику — пересчитываем
-         после его обработчиков (setTimeout 0), затем при любом действии в виджете */
-      booking.addEventListener("click", () => setTimeout(updateSummary, 0));
+      /* booking.js пишет даты в скрытые поля синхронно по клику и вызывает
+         stopPropagation() в своих обработчиках (выбор дня, степперы), поэтому
+         клики не всплывают до #booking. Слушаем на фазе перехвата (capture),
+         она срабатывает до stopPropagation, а setTimeout(0) откладывает пересчёт
+         до завершения обработчиков booking.js — к этому моменту поля уже обновлены. */
+      booking.addEventListener("click", () => setTimeout(updateSummary, 0), true);
+      if (banyaCb) banyaCb.addEventListener("change", updateSummary);
+      if (chanCb) chanCb.addEventListener("change", updateSummary);
+      /* Перед отправкой формы (POST на страницу объекта) убеждаемся, что даты
+         выбраны — иначе сервер вернёт обратно с ошибкой. */
       const bookingForm = document.getElementById("bookingForm");
       if (bookingForm) bookingForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        alert("Заявка отправлена! Мы свяжемся с вами для подтверждения брони.");
+        if (!firstInputDate.value || !secondInputDate.value) {
+          e.preventDefault();
+          alert("Пожалуйста, выберите даты проживания.");
+        }
       });
 
       updateSummary();
+      /* booking.js восстанавливает перенесённый с главной выбор на
+         DOMContentLoaded (после первого updateSummary). Пересчитываем итог
+         на window.load, когда скрытые поля уже заполнены. */
+      window.addEventListener('load', function () { setTimeout(updateSummary, 0); });
     })();
   </script>
 </body>

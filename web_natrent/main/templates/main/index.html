@@ -214,11 +214,7 @@
                   {% if not house.img1 and not house.img2 and not house.img3 and not house.img4 %}<div class="card__slide" style="background-image:url('{% static 'main/img/house1.jpg' %}')"></div>{% endif %}
                 </div>
                 <span class="card__price">
-                  {% if search_applied and house.use_total_stay_cost %}
-                    {{ house.total_stay_cost }} ₽<span> / {{ house.stay_nights }} ноч{{ house.stay_nights|ru_plural:"ь,и,ей" }}</span>
-                  {% else %}
-                    от {{ house.price }} ₽<span> / ночь</span>
-                  {% endif %}
+                  от {{ house.price }} ₽<span> / ночь</span>
                 </span>
                 <button class="card__slider-btn card__slider-btn--prev" type="button" aria-label="Назад">&#8249;</button>
                 <button class="card__slider-btn card__slider-btn--next" type="button" aria-label="Вперёд">&#8250;</button>
@@ -238,24 +234,15 @@
                 <div class="card__meta">
                   <div class="card__facts">
                     <span><i data-feather="users"></i>до {{ house.max_guests }} гост{{ house.max_guests|ru_plural:"ь,я,ей" }}</span>
+                    {% if house.pets_allowed %}
+                      <span><i data-feather="heart"></i>Можно с питомцами</span>
+                    {% else %}
+                      <span><i data-feather="slash"></i>Без питомцев</span>
+                    {% endif %}
                   </div>
                 </div>
                 <div class="card__actions">
                   <a href="{% url 'main:house_detail' house.id %}" class="btn-outline">Подробнее</a>
-                  {% if search_applied %}
-                    <form action="{% url 'main:book_house' house.id %}" method="post" class="book-house-form">
-                      {% csrf_token %}
-                      <input type="hidden" name="form_action" value="show">
-                      <input type="hidden" name="first_date" value="{{ first_date }}">
-                      <input type="hidden" name="second_date" value="{{ second_date }}">
-                      <input type="hidden" name="guest_count" value="{{ guest_count }}">
-                      <input type="hidden" name="children_under_3" value="{{ children_under_3|default:0 }}">
-                      <input type="hidden" name="has_pet" value="{{ has_pet|default:'false' }}">
-                      <button type="submit" class="btn-accent">Забронировать</button>
-                    </form>
-                  {% else %}
-                    <a href="{% url 'main:house_detail' house.id %}" class="btn-accent">Выбрать даты</a>
-                  {% endif %}
                 </div>
               </div>
             </article>

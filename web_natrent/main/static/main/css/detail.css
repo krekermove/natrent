@@ -182,7 +182,12 @@
 
 /* ---------- Отзывы об объекте ---------- */
 .detail-reviews{margin-top:18px;}
-.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:8px;}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:8px;align-items:stretch;}
+/* Карточки отзывов одной высоты, текст — одинакового размера (6 строк),
+   лишнее обрезается, автор всегда прижат к низу */
+.reviews-grid .review{display:flex;flex-direction:column;}
+.reviews-grid .review__text{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;height:154px;}
+.reviews-grid .review__author{margin-top:auto;}
 
 /* ---------- Похожие дома ---------- */
 .similar{margin-top:64px;}

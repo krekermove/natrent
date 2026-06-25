@@ -157,13 +157,13 @@ img{max-width:100%;display:block;}
 }
 .properties-wrapper .h2{font-size:clamp(20px,2.4vw,30px);}
 .cards{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:22px;}
-.properties-wrapper .cards{padding-bottom:28px;}
+.properties-wrapper .cards{padding-bottom:28px;grid-template-columns:repeat(2,1fr);align-items:stretch;}
 
 /* Card description + actions */
 .card__address{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:13px;line-height:1.4;color:#6B7682;}
 .card__address svg{width:14px;height:14px;flex-shrink:0;color:var(--accent);}
-.card__desc{margin:10px 0 0;font-size:14px;line-height:1.5;color:#6B7682;}
-.card__actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid #F0F2F3;}
+.card__desc{margin:10px 0 0;font-size:14px;line-height:1.5;color:#6B7682;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;height:63px;}
+.card__actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:auto;padding-top:16px;border-top:1px solid #F0F2F3;}
 .card__actions form{display:contents;}
 .btn-outline{display:flex;align-items:center;justify-content:center;height:42px;border:1px solid #E3E6E9;border-radius:11px;font-size:13px;font-weight:600;color:#41474E;background:#fff;cursor:pointer;transition:border-color .15s,background .15s;text-decoration:none;}
 .btn-outline:hover{border-color:#C0C5CB;background:#F0F2F3;}
@@ -174,17 +174,17 @@ img{max-width:100%;display:block;}
 .no-results{margin-top:36px;padding:32px;background:#fff;border:1px solid #ECEEF0;border-radius:18px;text-align:center;}
 .no-results p:first-child{font-size:18px;font-weight:600;color:#1C1F23;margin:0;}
 .no-results p:last-child{margin:8px 0 0;color:#6B7682;}
-.card{background:#fff;border:1px solid #ECEEF0;border-radius:18px;overflow:hidden;transition:box-shadow .25s, transform .25s;}
+.card{background:#fff;border:1px solid #ECEEF0;border-radius:18px;overflow:hidden;transition:box-shadow .25s, transform .25s;display:flex;align-items:stretch;}
 .card:hover{box-shadow:0 22px 46px rgba(20,28,40,.12);transform:translateY(-4px);}
 .card__media{position:relative;height:218px;background-color:#E7EBEE;background-size:cover;background-position:center;}
 .card__media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,16,22,0) 55%,rgba(10,16,22,.26));}
 .card__price{position:absolute;top:14px;right:14px;background:#fff;font-size:13px;font-weight:700;padding:7px 13px;border-radius:100px;box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:2;}
 .card__price span{color:#9AA3AC;font-weight:500;}
-.card__body{padding:20px;}
+.card__body{padding:20px;flex:1;min-width:0;display:flex;flex-direction:column;}
 .card__title{font-size:18px;font-weight:700;margin:0;letter-spacing:-.01em;}
 .card__loc{display:flex;align-items:center;gap:6px;margin-top:8px;color:#6B7682;font-size:14px;}
 .card__loc i,.card__loc svg{width:14px;height:14px;}
-.card__meta{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid #F0F2F3;}
+.card__meta{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid #F0F2F3;padding-bottom: 5px}
 .card__facts{display:flex;gap:16px;color:#6B7682;font-size:14px;}
 .card__facts span{display:flex;align-items:center;gap:5px;}
 .card__facts i,.card__facts svg{width:14px;height:14px;}
@@ -192,7 +192,7 @@ img{max-width:100%;display:block;}
 .card__rating i,.card__rating svg{width:14px;height:14px;color:var(--accent);}
 
 /* ---------- Card image slider ---------- */
-.card__slider{position:relative;height:218px;overflow:hidden;border-radius:18px 18px 0 0;background:#E7EBEE;}
+.card__slider{position:relative;flex:0 0 42%;align-self:stretch;min-height:240px;overflow:hidden;border-radius:18px 0 0 18px;background:#E7EBEE;}
 .card__slider::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,16,22,0) 55%,rgba(10,16,22,.26));pointer-events:none;z-index:1;}
 .card__slides{display:flex;height:100%;transition:transform .35s ease;will-change:transform;}
 .card__slide{flex:0 0 100%;background-size:cover;background-position:center;}
@@ -319,5 +319,11 @@ img{max-width:100%;display:block;}
   .booking--sticky .field{height:calc(56px - 12px * var(--sq,0));}
   .booking--sticky .submit-btn{height:calc(56px - 12px * var(--sq,0));}
   .booking--sticky .booking-form{gap:calc(14px - 6px * var(--sq,0));}
+
+  /* Карточки объектов на узких экранах — прежняя вертикальная структура:
+     фото сверху, информация снизу, одна колонка */
+  .properties-wrapper .cards{grid-template-columns:1fr;}
+  .card{flex-direction:column;}
+  .card__slider{flex:0 0 auto;align-self:auto;height:218px;min-height:0;border-radius:18px 18px 0 0;}
 
 }

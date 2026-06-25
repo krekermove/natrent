@@ -43,14 +43,14 @@
         <h1 class="book-head__title">Бронирование</h1>
         <p class="book-head__sub">Проверьте детали и оставьте контакты — мы свяжемся для подтверждения.</p>
       </div>
-      <form action="{% url 'main:search_houses' %}" method="post">
+      <form action="{% url 'main:house_detail' house.id%}" method="post">
         {% csrf_token %}
         <input type="hidden" name="first_date" value="{{ first_date }}">
         <input type="hidden" name="second_date" value="{{ second_date }}">
         <input type="hidden" name="guest_count" value="{{ guest_count }}">
         <input type="hidden" name="children_under_3" value="{{ children_under_3 }}">
         <input type="hidden" name="has_pet" value="{{ has_pet }}">
-        <button type="submit" class="book-back"><i data-feather="arrow-left"></i>Назад к поиску</button>
+        <button type="submit" class="book-back"><i data-feather="arrow-left"></i>Назад к дому</button>
       </form>
     </div>
 

@@ -59,7 +59,7 @@ def addons_cost(addon_banya, addon_chan):
     if addon_banya and addon_chan:
         return BANYA_CHAN_COMBO_PRICE, 'Баня + чан · 3 часа'
     if addon_banya:
-        return BANYA_PRICE, 'Баня · 2 часа'
+        return BANYA_PRICE, 'Баня'
     if addon_chan:
         return CHAN_PRICE, 'Сибирский чан'
     return 0, ''
@@ -451,6 +451,15 @@ class SearchView(View):
 
 
 class HouseDetailView(View):
+    @staticmethod
+    def _load_houses(house_id):
+        houses = list(RentObject.objects.exclude(id=house_id))
+        for house in houses:
+            house.gallery_images = [
+                img for img in [house.img1, house.img2, house.img3, house.img4] if img
+            ]
+        return houses
+
     def get(self, request, house_id):
         house = get_object_or_404(RentObject, pk=house_id)
         slug = ''
@@ -459,9 +468,8 @@ class HouseDetailView(View):
         elif house_id == 1:
             slug = 'detail_house_fedorov'
         elif house_id == 3:
-            slug = 'detail_house_novoizm'
-        elif house_id == 4:
-            slug = 'detail_banya'
+            slug = 'detail_novoizm'
+
 
         date_costs = {
             date_cost.date.strftime('%Y-%m-%d'): date_cost.cost
@@ -469,10 +477,13 @@ class HouseDetailView(View):
             if date_cost.cost is not None
         }
 
+        houses = HouseDetailView._load_houses(house_id)
+
         return render(request, f'main/{slug}.html', {
             'house': house,
             'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY,
             'date_costs_json': json.dumps(date_costs),
+            'houses': houses
         })
 
     def post(self, request, house_id):
@@ -486,8 +497,12 @@ class HouseDetailView(View):
             messages.error(request, error)
             return redirect(reverse('main:house_detail', args=[house_id]))
 
-        context = build_booking_context(house, params)
-        return render(request, 'main/book_object.html', context)
+        # Перенаправляем на оформление брони, передавая выбранные данные
+        # в теле POST-запроса. Код 307 заставляет браузер повторить запрос
+        # тем же методом (POST) и с тем же телом на указанный viewname.
+        response = HttpResponseRedirect(reverse('main:book_house', args=[house_id]))
+        response.status_code = 307
+        return response
 
 
 class PersonalDataConsentView(View):
@@ -524,7 +539,10 @@ class BookHouseView(View):
 
     def post(self, request, house_id):
         house = get_object_or_404(RentObject, pk=house_id)
-        params = parse_booking_params(request.POST)
+        # normalize_search_data приводит поля разных форм к единому виду
+        # (в т.ч. firstInputDate -> first_date), чтобы корректно принять
+        # данные, переданные 307-редиректом со страницы объекта.
+        params = parse_booking_params(normalize_search_data(request.POST))
         form_action = request.POST.get('form_action', 'show')
 
         if form_action == 'show':

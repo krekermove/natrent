@@ -1,4 +1,5 @@
 {% load static %}
+{% load russian_plural %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -248,34 +249,47 @@
           <div class="reviews-grid">
             <div class="review">
               <div class="review__stars">★★★★★</div>
-              <p class="review__text">Снимали дом на выходные — топили баню и сразу в чан под звёздами. Дом тёплый, всё чисто и продумано до мелочей. Обязательно вернёмся зимой!</p>
+              <p class="review__text">Огромное спасибо Наталье и Денису!!! Отличный теплый, чистый и комфортный дом!!!! Шикарная баня!!! Велиуолепный чан!!! Будем советовать всем друзьям и знакомым. Это были незабываемые выходные!!!</p>
               <div class="review__author">
-                <span class="review__avatar">АК</span>
+                <span class="review__avatar">М</span>
                 <div>
-                  <div class="review__name">Анна К.</div>
+                  <div class="review__name">Максим</div>
+                  <div class="review__when">Февраль 2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="review">
+              <div class="review__stars">★★★★★</div>
+              <p class="review__text">Очень уютный домик, тепло, чисто. Все дорожки расчищены, достаточно парковочного места для машин.
+Вокруг тишина и свежий воздух) остались довольны отдыхом, еще обязательно сюда вернемся)</p>
+              <div class="review__author">
+                <span class="review__avatar">М</span>
+                <div>
+                  <div class="review__name">Марина</div>
                   <div class="review__when">Январь 2026</div>
                 </div>
               </div>
             </div>
             <div class="review">
               <div class="review__stars">★★★★★</div>
-              <p class="review__text">Тихое место у леса, до озера правда близко. Чан — отдельный кайф. Хозяйка на связи, помогла с заездом поздно вечером. Рекомендую.</p>
+              <p class="review__text">Отличный, уютный домик✨ Прекрасная придомовая территория и очень ухоженная. Ощущается забота о жильцах во всех деталях: начиная от этапов бронирования, заканчивая необходимыми бытовыми вещами в доме.
+Спасибо ☺️</p>
               <div class="review__author">
-                <span class="review__avatar">МР</span>
+                <span class="review__avatar">И</span>
                 <div>
-                  <div class="review__name">Михаил Р.</div>
-                  <div class="review__when">Октябрь 2025</div>
+                  <div class="review__name">Ирина</div>
+                  <div class="review__when">Сентябрь 2025</div>
                 </div>
               </div>
             </div>
             <div class="review">
               <div class="review__stars">★★★★★</div>
-              <p class="review__text">Брали с детьми. Дом просторный, кухня со всем необходимым, мангал и дрова уже ждали. Баня шикарная. Спасибо, было здорово!</p>
+              <p class="review__text">Очень ухоженный чистый домик и территория. Хорошее расположение, рядом есть конная ферма, покатались на лошадях. На территории дома поле для мини футбола, ребенку понравилось. Есть спальное место на втором этаже, на крыше, было приятным сюрпризом.</p>
               <div class="review__author">
-                <span class="review__avatar">ОВ</span>
+                <span class="review__avatar">А</span>
                 <div>
-                  <div class="review__name">Ольга В.</div>
-                  <div class="review__when">Август 2025</div>
+                  <div class="review__name">Анна</div>
+                  <div class="review__when">Июнь 2025</div>
                 </div>
               </div>
             </div>
@@ -473,75 +487,13 @@
 
           <div class="book-perks">
             <div class="book-perk"><i data-feather="check-circle"></i>Бесплатная отмена за 5 дней до заезда</div>
-            <div class="book-perk"><i data-feather="droplet"></i>Баню и чан протопим к приезду — выберите при бронировании</div>
+            <div class="book-perk"><i data-feather="droplet"></i>Баню и чан протопим к обговоренному времени</div>
             <div class="book-perk"><i data-feather="message-circle"></i>Хозяйка на связи ежедневно 9:00–21:00</div>
           </div>
         </div>
       </aside>
 
     </div>
-
-    <!-- ===== ПОХОЖИЕ ДОМА ===== -->
-    <section class="similar">
-      <div class="similar__head">
-        <h2 class="h2">Похожие дома</h2>
-        <a href="_preview_search.html" class="similar-link">Смотреть все<i data-feather="arrow-right"></i></a>
-      </div>
-      <div class="similar-grid">
-
-        <a class="card" href="#">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 24 000 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Дом с бассейном и баней</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · Выборгское напр.</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>8 гостей</span>
-                <span><i data-feather="home"></i>3 спальни</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.8</span>
-            </div>
-          </div>
-        </a>
-
-        <a class="card" href="#">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 15 000 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Дом у леса с панорамной баней</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Ленинградская обл. · у Лосевских порогов</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>4 гостя</span>
-                <span><i data-feather="home"></i>2 спальни</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.9</span>
-            </div>
-          </div>
-        </a>
-
-        <a class="card" href="#">
-          <div class="card__media" style="background-image:url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80&auto=format&fit=crop');">
-            <span class="card__price">от 6 500 ₽<span> / ночь</span></span>
-          </div>
-          <div class="card__body">
-            <h3 class="card__title">Апартаменты на Ленинском пр.</h3>
-            <div class="card__loc"><i data-feather="map-pin"></i><span>Санкт-Петербург · у клиники «Скандинавия»</span></div>
-            <div class="card__meta">
-              <div class="card__facts">
-                <span><i data-feather="users"></i>4 гостя</span>
-                <span><i data-feather="home"></i>1 спальня</span>
-              </div>
-              <span class="card__rating"><i data-feather="star"></i>4.7</span>
-            </div>
-          </div>
-        </a>
-
-      </div>
-    </section>
 
     <!-- ===== ЛАЙТБОКС ГАЛЕРЕИ ===== -->
     <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Фотографии объекта">
@@ -587,24 +539,24 @@
         <div>
           <div class="footer__h">Объекты</div>
           <div class="footer__list">
-            <a href="_preview.html#properties">Дома с баней</a>
-            <a href="_preview.html#properties">Дом с бассейном</a>
-            <a href="_preview.html#properties">Квартира в СПб</a>
+            <a href="{% url 'main:house_detail' 2 %}">Дом в Аннолово</a>
+            <a href="{% url 'main:house_detail' 1 %}">Дом в Федоровском</a>
+            <a href="{% url 'main:house_detail' 3 %}">Аппартаменты на московской</a>
           </div>
         </div>
         <div>
           <div class="footer__h">Компания</div>
           <div class="footer__list">
-            <a href="_preview.html#about">О нас</a>
-            <a href="_preview.html#reviews">Отзывы</a>
-            <a href="_preview.html#contact">Контакты</a>
+            <a href="{% url 'main:main_page' %}#about">О нас</a>
+            <a href="{% url 'main:main_page' %}#reviews">Отзывы</a>
+            <a href="{% url 'main:main_page' %}#contact">Контакты</a>
           </div>
         </div>
         <div>
           <div class="footer__h">Мы на связи</div>
           <div class="footer__list">
-            <span>+7 (921) 000-00-00</span>
-            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2048454c4c4f604e415452454e540e5255">[email&#160;protected]</a></span>
+            <span>+7 (911) 811-08-42</span>
+            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2048454c4c4f604e415452454e540e5255">natalkob@gmail.com</a></span>
             <a href="#">Telegram · @natrent</a>
           </div>
         </div>
@@ -612,8 +564,9 @@
       <div class="footer__bottom">
         <span>© 2026 NatRent. Все права защищены.</span>
         <div class="footer__legal">
-          <a href="#">Политика конфиденциальности</a>
-          <a href="#">Условия аренды</a>
+          <a href="{% url 'main:personal_data_consent' %}" target="_blank" rel="noopener noreferrer">Согласие на обработку персональных данных</a>
+          <a href="{% url 'main:user_agreement' %}" target="_blank" rel="noopener noreferrer">Пользовательским соглашением</a>
+          <a href="{% url 'main:privacy_policy' %}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>
         </div>
       </div>
     </div>
