@@ -1,27 +1,104 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block page_title %}NatRent{% endblock %} | NatRent</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Пользовательское соглашение | NatRent</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
+  <link rel="stylesheet" href="{% static 'main/css/legal.css' %}">
 </head>
-<body class="bg-gray-50 font-sans text-gray-800">
-    <header class="bg-white border-b shadow-sm">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <span class="text-xl font-bold text-blue-600">NatRent</span>
-            <a href="{% url 'main:search_houses' %}" class="text-blue-600 hover:text-blue-800">К поиску домов</a>
+<body class="legal-page">
+
+  <!-- ===== НАВИГАЦИЯ ===== -->
+  <nav class="nav">
+    <div class="nav__inner">
+      <a href="{% url 'main:main_page' %}" class="nav__logo">
+        <span class="nav__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+        <span class="nav__brand">NatRent</span>
+      </a>
+      <div class="nav__right">
+        <div class="nav__links">
+          <a href="{% url 'main:main_page' %}#properties" class="nav__link">Объекты</a>
+          <a href="{% url 'main:main_page' %}#about" class="nav__link">О нас</a>
+          <a href="{% url 'main:main_page' %}#reviews" class="nav__link">Отзывы</a>
+          <a href="{% url 'main:main_page' %}#contact" class="nav__link">Контакты</a>
         </div>
+<!--        <a href="_preview_search.html" class="nav__cta">Свободные дома</a>-->
+      </div>
+    </div>
+  </nav>
+
+  <main class="legal-main">
+    <a href="javascript:history.back()" class="legal-back"><i data-feather="arrow-left"></i>Назад</a>
+
+    <!-- ===== ШАПКА ДОКУМЕНТА ===== -->
+    <header class="legal-head">
+      <p class="legal-head__eyebrow">Правовая информация</p>
+      <h1 class="legal-head__title">{% block document_title %}{% endblock %}</h1>
+      <p class="legal-head__meta">
+        <i data-feather="calendar"></i>
+        Дата публикации: 23 мая 2026 г.
+      </p>
     </header>
 
-    <main class="container mx-auto px-4 py-10 max-w-3xl">
-        <a href="javascript:history.back()" class="inline-block text-blue-600 hover:text-blue-800 mb-6">← Назад</a>
-        <h1 class="text-3xl font-bold mb-2">{% block document_title %}{% endblock %}</h1>
-        <p class="text-sm text-gray-500 mb-8">Дата публикации: 23 мая 2026 г.</p>
+    <article class="legal-article">
+      {% block legal_content %}{% endblock %}
+    </article>
+  </main>
 
-        <article class="bg-white rounded-lg shadow-sm border p-6 md:p-8 space-y-4 text-sm leading-relaxed text-gray-700">
-            {% block legal_content %}{% endblock %}
-        </article>
-    </main>
+  <!-- ===== ФУТЕР ===== -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__cols">
+        <div class="footer__brand">
+          <div class="footer__brandrow">
+            <span class="footer__mark"><i data-feather="home" style="width:16px;height:16px;"></i></span>
+            <span class="footer__brandname">NatRent</span>
+          </div>
+          <p class="footer__about">Дома с баней, чаном и бассейном в Ленинградской области и квартира в центре Петербурга.</p>
+        </div>
+        <div>
+          <div class="footer__h">Объекты</div>
+          <div class="footer__list">
+            <a href="_preview.html#properties">Дома с баней</a>
+            <a href="_preview.html#properties">Дом с бассейном</a>
+            <a href="_preview.html#properties">Квартира в СПб</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Компания</div>
+          <div class="footer__list">
+            <a href="_preview.html#about">О нас</a>
+            <a href="_preview.html#reviews">Отзывы</a>
+            <a href="_preview.html#contact">Контакты</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer__h">Мы на связи</div>
+          <div class="footer__list">
+            <span>+7 (921) 000-00-00</span>
+            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="94fcf1f8f8fbd4faf5e0e6f1fae0bae6e1">[email&#160;protected]</a></span>
+            <a href="#">Telegram · @natrent</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© 2026 NatRent. Все права защищены.</span>
+        <div class="footer__legal">
+          <a href="#">Политика конфиденциальности</a>
+          <a href="#">Условия аренды</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://unpkg.com/feather-icons"></script>
+  <script>if (window.feather) feather.replace();</script>
 </body>
 </html>
