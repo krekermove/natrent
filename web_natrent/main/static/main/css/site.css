@@ -297,6 +297,8 @@ img{max-width:100%;display:block;}
   .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:6px 18px 14px;flex-shrink:0;}
   .guest-pop .sheet-head{padding:6px 0 12px;border-bottom:1px solid #F0F2F3;}
   .sheet-head__title{font-size:17px;font-weight:700;color:#1C1F23;}
+  .cal-pop .sheet-head{position:relative;}
+  .cal-pop .sheet-head__title{position:absolute;left:50%;transform:translateX(-50%);}
   .sheet-x{width:36px;height:36px;border:none;background:none;cursor:pointer;font-size:22px;line-height:1;color:#1C1F23;font-family:inherit;display:flex;align-items:center;justify-content:center;margin-left:-8px;}
   .sheet-x--spacer{width:36px;visibility:hidden;}
   .sheet-reset{background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--accent);font-family:inherit;}

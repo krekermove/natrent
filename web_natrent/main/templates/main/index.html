@@ -453,8 +453,9 @@
       <div class="footer__bottom">
         <span>© 2026 NatRent. Все права защищены.</span>
         <div class="footer__legal">
-          <a href="#">Политика конфиденциальности</a>
-          <a href="#">Условия аренды</a>
+          <a href="{% url 'main:personal_data_consent' %}" target="_blank" rel="noopener noreferrer">Согласие на обработку персональных данных</a>
+          <a href="{% url 'main:user_agreement' %}" target="_blank" rel="noopener noreferrer">Пользовательским соглашением</a>
+          <a href="{% url 'main:privacy_policy' %}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>
         </div>
       </div>
     </div>
