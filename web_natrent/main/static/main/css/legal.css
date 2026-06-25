@@ -1,0 +1,61 @@
+/* ==========================================================================
+   NatRent — базовый шаблон правовых страниц (соглашение, политика и т.д.)
+   Дополняет site.css (переменные, .nav, .footer, .wrap берутся оттуда).
+   Подключается через {% static 'rental/css/legal.css' %} ПОСЛЕ site.css.
+   ========================================================================== */
+
+.legal-page{padding-top:72px;min-height:100vh;display:flex;flex-direction:column;background:#F7F8F9;}
+.legal-main{flex:1;width:100%;max-width:860px;margin:0 auto;padding:104px 28px 88px;}
+
+/* ---------- Хлебная навигация / назад ---------- */
+.legal-back{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--accent);margin-bottom:26px;transition:gap .15s,color .15s;}
+.legal-back:hover{gap:11px;color:color-mix(in srgb, var(--accent) 80%, #000);}
+.legal-back i,.legal-back svg{width:15px;height:15px;}
+
+/* ---------- Шапка документа ---------- */
+.legal-head{margin-bottom:30px;}
+.legal-head__eyebrow{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:0 0 14px;}
+.legal-head__title{font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-.025em;line-height:1.08;margin:0;color:#15181C;text-wrap:balance;}
+.legal-head__meta{display:flex;align-items:center;gap:8px;margin:16px 0 0;font-size:14px;color:#8B939B;}
+.legal-head__meta i,.legal-head__meta svg{width:15px;height:15px;color:#A6AEB6;}
+
+/* ---------- Карточка с содержимым документа ---------- */
+.legal-article{background:#fff;border:1px solid #ECEEF0;border-radius:20px;padding:clamp(26px,4vw,48px);box-shadow:0 12px 38px rgba(20,28,40,.06);}
+
+/* ---------- Типографика правового текста ----------
+   Дочерние шаблоны заполняют {% block legal_content %} произвольным HTML —
+   стили ниже оформляют любые стандартные теги внутри статьи. */
+.legal-article{font-size:15.5px;line-height:1.72;color:#41474E;}
+.legal-article > *:first-child{margin-top:0;}
+.legal-article > *:last-child{margin-bottom:0;}
+
+.legal-article h2{font-size:clamp(20px,2.4vw,26px);font-weight:800;letter-spacing:-.015em;line-height:1.25;color:#15181C;margin:42px 0 14px;}
+.legal-article h3{font-size:18px;font-weight:700;letter-spacing:-.01em;color:#1C1F23;margin:30px 0 10px;}
+.legal-article h4{font-size:15.5px;font-weight:700;color:#1C1F23;margin:24px 0 8px;}
+
+.legal-article p{margin:0 0 16px;text-wrap:pretty;}
+.legal-article strong,.legal-article b{font-weight:700;color:#1C1F23;}
+.legal-article a{color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;}
+.legal-article a:hover{color:color-mix(in srgb, var(--accent) 78%, #000);}
+
+.legal-article ul,.legal-article ol{margin:0 0 18px;padding-left:4px;display:flex;flex-direction:column;gap:9px;list-style:none;counter-reset:legal;}
+.legal-article li{position:relative;padding-left:28px;text-wrap:pretty;}
+.legal-article ul > li::before{content:"";position:absolute;left:8px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.legal-article ol{counter-reset:legal;}
+.legal-article ol > li{counter-increment:legal;}
+.legal-article ol > li::before{content:counter(legal);position:absolute;left:0;top:1px;width:21px;height:21px;border-radius:7px;background:color-mix(in srgb, var(--accent) 13%, #fff);color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.legal-article li ul,.legal-article li ol{margin:9px 0 0;}
+
+.legal-article hr{border:none;border-top:1px solid #ECEEF0;margin:34px 0;}
+.legal-article blockquote{margin:0 0 18px;padding:14px 20px;border-left:3px solid var(--accent);background:#F7F8F9;border-radius:0 10px 10px 0;color:#41474E;}
+.legal-article blockquote p:last-child{margin-bottom:0;}
+
+.legal-article table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14.5px;}
+.legal-article th,.legal-article td{border:1px solid #ECEEF0;padding:11px 14px;text-align:left;vertical-align:top;}
+.legal-article th{background:#F7F8F9;font-weight:700;color:#1C1F23;}
+
+.legal-article code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;background:#F0F2F3;border-radius:6px;padding:2px 6px;color:#3A4047;}
+
+@media (max-width:760px){
+  .legal-main{padding:92px 18px 64px;}
+}
