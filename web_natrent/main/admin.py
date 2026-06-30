@@ -10,7 +10,7 @@ from .models import TimeTable, RentObject, DateObjectCost, Feedback
 
 @admin.register(TimeTable)
 class TimeTableAdmin(admin.ModelAdmin):
-    list_display = ('phone', 'house', 'startdate', 'enddate', 'status', 'guests_amount', 'has_pet', 'addon_banya', 'addon_chan')
+    list_display = ('phone', 'house', 'startdate', 'enddate', 'status', 'guests_amount', 'has_pet', 'addon_banya', 'addon_chan', 'created')
 
     change_list_template = 'admin/timetable_changelist.html'
 
@@ -97,7 +97,6 @@ class TimeTableAdmin(admin.ModelAdmin):
                 return render(request, "admin/timetable_calendar.html", context=context)
             else:
                 form = BookingForm(request.POST)
-                print("1")
                 if form.is_valid():
                     instance = form.save(commit=False)
                     instance.name = form.cleaned_data.get('name')
@@ -110,7 +109,6 @@ class TimeTableAdmin(admin.ModelAdmin):
                     instance.comment = form.cleaned_data.get('comment')
                     instance.order_cost = form.cleaned_data.get('order_cost')
                     instance.save()
-                    print("1")
                     return redirect('admin:timetable_calendar')
                 context = self.context_for_timetable_page(request)
                 return render(request, "admin/timetable_calendar.html", context=context)

@@ -19,7 +19,7 @@ class TimeTable(models.Model):
     comment = models.TextField(max_length=200, null=True, blank=True, default=None, verbose_name="Комментарий")
     order_cost = models.PositiveIntegerField(verbose_name="Стоимость заказа")
     status = models.BooleanField(default=True, blank=True, verbose_name="Статус аренды")
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, verbose_name="Дата отправки")
 
     class Meta:
         verbose_name = "Бронирование"

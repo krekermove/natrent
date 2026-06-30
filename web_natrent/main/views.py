@@ -481,9 +481,9 @@ class HouseDetailView(View):
     def get(self, request, house_id):
         house = get_object_or_404(RentObject, pk=house_id)
         slug = ''
-        if house_id == 2:
+        if house_id == 1:
             slug = 'detail_house_annolovo'
-        elif house_id == 1:
+        elif house_id == 2:
             slug = 'detail_house_fedorov'
         elif house_id == 3:
             slug = 'detail_novoizm'
