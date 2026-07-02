@@ -13,6 +13,7 @@
 
   <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
   <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.23/dist/lenis.css">
+  <link rel="icon" href="{% static 'main/img/favicon.png' %}" type="image/png">
 </head>
 <body>
 <div class="page">
@@ -356,21 +357,21 @@
             <span class="contact-item__icon"><i data-feather="phone"></i></span>
             <div>
               <div class="contact-item__label">Телефон</div>
-              <div class="contact-item__value">+7 (911) 811-08-42</div>
+              <a href="tel:+79118119842" class="contact-item__value">+7 (911) 811-08-42</a>
             </div>
           </div>
           <div class="contact-item">
             <span class="contact-item__icon"><i data-feather="message-circle"></i></span>
             <div>
               <div class="contact-item__label">Telegram / WhatsApp</div>
-              <div class="contact-item__value">@natrent</div>
+              <a href="#" class="contact-item__value">Telegram · @natrent</a>
             </div>
           </div>
           <div class="contact-item">
             <span class="contact-item__icon"><i data-feather="mail"></i></span>
             <div>
               <div class="contact-item__label">Почта</div>
-              <div class="contact-item__value">hello@natrent.ru</div>
+              <a href="mailto:info@natrent.ru" class="contact-item__value">info@natrent.ru</a>
             </div>
           </div>
           <div class="contact-item">
@@ -428,8 +429,8 @@
         <div>
           <div class="footer__h">Объекты</div>
           <div class="footer__list">
-            <a href="{% url 'main:house_detail' 2 %}">Дом в Аннолово</a>
-            <a href="{% url 'main:house_detail' 1 %}">Дом в Федоровском</a>
+            <a href="{% url 'main:house_detail' 1 %}">Дом в Аннолово</a>
+            <a href="{% url 'main:house_detail' 2 %}">Дом в Федоровском</a>
             <a href="{% url 'main:house_detail' 3 %}">Аппартаменты на московской</a>
           </div>
         </div>
@@ -444,8 +445,8 @@
         <div>
           <div class="footer__h">Мы на связи</div>
           <div class="footer__list">
-            <span>+7 (911) 811-08-42</span>
-            <span>hello@natrent.ru</span>
+            <a href="tel:+79118119842">+7 (911) 811-08-42</a>
+            <a href="mailto:info@natrent.ru">info@natrent.ru</a>
             <a href="#">Telegram · @natrent</a>
           </div>
         </div>

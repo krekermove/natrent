@@ -13,6 +13,7 @@
 
   <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
   <link rel="stylesheet" href="{% static 'main/css/book.css' %}">
+  <link rel="icon" href="{% static 'main/img/favicon.png' %}" type="image/png">
 </head>
 <body class="book-page">
 
@@ -218,9 +219,9 @@
         <div>
           <div class="footer__h">Объекты</div>
           <div class="footer__list">
-            <a href="{% url 'main:main_page' %}#properties">Дома с баней</a>
-            <a href="{% url 'main:main_page' %}#properties">Дом с бассейном</a>
-            <a href="{% url 'main:main_page' %}#properties">Квартира в СПб</a>
+            <a href="{% url 'main:house_detail' 1 %}">Дом в Аннолово</a>
+            <a href="{% url 'main:house_detail' 2 %}">Дом в Федоровском</a>
+            <a href="{% url 'main:house_detail' 3 %}">Аппартаменты на московской</a>
           </div>
         </div>
         <div>
@@ -234,7 +235,8 @@
         <div>
           <div class="footer__h">Мы на связи</div>
           <div class="footer__list">
-            <span>+7 (921) 000-00-00</span>
+            <a href="tel:+79118119842">+7 (911) 811-08-42</a>
+            <a href="mailto:info@natrent.ru">info@natrent.ru</a>
             <a href="#">Telegram · @natrent</a>
           </div>
         </div>
@@ -242,8 +244,9 @@
       <div class="footer__bottom">
         <span>© 2026 NatRent. Все права защищены.</span>
         <div class="footer__legal">
-          <a href="{% url 'main:privacy_policy' %}">Политика конфиденциальности</a>
-          <a href="{% url 'main:user_agreement' %}">Условия аренды</a>
+          <a href="{% url 'main:personal_data_consent' %}" target="_blank" rel="noopener noreferrer">Согласие на обработку персональных данных</a>
+          <a href="{% url 'main:user_agreement' %}" target="_blank" rel="noopener noreferrer">Пользовательским соглашением</a>
+          <a href="{% url 'main:privacy_policy' %}" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>
         </div>
       </div>
     </div>

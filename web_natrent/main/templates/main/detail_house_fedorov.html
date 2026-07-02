@@ -13,6 +13,7 @@
 
   <link rel="stylesheet" href="{% static 'main/css/site.css' %}">
   <link rel="stylesheet" href="{% static 'main/css/detail.css' %}">
+  <link rel="icon" href="{% static 'main/img/favicon.png' %}" type="image/png">
 
   <style>
     /* Содержимое каждого факта — в строку */
@@ -556,8 +557,8 @@
         <div>
           <div class="footer__h">Объекты</div>
           <div class="footer__list">
-            <a href="{% url 'main:house_detail' 2 %}">Дом в Аннолово</a>
-            <a href="{% url 'main:house_detail' 1 %}">Дом в Федоровском</a>
+            <a href="{% url 'main:house_detail' 1 %}">Дом в Аннолово</a>
+            <a href="{% url 'main:house_detail' 2 %}">Дом в Федоровском</a>
             <a href="{% url 'main:house_detail' 3 %}">Аппартаменты на московской</a>
           </div>
         </div>
@@ -572,8 +573,8 @@
         <div>
           <div class="footer__h">Мы на связи</div>
           <div class="footer__list">
-            <span>+7 (911) 811-08-42</span>
-            <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2048454c4c4f604e415452454e540e5255">natalkob@gmail.com</a></span>
+            <a href="tel:+79118119842">+7 (911) 811-08-42</a>
+            <a href="mailto:info@natrent.ru">info@natrent.ru</a>
             <a href="#">Telegram · @natrent</a>
           </div>
         </div>
