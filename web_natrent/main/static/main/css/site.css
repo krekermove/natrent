@@ -20,7 +20,7 @@ body{
   -webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
-section{scroll-margin-top:88px;}
+section{scroll-margin-top:90px;}
 a{text-decoration:none;color:inherit;}
 img{max-width:100%;display:block;}
 ::selection{background:color-mix(in srgb, var(--accent) 22%, #fff);}
@@ -223,24 +223,89 @@ html{scrollbar-width:thin;scrollbar-color:var(--accent) #ECEEF0;}
 
 /* ---------- О нас / Контакты (тёмные) ---------- */
 .section-dark{background:var(--navy);padding:96px 28px;}
-.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:60px;align-items:center;}
-.about__media{height:clamp(360px,34vw,460px);border-radius:22px;background-color:#0f1820;background-size:cover;background-position:center;box-shadow:0 24px 60px rgba(0,0,0,.35);}
-.about__badge{position:absolute;right:-14px;bottom:-22px;background:#fff;border:1px solid #ECEEF0;box-shadow:0 16px 40px rgba(20,28,40,.12);border-radius:16px;padding:18px 22px;}
-.about__badge b{display:block;font-size:34px;font-weight:800;color:var(--accent);letter-spacing:-.02em;line-height:1;}
-.about__badge small{display:block;font-size:14px;color:#6B7682;margin-top:6px;}
-.section-lead--light{color:rgba(255,255,255,.74);}
-.feature-list{margin-top:34px;display:flex;flex-direction:column;gap:24px;}
-.feature{display:flex;gap:16px;}
-.feature__icon{flex-shrink:0;width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;color:#B7C9D6;}
-.feature__icon i,.feature__icon svg{width:20px;height:20px;}
-.feature h3{font-size:17px;font-weight:700;margin:0;color:#fff;}
-.feature p{margin:6px 0 0;font-size:15px;line-height:1.55;color:rgba(255,255,255,.62);}
+.container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.advantages {
+    position: relative;
+    background: url("images/apartment.jpg") center/cover no-repeat;
+    padding: 55px 0;
+    overflow: hidden;
+}
+
+.advantages__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+}
+
+.advantages .container {
+    position: relative;
+    z-index: 2;
+}
+
+.advantages__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+}
+
+.advantage {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.advantage__icon {
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    padding-top: 20px;
+}
+
+.advantage__content h3 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+.advantage__content h3 span {
+    font-size: 22px;
+}
+
+.advantage__content p {
+    color: rgba(255,255,255,.92);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+@media (max-width: 992px) {
+    .advantages__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 35px;
+    }
+}
+
+@media (max-width: 600px) {
+    .advantages {
+        padding: 40px 0;
+    }
+
+    .advantages__grid {
+        grid-template-columns: 1fr;
+    }
+}
 
 /* ---------- Отзывы ---------- */
 .reviews{padding:96px 28px 100px;}
 .review{background:#fff;border:1px solid #ECEEF0;border-radius:18px;padding:28px;}
 .review__stars{color:var(--accent);font-size:16px;letter-spacing:3px;}
-.review__text{margin:16px 0 0;font-size:16px;line-height:1.6;color:#3A4047;text-wrap:pretty;}
+.review__text{margin:16px 0 0;font-size:16px;line-height:1.6;color:#3A4047;text-wrap:pretty;height: 160px}
 .review__author{display:flex;align-items:center;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #F0F2F3;}
 .review__avatar{width:42px;height:42px;border-radius:50%;background:color-mix(in srgb, var(--accent) 14%, #fff);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
 .review__name{font-weight:700;font-size:15px;}

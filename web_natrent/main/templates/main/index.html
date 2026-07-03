@@ -46,7 +46,7 @@
     <div class="hero__body">
       <div class="hero__badge"><span></span>Санкт-Петербург · Ленинградская область</div>
       <h1 class="hero__title">Загородные дома с баней, чаном и бассейном</h1>
-      <p class="hero__lead">Уютный отдых под Петербургом и квартира в центре города. Премиальная баня от уральских мастеров, банный чан под открытым небом и подогреваемый бассейн.</p>
+      <p class="hero__lead">Уютный отдых под Санкт-Петербургом и квартира в центре города. Премиальная баня от уральских мастеров, сибирский банный чан под открытым небом с подогревом и бассейн.</p>
     </div>
 
     <div class="hero__booking">
@@ -232,7 +232,7 @@
                 {% if house.address %}
                   <p class="card__address"><i data-feather="map-pin"></i>{{ house.address }}</p>
                 {% endif %}
-                <p class="card__desc">{{ house.description|truncatechars:90 }}</p>
+                <p class="card__desc">{{ house.description|truncatechars:120 }}</p>
                 <div class="card__meta">
                   <div class="card__facts">
                     <span><i data-feather="users"></i>до {{ house.max_guests }} гост{{ house.max_guests|ru_plural:"ь,я,ей" }}</span>
@@ -261,41 +261,59 @@
   </div>
 
   <!-- ===== О НАС ===== -->
-  <section id="about" class="section-dark" style="margin-top:96px;">
-    <div class="wrap split">
-      <div style="position:relative;">
-        <div class="about__media" style="background-image:url('https://images.unsplash.com/photo-1554995207-c18c203602cb?w=1000&q=80&auto=format&fit=crop');"></div>
-        <div class="about__badge"><b>4+</b><small>года принимаем гостей</small></div>
-      </div>
-      <div>
-        <div class="eyebrow eyebrow--light">О нас</div>
-        <h2 class="h2 h2--light">Свой дом для отдыха под Петербургом</h2>
-        <p class="section-lead section-lead--light" style="margin-top:18px;line-height:1.65;text-wrap:pretty;">Сдаём собственные дома в Ленинградской области и квартиру в Петербурге. Баня премиум-класса собрана уральскими мастерами, во дворе — сибирский банный чан под открытым небом и подогреваемый бассейн. Всё готово к вашему приезду.</p>
+  <section id="about" class="section-dark">
+    <div class="container">
+        <div class="advantages__grid">
+            <div class="advantage">
+                <div class="advantage__icon"><i data-feather="check-circle"></i></div>
+                <div class="advantage__content">
+                    <h3>Рейтинг <span>4,9</span> из 5,0</h3>
+                    <p>
+                        По отзывам гостей на
+                        Авито, ЦИАН,
+                        Яндекс Путешествия, Суточно.ру
+                    </p>
+                </div>
+            </div>
 
-        <div class="feature-list">
-          <div class="feature">
-            <span class="feature__icon"><i data-feather="key"></i></span>
-            <div>
-              <h3>Свои объекты, без посредников</h3>
-              <p>Сдаём напрямую — честная цена и быстрые ответы на любые вопросы.</p>
+            <div class="advantage">
+                <div class="advantage__icon"><i data-feather="check-circle"></i></div>
+                <div class="advantage__content">
+                    <h3>Бесплатная отмена</h3>
+                    <p>
+                        Гарантия 100% возврата
+                        предоплаты при отмене
+                        бронирования за 5 дней
+                        до заезда
+                    </p>
+                </div>
             </div>
-          </div>
-          <div class="feature">
-            <span class="feature__icon"><i data-feather="droplet"></i></span>
-            <div>
-              <h3>Баня, чан и бассейн</h3>
-              <p>Премиальная парная от уральских мастеров и банный чан под открытым небом круглый год.</p>
+            <div class="advantage">
+                <div class="advantage__icon"><i data-feather="check-circle"></i></div>
+                <div class="advantage__content">
+                    <h3>Суперхозяин</h3>
+                    <p>
+                        Постоянный статус
+                        подтверждает качество
+                        предоставляемых услуг
+                        и доверие гостей!
+                    </p>
+                </div>
             </div>
-          </div>
-          <div class="feature">
-            <span class="feature__icon"><i data-feather="message-circle"></i></span>
-            <div>
-              <h3>На связи в любое время</h3>
-              <p>Поможем с заселением, трансфером и подбором свободных дат.</p>
+
+            <div class="advantage">
+                <div class="advantage__icon"><i data-feather="check-circle"></i></div>
+                <div class="advantage__content">
+                    <h3>Отчётные документы</h3>
+                    <p>
+                        В соответствии с 54-ФЗ,
+                        предоставляется электронный
+                        кассовый чек
+                    </p>
+                </div>
             </div>
-          </div>
+
         </div>
-      </div>
     </div>
   </section>
 
@@ -310,34 +328,34 @@
       <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));">
         <div class="review">
           <div class="review__stars">★★★★★</div>
-          <p class="review__text">Снимали дом с чаном на выходные — топили баню и сразу в чан под звёздами. Дом тёплый, всё чисто и продумано. Обязательно вернёмся зимой!</p>
+          <p class="review__text">Огромное спасибо Наталье и Денису!!! Отличный теплый, чистый и комфортный дом!!!! Шикарная баня!!! Великолепный чан!!! Будем советовать всем друзьям и знакомым. Это были незабываемые выходные!!!</p>
           <div class="review__author">
             <span class="review__avatar">АК</span>
             <div>
               <div class="review__name">Анна К.</div>
-              <div class="review__when">Приозерское напр. · январь 2026</div>
+              <div class="review__when">январь 2026</div>
             </div>
           </div>
         </div>
         <div class="review">
           <div class="review__stars">★★★★★</div>
-          <p class="review__text">Брали дом с бассейном на компанию. Вода тёплая, мангал, тихий участок у леса. Хозяева всегда на связи, заехали без единой заминки.</p>
+          <p class="review__text">Мы с мужем отлично провели время в этом доме! Очень уютная, чистая и комфортная атмосфера, всё продумано до мелочей. Баня просто замечательная, а бассейн стал отличным дополнением к отдыху. Здесь действительно можно расслабиться.</p>
           <div class="review__author">
-            <span class="review__avatar">ДС</span>
+            <span class="review__avatar">А</span>
             <div>
-              <div class="review__name">Дмитрий С.</div>
-              <div class="review__when">Выборгское напр. · август 2025</div>
+              <div class="review__name">Анастасия</div>
+              <div class="review__when">июнь 2026</div>
             </div>
           </div>
         </div>
         <div class="review">
           <div class="review__stars">★★★★★</div>
-          <p class="review__text">Останавливались в квартире на Ленинском рядом со «Скандинавией» — очень удобно перед приёмом. Чисто, тихо, до метро пять минут пешком.</p>
+          <p class="review__text">Останавливались в квартире на Новоизмайловском рядом со «Скандинавией» — очень удобно перед приёмом. Чисто, тихо, до метро пять минут пешком.</p>
           <div class="review__author">
             <span class="review__avatar">ЕМ</span>
             <div>
               <div class="review__name">Елена М.</div>
-              <div class="review__when">Санкт-Петербург · март 2026</div>
+              <div class="review__when">март 2026</div>
             </div>
           </div>
         </div>
@@ -365,7 +383,7 @@
             <span class="contact-item__icon"><i data-feather="message-circle"></i></span>
             <div>
               <div class="contact-item__label">Telegram / WhatsApp</div>
-              <a href="#" class="contact-item__value">Telegram · @natrent</a>
+              <a href="https://t.me/natrent3" class="contact-item__value">Telegram · @natrent3</a>
             </div>
           </div>
           <div class="contact-item">
@@ -446,9 +464,9 @@
         <div>
           <div class="footer__h">Мы на связи</div>
           <div class="footer__list">
-            <a href="tel:+79118119842">+7 (911) 811-08-42</a>
+            <a href="tel:+79118110842">+7 (911) 811-08-42</a>
             <a href="mailto:info@natrent.ru">info@natrent.ru</a>
-            <a href="#">Telegram · @natrent</a>
+            <a href="https://t.me/natrent3">Telegram · @natrent3</a>
           </div>
         </div>
       </div>
