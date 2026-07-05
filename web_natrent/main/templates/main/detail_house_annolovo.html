@@ -809,6 +809,13 @@
         if (b === 1) return n + " гость";
         return n + " гостей";
       }
+      function pluralNights(n){
+        const a = Math.abs(n) % 100, b = a % 10;
+        if (a > 10 && a < 20) return n + " ночей";
+        if (b > 1 && b < 5) return n + " ночи";
+        if (b === 1) return n + " ночь";
+        return n + " ночей";
+      }
       /* Доп. плата за гостей и питомца — повторяет расчёт сервера
          (calculate_booking_cost): доп. гость = гость сверх 2, кроме детей до 3 лет;
          применяется только при выбранных датах (nights > 0). */
@@ -820,9 +827,9 @@
           const hasPet = petInput && petInput.value === "true";
           if (guestCount > 2) {
             extraGuests = Math.max(0, guestCount - childrenUnder3 - 2);
-            extraGuestsCost = extraGuests * EXTRA_GUEST_FEE;
+            extraGuestsCost = extraGuests * EXTRA_GUEST_FEE * nights;
           }
-          if (hasPet) petCost = EXTRA_PET_FEE;
+          if (hasPet) petCost = EXTRA_PET_FEE * nights;
         }
         return { extraGuests: extraGuests, extraGuestsCost: extraGuestsCost, petCost: petCost };
       }
@@ -848,7 +855,7 @@
         const fees = extraFees(nights);
         /* строка с доплатой за дополнительных гостей */
         if (fees.extraGuestsCost > 0) {
-          sumGuestLabel.textContent = "Доп. гости · " + pluralGuests(fees.extraGuests);
+          sumGuestLabel.textContent = "Доп. гости · " + pluralGuests(fees.extraGuests) + " * " + pluralNights(nights);
           sumGuestEl.textContent = nf(fees.extraGuestsCost) + " ₽";
           sumGuestLine.hidden = false;
         } else {

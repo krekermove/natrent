@@ -59,9 +59,13 @@ CHAN_PRICE = 6000
 BANYA_CHAN_COMBO_PRICE = 11000  # баня + чан вместе на 3 часа — выгоднее
 
 
-def addons_cost(addon_banya, addon_chan):
+def addons_cost(addon_banya, addon_chan, id):
     """Стоимость и подпись выбранных доп. услуг (баня/чан).
     Вместе они дешевле, чем по отдельности."""
+    if id == 1:
+        BANYA_PRICE = 6000
+    else:
+        BANYA_PRICE = 5000
     if addon_banya and addon_chan:
         return BANYA_CHAN_COMBO_PRICE, 'Баня + чан · 3 часа'
     if addon_banya:
@@ -162,10 +166,10 @@ def calculate_booking_cost(
     if has_all_dates_cost:
         if guest_count > 2:
             extra_guests = max(0, guest_count - children_under_3 - 2)
-            extra_guests_cost = extra_guests * house.extra_guest_fee
+            extra_guests_cost = extra_guests * house.extra_guest_fee * stay_nights
         if has_pet:
-            pet_cost = house.extra_pet_fee
-        addon_cost, addon_label = addons_cost(addon_banya, addon_chan)
+            pet_cost = house.extra_pet_fee * stay_nights
+        addon_cost, addon_label = addons_cost(addon_banya, addon_chan, house.id)
 
     total_cost = base_cost + extra_guests_cost + pet_cost + addon_cost
 
