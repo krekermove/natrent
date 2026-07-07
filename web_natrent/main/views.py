@@ -46,12 +46,6 @@ WEEKDAYS_RU = (
     'пятница', 'суббота', 'воскресенье',
 )
 
-# Апартаменты (единственный объект такого типа в базе) бронируются минимум
-# от двух ночей. Объекты пока не разделены на категории, поэтому ориентируемся
-# на конкретный id объекта с апартаментами.
-APARTMENTS_HOUSE_ID = 3
-APARTMENTS_MIN_NIGHTS = 2
-
 # Стоимость дополнительных услуг (баня и сибирский чан).
 # Должна совпадать с ценами в шаблоне страницы объекта.
 BANYA_PRICE = 6000
@@ -260,11 +254,19 @@ def validate_booking_params(house, params):
     if end_date <= start_date:
         return 'Дата выезда должна быть позже даты заезда.'
 
-    if (
-        house.id == APARTMENTS_HOUSE_ID
-        and (end_date - start_date).days < APARTMENTS_MIN_NIGHTS
-    ):
-        return 'Апартаменты можно забронировать минимум от 2 ночей.'
+    nights = (end_date - start_date).days
+    if nights < house.min_nights:
+        n = house.min_nights
+        a, b = n % 100, n % 10
+        if a > 10 and a < 20:
+            word = 'ночей'
+        elif b == 1:
+            word = 'ночь'
+        elif 2 <= b <= 4:
+            word = 'ночи'
+        else:
+            word = 'ночей'
+        return f'Минимальный срок бронирования — {n} {word}.'
 
     if guest_count is None or guest_count < 1:
         return 'Укажите количество гостей.'
@@ -355,10 +357,7 @@ class MainView(View):
         if has_pet_bool:
             free_houses_qs = free_houses_qs.filter(pets_allowed=True)
 
-        # Апартаменты бронируются минимум от двух ночей — при коротком
-        # выборе не показываем их в результатах поиска.
-        if nights < APARTMENTS_MIN_NIGHTS:
-            free_houses_qs = free_houses_qs.exclude(id=APARTMENTS_HOUSE_ID)
+        free_houses_qs = free_houses_qs.filter(min_nights__lte=nights)
 
         free_houses = list(free_houses_qs)
 

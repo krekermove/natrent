@@ -1,11 +1,14 @@
 import datetime
+import json
 
 from django.contrib import admin
-from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.urls import path
 
-from .forms import BookingForm, CostForm
 from .models import TimeTable, RentObject, DateObjectCost, Feedback
+
+CLOSED_BY_ADMIN_NAME = 'Закрыто администратором'
 
 
 @admin.register(TimeTable)
@@ -14,9 +17,6 @@ class TimeTableAdmin(admin.ModelAdmin):
 
     change_list_template = 'admin/timetable_changelist.html'
 
-    recently_month = -1
-    recently_year = -1
-
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
@@ -24,99 +24,130 @@ class TimeTableAdmin(admin.ModelAdmin):
         ]
         return my_urls + urls
 
-    def booked_days_counter(self, house_type):
+    def booked_days_counter(self, house_id):
+        """Все занятые даты дома (включая дату выезда) в формате YYYY-MM-DD."""
         booked_days = []
+        for interval in TimeTable.objects.filter(house=house_id):
+            day = interval.startdate
+            while day <= interval.enddate:
+                booked_days.append(day.strftime('%Y-%m-%d'))
+                day += datetime.timedelta(days=1)
+        return booked_days
+
+    def dates_with_cost(self, house_id):
+        return {
+            date_cost.date.strftime('%Y-%m-%d'): date_cost.cost
+            for date_cost in DateObjectCost.objects.filter(house=house_id)
+        }
+
+    def close_dates(self, house, start, end):
+        """Закрывает свободные даты из [start, end], разбивая диапазон на
+        отрезки вокруг уже существующих броней. Возвращает текст ошибки или None."""
+        closed = set()
+        for interval in TimeTable.objects.filter(house=house):
+            day = interval.startdate
+            while day <= interval.enddate:
+                closed.add(day)
+                day += datetime.timedelta(days=1)
+
+        segments = []
+        segment_start = None
+        day = start
+        while day <= end:
+            if day in closed:
+                if segment_start:
+                    segments.append((segment_start, day - datetime.timedelta(days=1)))
+                    segment_start = None
+            elif segment_start is None:
+                segment_start = day
+            day += datetime.timedelta(days=1)
+        if segment_start:
+            segments.append((segment_start, end))
+
+        if not segments:
+            return 'Все выбранные даты уже закрыты.'
+
+        for segment_start, segment_end in segments:
+            closure = TimeTable(
+                name=CLOSED_BY_ADMIN_NAME,
+                phone='—',
+                email='admin@natrent.ru',
+                house=house,
+                startdate=segment_start,
+                enddate=segment_end,
+                guests_amount=1,
+                comment='Даты закрыты через календарь в админке',
+                order_cost=0,
+            )
+            try:
+                closure.save()
+            except ValueError as error:
+                return str(error)
+        return None
+
+    def open_dates(self, house, start, end):
+        """Удаляет все брони и закрытия дома, пересекающиеся с [start, end]."""
+        TimeTable.objects.filter(house=house, startdate__lte=end, enddate__gte=start).delete()
+        return None
+
+    def set_cost(self, house, start, end, cost):
+        """Устанавливает стоимость проживания для каждой даты из [start, end]."""
+        day = start
+        while day <= end:
+            DateObjectCost.objects.update_or_create(date=day, house=house, defaults={'cost': cost})
+            day += datetime.timedelta(days=1)
+        return None
+
+    def calendar_action(self, request):
         try:
-            intervals = TimeTable.objects.filter(house=house_type)
-            for interval in intervals:
-                start_date = interval.startdate
-                booked_days.append(start_date.strftime('%Y-%m-%d'))
-                while start_date < interval.enddate:
-                    start_date += datetime.timedelta(days=1)
-                    booked_days.append(start_date.strftime('%Y-%m-%d'))
-            return booked_days
-        except:
-            return booked_days
+            data = json.loads(request.body)
+            action = data.get('action')
+            house = RentObject.objects.get(id=data.get('house'))
+            start = datetime.date.fromisoformat(data.get('start'))
+            end = datetime.date.fromisoformat(data.get('end'))
+        except (json.JSONDecodeError, RentObject.DoesNotExist, TypeError, ValueError):
+            return JsonResponse({'error': 'Некорректные данные запроса.'}, status=400)
+        if end < start:
+            start, end = end, start
 
-    def dates_with_cost(self, context, house_type):
-        dates = DateObjectCost.objects.filter(house=house_type)
-        context['dates_object_cost'][f"{house_type}"] = {}
-        for date in dates:
-            context['dates_object_cost'][f"{house_type}"][f"{date.date}"] = date.cost
+        if action == 'close':
+            error = self.close_dates(house, start, end)
+        elif action == 'open':
+            error = self.open_dates(house, start, end)
+        elif action == 'set_cost':
+            try:
+                cost = int(data.get('cost'))
+            except (TypeError, ValueError):
+                cost = -1
+            if cost < 0:
+                return JsonResponse({'error': 'Укажите корректную стоимость.'}, status=400)
+            error = self.set_cost(house, start, end, cost)
+        else:
+            return JsonResponse({'error': 'Неизвестное действие.'}, status=400)
 
-    def context_for_timetable_page(self, request):
+        if error:
+            return JsonResponse({'error': error}, status=400)
+        return JsonResponse({
+            'booked_days': self.booked_days_counter(house.id),
+            'dates_object_cost': self.dates_with_cost(house.id),
+        })
+
+    def timetable_calendar_view(self, request):
+        if request.method == 'POST':
+            return self.calendar_action(request)
         objects = RentObject.objects.all()
         context = dict(
             self.admin_site.each_context(request),
+            objects=objects,
+            booked_days_json=json.dumps({str(el.id): self.booked_days_counter(el.id) for el in objects}),
+            dates_object_cost_json=json.dumps({str(el.id): self.dates_with_cost(el.id) for el in objects}),
         )
-        context['booked_days'] = {}
-        context['dates_object_cost'] = {}
-        for el in objects:
-            context[f'booked_days'][f"{el.id}"] = self.booked_days_counter(el.id)
-            self.dates_with_cost(context, el.id)
-        context['objects'] = objects
-        context['length'] = len(objects)
-        context['form'] = BookingForm()
-        context['formCost'] = CostForm()
-        context['month'] = self.recently_month
-        context['year'] = self.recently_year
-        return context
-
-    def timetable_calendar_view(self, request):
-        if request.method == 'GET':
-            context = self.context_for_timetable_page(request)
-            self.recently_month = -1
-            self.recently_year = -1
-            return render(request, "admin/timetable_calendar.html", context=context)
-        elif request.method == 'POST':
-            tmp_month = request.POST.get('month')
-            tmp_year = request.POST.get('year')
-            if tmp_month: self.recently_month = tmp_month
-            if tmp_year: self.recently_year = tmp_year
-            input_date = request.POST.get('date')
-            if input_date:
-                form = CostForm(request.POST)
-                house = request.POST.get('house1')
-                date = datetime.datetime.strptime(input_date, "%Y-%m-%d").date()
-                try:
-                    cost_obj = DateObjectCost.objects.get(date=date, house=house)
-                except:
-                    cost_obj = None
-                if form.is_valid():
-                    if cost_obj:
-                        cost_obj.cost = form.cleaned_data.get('cost')
-                        cost_obj.save()
-                    else:
-                        instance = form.save(commit=False)
-                        instance.date = date
-                        instance.house = RentObject.objects.get(id=house)
-                        instance.cost = form.cleaned_data.get('cost')
-                        instance.save()
-                    return redirect('admin:timetable_calendar')
-                context = self.context_for_timetable_page(request)
-                return render(request, "admin/timetable_calendar.html", context=context)
-            else:
-                form = BookingForm(request.POST)
-                if form.is_valid():
-                    instance = form.save(commit=False)
-                    instance.name = form.cleaned_data.get('name')
-                    instance.phone = form.cleaned_data.get('phone')
-                    instance.email = form.cleaned_data.get('email')
-                    instance.house = form.cleaned_data.get('house')
-                    instance.startdate = form.cleaned_data.get('startdate')
-                    instance.enddate = form.cleaned_data.get('enddate')
-                    instance.guests_amount = form.cleaned_data.get('guests_amount')
-                    instance.comment = form.cleaned_data.get('comment')
-                    instance.order_cost = form.cleaned_data.get('order_cost')
-                    instance.save()
-                    return redirect('admin:timetable_calendar')
-                context = self.context_for_timetable_page(request)
-                return render(request, "admin/timetable_calendar.html", context=context)
+        return render(request, "admin/timetable_calendar.html", context=context)
 
 
 @admin.register(RentObject)
 class RentObjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'address', 'max_guests', 'price', 'pets_allowed')
+    list_display = ('name', 'address', 'max_guests', 'price', 'pets_allowed', 'min_nights')
 
 
 @admin.register(DateObjectCost)

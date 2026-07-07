@@ -20,6 +20,26 @@
     var maxGuestsAttr = parseInt(root.getAttribute('data-max-guests'), 10);
     var guestLimit = (maxGuestsAttr > 0) ? maxGuestsAttr : GUEST_LIMIT;
 
+    // Минимальное количество ночей из data-min-nights (RentObject.min_nights).
+    var minNightsAttr = parseInt(root.getAttribute('data-min-nights'), 10);
+    var minNights = (minNightsAttr > 0) ? minNightsAttr : 1;
+
+    function nightsWord(n) {
+      var a = n % 100, b = n % 10;
+      if (a > 10 && a < 20) return 'ночей';
+      if (b === 1) return 'ночь';
+      if (b >= 2 && b <= 4) return 'ночи';
+      return 'ночей';
+    }
+
+    var calErrors = root.querySelectorAll('[data-cal-error]');
+    function showCalError(msg) {
+      calErrors.forEach(function (e) { e.textContent = msg; e.hidden = false; });
+    }
+    function hideCalError() {
+      calErrors.forEach(function (e) { e.hidden = true; e.textContent = ''; });
+    }
+
     var now = new Date();
     var state = {
       calOpen: false,
@@ -70,10 +90,21 @@
 
     // --- выбор диапазона дат ---
     function pickDate(ms) {
-      if (state.start == null || state.end != null) { state.start = ms; state.end = null; }
-      else if (ms === state.start) { /* без изменений */ }
-      else if (ms < state.start) { state.start = ms; state.end = null; }
-      else { state.end = ms; }
+      if (state.start == null || state.end != null) {
+        state.start = ms; state.end = null; hideCalError();
+      } else if (ms === state.start) { /* без изменений */ }
+      else if (ms < state.start) { state.start = ms; state.end = null; hideCalError(); }
+      else {
+        var nights = Math.round((ms - state.start) / 86400000);
+        if (nights < minNights) {
+          showCalError('Минимальный срок — ' + minNights + ' ' + nightsWord(minNights));
+          renderCalendar();
+          renderLabels();
+          return;
+        }
+        hideCalError();
+        state.end = ms;
+      }
       renderCalendar();
       renderLabels();
     }

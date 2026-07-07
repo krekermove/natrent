@@ -326,7 +326,7 @@
 
           <!-- Виджет бронирования портирован со страницы index.html (booking.js + site.css):
                на мобильных календарь и гости раскрываются нижней шторкой во всю ширину экрана. -->
-          <div id="booking" data-max-guests="{{ house.max_guests }}">
+          <div id="booking" data-max-guests="{{ house.max_guests }}" data-min-nights="{{ house.min_nights }}">
             <form id="bookingForm" class="book-fields" action="{% url 'main:house_detail' house.id %}" method="post">
               {% csrf_token %}
               <input type="hidden" name="guest_count" value="2">
@@ -360,7 +360,7 @@
                   <div class="cal-mobile" data-cal-mobile>
                     <div class="cal-scroll" data-cal-scroll></div>
                     <div class="sheet-foot">
-                      <span class="sheet-foot__note">Минимум 2 ночи</span>
+                      <span class="cal-foot__error" data-cal-error hidden></span>
                       <button type="button" class="sheet-apply" data-action="close-cal">Применить</button>
                     </div>
                   </div>
@@ -392,7 +392,7 @@
                   </div>
 
                   <div class="cal-foot">
-                    <span class="cal-foot__note">Минимум 2 ночи</span>
+                    <span class="cal-foot__error" data-cal-error hidden></span>
                     <button type="button" class="link-btn" data-action="clear-dates">Очистить даты</button>
                   </div>
                 </div>

@@ -73,6 +73,10 @@ class RentObject(models.Model):
         default=False,
         verbose_name="Разрешено с питомцами",
     )
+    min_nights = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Минимальное количество ночей",
+    )
 
     class Meta:
         verbose_name = "Объект аренды"

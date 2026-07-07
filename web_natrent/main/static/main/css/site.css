@@ -98,6 +98,7 @@ html{scrollbar-width:thin;scrollbar-color:var(--accent) #ECEEF0;}
 .cal-wd{font-size:11px;color:#9AA3AC;font-weight:700;height:26px;display:flex;align-items:center;justify-content:center;text-transform:uppercase;letter-spacing:.03em;}
 .cal-foot{margin-top:10px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #F0F2F3;padding-top:12px;}
 .cal-foot__note{font-size:13px;color:#9AA3AC;}
+.cal-foot__error{font-size:13px;color:#c0392b;font-weight:600;}
 .link-btn{background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);font-family:inherit;text-decoration:underline;text-underline-offset:3px;}
 
 /* Ячейки дней */
