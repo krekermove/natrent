@@ -121,6 +121,22 @@
     .nr-day.is-closed .nr-day__num { color: var(--nr-closed-ink); text-decoration: line-through; }
     .nr-day.is-inrange { background: #E7EBEF; border-radius: 0; }
     .nr-day.is-closed.is-inrange { background: #EDDCDC; }
+    /* Граничные даты диапазона: полузаливка в сторону диапазона */
+    .nr-day.is-closed.is-closed-start:not(.is-closed-end) {
+        background: linear-gradient(to right, transparent 50%, var(--nr-closed-bg) 50%);
+    }
+    .nr-day.is-closed.is-closed-start:not(.is-closed-end):hover {
+        background: linear-gradient(to right, #F0F2F4 50%, var(--nr-closed-bg) 50%);
+    }
+    .nr-day.is-closed.is-closed-end:not(.is-closed-start) {
+        background: linear-gradient(to left, transparent 50%, var(--nr-closed-bg) 50%);
+    }
+    .nr-day.is-closed.is-closed-end:not(.is-closed-start):hover {
+        background: linear-gradient(to left, #F0F2F4 50%, var(--nr-closed-bg) 50%);
+    }
+    /* Граничные даты доступны для выбора — без зачёркивания */
+    .nr-day.is-closed-start:not(.is-closed-end) .nr-day__num,
+    .nr-day.is-closed-end:not(.is-closed-start) .nr-day__num { text-decoration: none; }
     .nr-day.is-edge { background: var(--nr-accent); }
     .nr-day.is-edge:hover { background: var(--nr-accent-dark); }
     .nr-day.is-edge .nr-day__num { color: #fff; text-decoration: none; }
@@ -327,6 +343,10 @@
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
     function dateKey(y, m, d) { return y + '-' + pad(m + 1) + '-' + pad(d); }
+    function shiftDay(key, delta) {
+        var d = toDate(key); d.setDate(d.getDate() + delta);
+        return dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+    }
     function toDate(key) {
         var p = key.split('-');
         return new Date(+p[0], +p[1] - 1, +p[2]);
@@ -376,7 +396,11 @@
             btn.className = 'nr-day';
             btn.setAttribute('data-date', key);
 
-            if (bookedSet.has(key)) btn.className += ' is-closed';
+            if (bookedSet.has(key)) {
+                btn.className += ' is-closed';
+                if (!bookedSet.has(shiftDay(key, -1))) btn.className += ' is-closed-start';
+                if (!bookedSet.has(shiftDay(key, 1)))  btn.className += ' is-closed-end';
+            }
             if (key < todayKey) btn.className += ' is-past';
             if (key === todayKey) btn.className += ' is-today';
             if (state.selStart && (key === state.selStart || key === effEnd)) btn.className += ' is-edge';

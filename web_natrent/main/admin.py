@@ -44,22 +44,30 @@ class TimeTableAdmin(admin.ModelAdmin):
         """Закрывает свободные даты из [start, end], разбивая диапазон на
         отрезки вокруг уже существующих броней. Возвращает текст ошибки или None."""
         closed = set()
+        edge_dates = set()
         for interval in TimeTable.objects.filter(house=house):
             day = interval.startdate
             while day <= interval.enddate:
                 closed.add(day)
                 day += datetime.timedelta(days=1)
+            edge_dates.add(interval.startdate)
+            edge_dates.add(interval.enddate)
 
         segments = []
         segment_start = None
         day = start
         while day <= end:
-            if day in closed:
+            # Дата заезда/выезда на границе выбранного диапазона может совпадать
+            # с датой выезда/заезда существующей брони — такой день включается в
+            # новый сегмент, а не пропускается.
+            is_shared_boundary = (day == start or day == end) and (day in edge_dates)
+            if day in closed and not is_shared_boundary:
                 if segment_start:
                     segments.append((segment_start, day - datetime.timedelta(days=1)))
                     segment_start = None
-            elif segment_start is None:
-                segment_start = day
+            else:
+                if segment_start is None:
+                    segment_start = day
             day += datetime.timedelta(days=1)
         if segment_start:
             segments.append((segment_start, end))
