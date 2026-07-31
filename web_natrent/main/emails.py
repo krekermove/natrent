@@ -1,10 +1,13 @@
 import logging
 from zoneinfo import ZoneInfo
 
+from celery import shared_task
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.urls import reverse
+
+from .models import TimeTable
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +45,8 @@ def build_booking_number(booking):
     return f'{created_local:%Y%m%d}-{booking.house_id:05d}-{booking.pk:09d}'
 
 
-def build_booking_email_context(booking, request=None):
-    if request:
-        site_url = request.build_absolute_uri('/')
-    else:
-        site_url = getattr(settings, 'NATRENT_SITE_URL', 'https://natrent.ru/')
+def build_booking_email_context(booking):
+    site_url = getattr(settings, 'NATRENT_SITE_URL', 'https://natrent.ru/')
 
     nights = (booking.enddate - booking.startdate).days
 
@@ -74,8 +74,13 @@ def build_booking_email_context(booking, request=None):
     }
 
 
-def send_booking_confirmation_email(booking, request=None):
-    context = build_booking_email_context(booking, request)
+@shared_task(retry_backoff=True, retry_kwargs={'max_retries': 5})
+def send_booking_confirmation_email(booking_id):
+    try:
+        booking = TimeTable.objects.get(id=booking_id)
+    except:
+        booking = None
+    context = build_booking_email_context(booking)
     subject = f'Подтверждение бронирования № {context["booking_number"]}'
     html_body = render_to_string('main/emails/booking_confirmation.html', context)
     text_body = render_to_string('main/emails/booking_confirmation.txt', context)

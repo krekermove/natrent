@@ -648,7 +648,7 @@ class BookHouseView(View):
             return self.render_booking_page(request, house, params, form_data)
 
         try:
-            send_booking_confirmation_email(booking, request)
+            send_booking_confirmation_email.delay(booking.id)
         except Exception:
             logger.exception(
                 'Не удалось отправить письмо с подтверждением бронирования %s',

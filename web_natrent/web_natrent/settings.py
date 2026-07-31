@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,6 +35,19 @@ CSRF_TRUSTED_ORIGINS = [
     "https://natrent.ru",
     "https://www.natrent.ru",
 ]
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
+
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_ENABLE_UTC = True
+
+CELERY_BEAT_SCHEDULE = {
+    "scheduled_task": {
+        "task": "main.tasks.scheduled_task",
+        "schedule": crontab(hour=12, minute=10)
+    }
+}
 
 # Application definition
 

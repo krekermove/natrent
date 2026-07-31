@@ -41,6 +41,21 @@ services:
       timeout: 5s
       retries: 5
 
+  celery:
+    build:
+      context: ./web_natrent
+    command: celery --app=web_natrent worker -B --loglevel=info --logfile=logs/celery.log
+    volumes:
+      - ./web_natrent:/usr/src/app/
+    env_file:
+      - .env
+    depends_on:
+      - web
+      - redis
+
+  redis:
+    image: redis:7-alpine
+
 volumes:
   postgres_data:
   static_volume:
